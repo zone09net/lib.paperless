@@ -18,10 +18,11 @@
 		"watch": true,
 		"declaration": true,
 		"declarationMap": true,
-		"outDir": "./.dist",
+		"outDir": "../www.zone09.net/public/js/dev",
 		"baseUrl": "../",
 		"paths": {
 			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
+			"@zone09.net/paperless": ["lib.paperless/src/lib.paperless.ts"],
 		},
 	},
 
@@ -31,7 +32,7 @@
 	 },
 
 	"include": [
-		"./src/lib.paperless.ts"
+		"./src/demo.paperless.ts"
 	],
 
 	"exclude": [
