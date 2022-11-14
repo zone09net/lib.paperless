@@ -1,4 +1,5 @@
 import {Point} from '../Point.js';
+import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
 import {IDrawableAttributes} from '../IDrawable.js';
 
@@ -29,6 +30,8 @@ export class Line extends Drawable
 			this._point2 = new Point(point1.x, point1.y);
 		}
 
+		this.size = new Size(0, 0);
+
 		if(generate)
 			this.generate();
 	}
@@ -57,7 +60,9 @@ export class Line extends Drawable
 		this.path.lineTo(points[1].x, points[1].y);
 
 		this.points = points;
-		this.boundaries = { topleft: new Point(points[0].x, points[0].y), bottomright: new Point(points[1].x, points[1].y) }
+		this.boundaries = { topleft: new Point(points[0].x, points[0].y), bottomright: new Point(points[1].x, points[1].y) };
+
+		this.size = new Size(points[1].x - points[0].x, points[1].y - points[0].y);
 	}
 
 	public draw(context2D: CanvasRenderingContext2D): void
