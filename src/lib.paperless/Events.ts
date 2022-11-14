@@ -48,7 +48,7 @@ export class Events
 				{
 					if(control.drawable.isHover(stage.cursor.current))
 					{
-						if(!control.drawable.hover)
+						if(!control.drawable.hover && control.drawable.hoverable)
 							refresh = true;
 
 						isHovers.push({ object: control, refresh: !control.drawable.hover ? true : false, sticky: control.drawable.sticky});
@@ -56,7 +56,7 @@ export class Events
 					}
 					else
 					{
-						if(control.drawable.hover)
+						if(control.drawable.hover && control.drawable.hoverable)
 							refresh = true;
 
 						notHovers.push({ object: control, refresh: control.drawable.hover ? true : false });

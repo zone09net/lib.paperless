@@ -39,6 +39,7 @@ export class Drawable
 	private _boundaries: {topleft: Point, bottomright: Point};
 	private _sticky: boolean;
 	private _removable: boolean;
+	private _hoverable: boolean;
 	private _offset: {x?: number, y?: number};
 	//---
 
@@ -61,6 +62,7 @@ export class Drawable
 			autodraw = true,
 			sticky = false,
 			removable = true,
+			hoverable = true,
 			offset = {x: 0, y: 0}
 		} = attributes;
 
@@ -78,6 +80,7 @@ export class Drawable
 		this._autodraw = autodraw;
 		this._sticky = sticky;
 		this._removable = removable;
+		this._hoverable = hoverable;
 		this._offset = offset;
 	}
 
@@ -366,6 +369,15 @@ export class Drawable
 	public set removable(removable: boolean)
 	{
 		this._removable = removable;
+	}
+
+	public get hoverable(): boolean
+	{
+		return this._hoverable;
+	}
+	public set hoverable(hoverable: boolean)
+	{
+		this._hoverable = hoverable;
 	}
 
 	public get offset(): {x?: number, y?: number}

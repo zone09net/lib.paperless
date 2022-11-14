@@ -60,6 +60,8 @@ export interface IDrawableAttributes
 	 */
 	removable?: boolean,
 
+	hoverable?: boolean,
+
 	generate?: boolean,
 
 	offset?: {x?: number, y?: number}
