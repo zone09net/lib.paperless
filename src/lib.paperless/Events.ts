@@ -97,6 +97,14 @@ export class Events
 
 	public static handleMouseDown(context: Context, stage: stage, event: HTMLElementEventMap['mousedown']): void
 	{
+		stage.view.canvas.main.dispatchEvent(new MouseEvent("mousemove", {
+			view: event.view,
+			bubbles: true,
+			cancelable: true,
+			clientX: event.clientX,
+			clientY: event.clientY
+		}));
+
 		event.preventDefault();
 
 		stage.cursor.clicked = new Point(stage.cursor.current.x - stage.view.offset, stage.cursor.current.y - stage.view.offset);
