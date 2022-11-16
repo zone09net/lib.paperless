@@ -572,10 +572,16 @@ export class Context
 		this._drawables.sorted.forEach((entry: any) => {
 			if((!this._stage.states.drag /*|| !this._stage.view.animated.includes(entry[0])*/) && entry[1].object.visible && entry[1].object.autodraw)
 			{
-				if(entry[1].object.sticky)
-					drawables.push(entry[1].object);
-				else
-					entry[1].object.draw(this._stage.view.context.buffer);
+				if(entry[1].object.point.x > -entry[1].object.size.width &&
+					entry[1].object.point.x < this._stage.view.canvas.buffer.width + entry[1].object.size.width &&
+					entry[1].object.point.y > -entry[1].object.size.height &&
+					entry[1].object.point.y < this._stage.view.canvas.buffer.height + entry[1].object.size.height)
+				{
+					if(entry[1].object.sticky)
+						drawables.push(entry[1].object);
+					else
+						entry[1].object.draw(this._stage.view.context.buffer);
+				}
 			}
 		});
 
