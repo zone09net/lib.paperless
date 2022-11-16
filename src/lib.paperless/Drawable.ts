@@ -62,7 +62,7 @@ export class Drawable
 			autodraw = true,
 			sticky = false,
 			removable = true,
-			hoverable = true,
+			hoverable = false,
 			offset = {x: 0, y: 0}
 		} = attributes;
 
