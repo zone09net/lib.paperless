@@ -38,23 +38,17 @@ export class Rectangle extends Drawable
 			ctx.closePath();
 		}
 		*/
-
-		let points: Array<Point> = [];
+		
 		let point: Point = new Point(-this.size.width / 2, -this.size.height / 2);
-
-		points[0] = new Point(point.x, point.y);
-		points[1] = new Point(point.x + this.size.width, point.y);
-		points[2] = new Point(point.x + this.size.width, point.y + this.size.height);
-		points[3] = new Point(point.x, point.y + this.size.height);
+		let points: Array<Point> = [
+			new Point(point.x, point.y),
+			new Point(point.x + this.size.width, point.y),
+			new Point(point.x + this.size.width, point.y + this.size.height),
+			new Point(point.x, point.y + this.size.height),
+		];
 
 		this.clearPath();
 		this.path.rect(points[0].x, points[0].y, this.size.width, this.size.height);
-		/*
-		this.path.moveTo(points[0].x, points[0].y);
-		for(let i: number = 1; i < points.length; i++)
-			this.path.lineTo(points[i].x, points[i].y);
-		this.path.lineTo(points[0].x, points[0].y - 1);
-		*/
 
 		this.points = points;
 		this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x + (this.size.width / 2), this.point.y + (this.size.height / 2)) }
