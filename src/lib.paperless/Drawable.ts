@@ -86,7 +86,7 @@ export class Drawable
 
 	public generate(): void {}
 
-	public draw(context2D: CanvasRenderingContext2D): void {}
+	public draw(context2D: OffscreenCanvasRenderingContext2D): void {}
 
 	public isHover(point: Point): boolean
 	{

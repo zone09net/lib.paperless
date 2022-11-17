@@ -13,6 +13,7 @@ import {Fx} from './Fx.js';
 
 
 interface IAttributes {
+	fillcolor?: string,
 	stageScale?: number,
 	stageSize?: Size,
 	stageOffset?: number,
@@ -25,23 +26,14 @@ interface IAttributes {
 
 type view = {
 	canvas: {
-		buffer: HTMLCanvasElement,
+		buffer: OffscreenCanvas,
 		main: HTMLCanvasElement
 	},
 	context:  {
-		buffer: CanvasRenderingContext2D,
-		main: CanvasRenderingContext2D
+		buffer: OffscreenCanvasRenderingContext2D,
+		main: ImageBitmapRenderingContext
 	},
-	/*
-	main: {
-		canvas: HTMLCanvasElement,
-		context: CanvasRenderingContext2D,
-	},
-	buffer: {
-		canvas: HTMLCanvasElement,
-		context: CanvasRenderingContext2D,
-	},
-	*/
+	fillcolor: string,
 	size: Size,
 	autosize: boolean,
 	offset: number,
@@ -102,6 +94,7 @@ export class Context
 	public constructor(attributes: IAttributes = {})
 	{
 		const {
+			fillcolor = '#000000',
 			stageScale = 1,
 			stageSize = new Size(window.innerWidth, window.innerHeight),
 			stageOffset = 0,
@@ -115,23 +108,15 @@ export class Context
 		this._stage = {
 			view: {
 				canvas: {
-					buffer: document.createElement("canvas"),
+					buffer: new OffscreenCanvas(0, 0), //document.createElement("canvas"),
 					main: document.createElement("canvas")
 				},
 				context: {
 					buffer: undefined,
 					main: undefined
 				},
-				/*
-				main: {
-					canvas: document.createElement("canvas"),
-					context: undefined,
-				},
-				buffer: {
-					canvas: document.createElement("canvas"),
-					context: undefined,
-				},
-				*/
+
+				fillcolor: fillcolor,
 				size: new Size(stageSize.width, stageSize.height),
 				autosize: autosize,
 				offset: stageOffset,
@@ -165,8 +150,8 @@ export class Context
 			}
 		}
 
-		this._stage.view.context.main = this._stage.view.canvas.main.getContext("2d");
-		this._stage.view.context.buffer = this._stage.view.canvas.buffer.getContext("2d");
+		this._stage.view.context.main = this._stage.view.canvas.main.getContext("bitmaprenderer", {alpha: false});
+		this._stage.view.context.buffer = this._stage.view.canvas.buffer.getContext("2d", {alpha: false});
 		this.size = this._stage.view.size;
 
 		this._stage.view.canvas.main.addEventListener("mousemove", Events.handleMouseMove.bind(null, this, this._stage), false);
@@ -423,14 +408,15 @@ export class Context
 
 	private clearBuffer(): void
 	{
-		this._stage.view.context.buffer.clearRect(-this._stage.view.offset, -this._stage.view.offset, this._stage.view.canvas.main.width + this._stage.view.offset, this._stage.view.canvas.main.height + this._stage.view.offset);
+		this._stage.view.context.buffer.fillStyle = this._stage.view.fillcolor;
+		this._stage.view.context.buffer.fillRect(-this._stage.view.offset, -this._stage.view.offset, this._stage.view.canvas.main.width + this._stage.view.offset, this._stage.view.canvas.main.height + this._stage.view.offset);
 		this._stage.view.context.buffer.scale(this._stage.view.scale, this._stage.view.scale);
 	}
 
 	private fillMain(): void
 	{
-		this._stage.view.context.main.clearRect(-this._stage.view.offset, -this._stage.view.offset, this._stage.view.canvas.main.width + this._stage.view.offset, this._stage.view.canvas.main.height + this._stage.view.offset);
-		this._stage.view.context.main.drawImage(this._stage.view.canvas.buffer, 0, 0);
+		let bitmap = this._stage.view.canvas.buffer.transferToImageBitmap();
+		this._stage.view.context.main.transferFromImageBitmap(bitmap);
 	}
 
 	public drag(context: Context, control: Control): void
@@ -725,7 +711,7 @@ export class Context
 	/**
 	 * Gets the CanvasRenderingContext2D objet of the canvas. Paperless is using a buffer so this accessor always return the buffer context.
 	 */
-	public get context2D(): CanvasRenderingContext2D
+	public get context2D(): OffscreenCanvasRenderingContext2D
 	{
 		return this._stage.view.context.buffer;
 	}
@@ -762,8 +748,6 @@ export class Context
 
 		this._stage.view.canvas.main.style.width = this._stage.view.canvas.main.width / ratio + 'px';
 		this._stage.view.canvas.main.style.height = this._stage.view.canvas.main.height / ratio + 'px';
-		this._stage.view.canvas.buffer.style.width = this._stage.view.canvas.buffer.width / ratio + 'px';
-		this._stage.view.canvas.buffer.style.height = this._stage.view.canvas.buffer.height / ratio + 'px';
 
 		this._stage.view.context.buffer.translate(this._stage.view.offset, this._stage.view.offset);
 		this.refresh();

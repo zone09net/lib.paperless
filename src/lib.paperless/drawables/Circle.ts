@@ -57,7 +57,7 @@ export class Circle extends Drawable
 		this.boundaries = { topleft: new Point(this.point.x - this._outerRadius, this.point.y - this._outerRadius), bottomright: new Point(this.point.x + this._outerRadius, this.point.y + this._outerRadius) }
 	}
 
-	public draw(context2D: CanvasRenderingContext2D): void
+	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
 		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);

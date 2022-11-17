@@ -23,6 +23,8 @@
 		"paths": {
 			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
 		},
+		"typeRoots": ["./types"],
+		"types": ["OffscreenCanvas"],
 	},
 
 	"tsc-alias": {

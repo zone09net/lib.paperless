@@ -270,7 +270,7 @@ export class Label extends Drawable
 		this._image.src = this._canvas.toDataURL('image/png');
 	}
 
-	public draw(context2D: CanvasRenderingContext2D): void
+	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
 		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);

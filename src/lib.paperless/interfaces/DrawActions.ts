@@ -8,8 +8,8 @@ export class DrawActions
 	private _guid: string = '';
 	//---
 
-	public onDrawBefore(context2D: CanvasRenderingContext2D): void {}
-	public onDrawAfter(context2D: CanvasRenderingContext2D): void {}
+	public onDrawBefore(context2D: OffscreenCanvasRenderingContext2D): void {}
+	public onDrawAfter(context2D: OffscreenCanvasRenderingContext2D): void {}
 	public onAttach(): void {}
 	public onDetach(): void {}
 

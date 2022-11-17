@@ -52,7 +52,7 @@ export class Hexagon extends Drawable
 		this.boundaries = { topleft: new Point(this.point.x - this._radius, this.point.y - ybounding), bottomright: new Point(this.point.x + this._radius, this.point.y + ybounding) }
 	}
 
-	public draw(context2D: CanvasRenderingContext2D): void
+	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
 		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);

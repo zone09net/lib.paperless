@@ -65,7 +65,7 @@ export class Line extends Drawable
 		this.size = new Size(points[1].x - points[0].x, points[1].y - points[0].y);
 	}
 
-	public draw(context2D: CanvasRenderingContext2D): void
+	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
 		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);

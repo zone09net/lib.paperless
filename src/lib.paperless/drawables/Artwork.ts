@@ -63,7 +63,7 @@ export class Artwork extends Rectangle
 		this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x + (this.size.width / 2), this.point.y + (this.size.height / 2)) }
 	}
 	
-	public draw(context2D: CanvasRenderingContext2D): void
+	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		if(this.points.length > 0)
 		{

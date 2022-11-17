@@ -39,7 +39,7 @@ export class Smiley extends Paperless.Drawable
 		this.boundaries = { topleft: new Paperless.Point(this.point.x - this._radius, this.point.y - this._radius), bottomright: new Paperless.Point(this.point.x + this.radius, this.point.y + this._radius) }
 	}
 
-	public draw(context2D: CanvasRenderingContext2D): void
+	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
 		context2D.translate(this.point.x, this.point.y);
