@@ -153,17 +153,8 @@ export class Events
 							context.draw();
 							stage.drag.diff = new Point(stage.cursor.current.x - drawable.point.x, stage.cursor.current.y - drawable.point.y);
 
-							if(group)
-							{
-								let filtered: Array<{guid: string, map: Map<string, any>}> = context.getDrawables().filter(([guid, map]: any) =>
-									map.object.group == group.guid 
-								);
-								filtered.forEach((map: any) => {
-									map[1].object.toFront();
-								});
-							}
-							else
-								drawable.toFront();
+
+							drawable.toFront();
 
 							context.setFocus(control.guid);
 							control.onDragBegin();
