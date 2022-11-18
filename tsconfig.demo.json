@@ -24,6 +24,8 @@
 			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
 			"@zone09.net/paperless": ["lib.paperless/src/lib.paperless.ts"],
 		},
+		"typeRoots": ["./types"],
+		"types": ["OffscreenCanvas"],
 	},
 
 	"tsc-alias": {
