@@ -34,10 +34,10 @@ export class Events
 		{
 			let filtered: Array<{guid: string, map: Map<string, any>}> = context.getControls().filter(([guid, map]: any) =>
 				(stage.cursor.radius ? (
-					map.object.drawable.point.x + map.object.drawable.offset.x >= stage.cursor.current.x - stage.cursor.radius &&
-					map.object.drawable.point.y + map.object.drawable.offset.y >= stage.cursor.current.y - stage.cursor.radius &&
-					map.object.drawable.point.x + map.object.drawable.offset.x <= stage.cursor.current.x + stage.cursor.radius &&
-					map.object.drawable.point.y + map.object.drawable.offset.y <= stage.cursor.current.y + stage.cursor.radius ) : true) &&
+					map.object.drawable.matrix.e + map.object.drawable.offset.x >= stage.cursor.current.x - stage.cursor.radius &&
+					map.object.drawable.matrix.f + map.object.drawable.offset.y >= stage.cursor.current.y - stage.cursor.radius &&
+					map.object.drawable.matrix.e + map.object.drawable.offset.x <= stage.cursor.current.x + stage.cursor.radius &&
+					map.object.drawable.matrix.f + map.object.drawable.offset.y <= stage.cursor.current.y + stage.cursor.radius ) : true) &&
 				map.object.drawable ? map.object.drawable.visible == true : true
 			);
 
@@ -150,8 +150,8 @@ export class Events
 								//stage.drag.excluded.push(drawable.guid);
 
 
-							context.draw();
-							stage.drag.diff = new Point(stage.cursor.current.x - drawable.point.x, stage.cursor.current.y - drawable.point.y);
+							//context.draw();
+							stage.drag.diff = new Point(stage.cursor.current.x - drawable.matrix.e, stage.cursor.current.y - drawable.matrix.f);
 
 
 							drawable.toFront();

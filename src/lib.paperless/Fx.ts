@@ -49,9 +49,11 @@ export class Fx
 			loop = false,
 			effect,
 			nogroup = false,
-			smuggler = { ease: Fx.easeLinear, angle: 0, distance: 0, scale: {x: 1, y: 1} },
+			smuggler = { ease: Fx.easeLinear, angle: 0, distance: 0, scale: {x: 1, y: 1}, data: {} },
 			complete = null,
 			t0 = new Date().getTime(),
+			t1 = true,
+			t9 = false,
 			t = 0        
 		} = fx;
 		
@@ -64,9 +66,11 @@ export class Fx
 					duration: duration,
 					loop: loop,
 					effect: effect,
-					smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale },
+					smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: {} },
 					complete: (i == 0 ? complete : null),
 					t0: t0,
+					t1: t1,
+					t9: t9,
 					t: t
 				});
 			}
@@ -86,9 +90,11 @@ export class Fx
 						duration: duration,
 						loop: loop,
 						effect: effect,
-						smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale },
+						smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: {} },
 						complete: (map[1].index == 1 ? complete : null),
 						t0: t0,
+						t1: t1,
+						t9: t9,
 						t: t
 					});
 				});
@@ -103,6 +109,8 @@ export class Fx
 					smuggler: smuggler,
 					complete: complete,
 					t0: t0,
+					t1: t1,
+					t9: t9,
 					t: t
 				});
 			}
@@ -120,7 +128,10 @@ export class Fx
 			this._stack[i].t = (1 / this._stack[i].duration * (new Date().getTime() - this._stack[i].t0));
 
 			if(this._stack[i].t > 1)
+			{
 				this._stack[i].t = 1;
+				this._stack[i].t9 = true;
+			}
 
 			if(typeof this._stack[i].effect === 'function')
 				this._stack[i].effect(this._stack[i]);
@@ -129,18 +140,16 @@ export class Fx
 			{				
 				if(typeof this._stack[i].complete === 'function')
 					this._stack[i].complete(this._stack[i]);
-
+								
 				// Removing entry in the stack if not looping
 				if(this._stack[i].loop)
 				{
 					this._stack[i].t = 0;
 					this._stack[i].t0 = new Date().getTime();
+					this._stack[i].t1 = true;
 				}
 				else
-				{
-					this._id = window.requestAnimationFrame(() => this.loop());
 					this._stack.splice(i, 1);
-				}
 
 				// Don't call requestAnimationFrame if the Stack is empty
 				if(this._stack.length === 0)
@@ -153,8 +162,10 @@ export class Fx
 
 		if(this._stack.length > 0)
 		{
-			(<Drawable>this._stack[0].drawable).context.refresh();
-			this._id = window.requestAnimationFrame(() => this.loop());
+			this._id = window.requestAnimationFrame(() => { 
+				this.loop(); 
+				(<Drawable>this._stack[0].drawable).context.draw(); 
+			});
 		}
 	}
 
@@ -172,60 +183,95 @@ export class Fx
 
 	public rotate(fx: IFx): void
 	{
-		let direction: number = Math.sign(fx.smuggler.angle);
-		let angle: number = Math.abs(fx.smuggler.ease(fx.t) * fx.smuggler.angle);
+		let ease: number = fx.smuggler.ease(fx.t);
+		let degree: number = ease * fx.smuggler.angle;
 
-		if(fx.smuggler.origin == undefined)
-			fx.smuggler.origin = (<Drawable>fx.drawable).rotation;
-
-		if(direction == -1)
+		if(fx.t1)
 		{
-			(<Drawable>fx.drawable).rotation = (fx.smuggler.origin as number) - angle;
-			if((<Drawable>fx.drawable).rotation < 0)
-			(<Drawable>fx.drawable).rotation = 360 - Math.abs((<Drawable>fx.drawable).rotation);
-		}
-		else
-		{
-			(<Drawable>fx.drawable).rotation = (fx.smuggler.origin as number) + angle;
-			if((<Drawable>fx.drawable).rotation > 360)
-			(<Drawable>fx.drawable).rotation = (<Drawable>fx.drawable).rotation - 360;
+			fx.t1 = false;
+			fx.smuggler.data = {
+				delta: 0,
+				degree: 0,
+				angle: {
+					last: 0,
+					current: 0
+				}
+			};
 		}
 
-		(<Drawable>fx.drawable).draw((<Drawable>fx.drawable).context.context2D);
+		fx.smuggler.data.angle.last = fx.smuggler.data.angle.current;
+		fx.smuggler.data.angle.current = ease * fx.smuggler.angle;
+
+		//console.log(fx.smuggler.data.angle.current - fx.smuggler.data.angle.last)
+		//fx.smuggler.data.delta = degree - fx.smuggler.data.degree;
+		//fx.smuggler.data.degree = degree;
+
+		let rad: number = (Math.PI / 180) * (fx.smuggler.data.angle.current - fx.smuggler.data.angle.last);
+		let sin: number = Math.sin(rad);
+		let cos: number = Math.cos(rad);
+
+		(<Drawable>fx.drawable).matrix.multiplySelf(DOMMatrix.fromMatrix({a: cos, b: sin, c: -sin, d: cos, e: 0, f: 0}));
 	}
 
-	public move(fx: IFx): void
+	public translate(fx: IFx): void
 	{
-		let radian: number = (fx.smuggler.angle + 90) * Math.PI / 180;
-		let distance: number = fx.smuggler.ease(fx.t) * fx.smuggler.distance;
+		let ease: number = fx.smuggler.ease(fx.t);
+		let distance: number = ease * fx.smuggler.distance;
 
-		if(fx.smuggler.origin == undefined)
-			fx.smuggler.origin = new Point((<Drawable>fx.drawable).point.x, (<Drawable>fx.drawable).point.y);
+		if(fx.t1)
+		{
+			let rad: number = (Math.PI / 180) * (fx.smuggler.angle);
+			let sin: number = Math.sin(rad);
+			let cos: number = Math.cos(rad);
 
-		(<Drawable>fx.drawable).point.x = (fx.smuggler.origin as Point).x + Math.round((distance * Math.sin(radian)));
-		(<Drawable>fx.drawable).point.y = (fx.smuggler.origin as Point).y - Math.round((distance * Math.cos(radian)));
-		(<Drawable>fx.drawable).draw((<Drawable>fx.drawable).context.context2D);
+			fx.t1 = false;
+			fx.smuggler.data = {
+				delta: 0,
+				distance: 0,
+				sin: sin,
+				cos: cos
+			};
+		}
+
+		fx.smuggler.data.delta = distance - fx.smuggler.data.distance;
+		fx.smuggler.data.distance = distance;
+		
+		(<Drawable>fx.drawable).matrix.preMultiplySelf(DOMMatrix.fromMatrix({a: 1, b: 0, c: 0, d: 1, e: fx.smuggler.data.cos * fx.smuggler.data.delta, f: fx.smuggler.data.sin * fx.smuggler.data.delta}));
+		
+		if(fx.t9)
+		{
+			(<Drawable>fx.drawable).matrix.e = Math.round((<Drawable>fx.drawable).matrix.e);
+			(<Drawable>fx.drawable).matrix.f = Math.round((<Drawable>fx.drawable).matrix.f);
+		}
 	}
 
 	public scale(fx: IFx): void
 	{
-		if(fx.smuggler.originx == undefined)
-		{
-			fx.smuggler.originx = (<Drawable>fx.drawable).scale.x;
-			fx.smuggler.originy = (<Drawable>fx.drawable).scale.y;
+		let ease: number = fx.smuggler.ease(fx.t);
 
-			fx.smuggler.startx = (<Drawable>fx.drawable).scale.x;
-			fx.smuggler.endx = (<Drawable>fx.drawable).scale.x;
-			fx.smuggler.starty = (<Drawable>fx.drawable).scale.y;
-			fx.smuggler.endy = (<Drawable>fx.drawable).scale.y;
+		if(fx.t1)
+		{
+			fx.t1 = false;
+			fx.smuggler.data = {
+				delta: {
+					current: {x: 0, y: 0},
+					last: {x: 0, y: 0},
+				},
+			};
 		}
 
-		let scalex = fx.smuggler.ease(fx.t) * (fx.smuggler.endx - fx.smuggler.startx) + fx.smuggler.originx;
-		let scaley = fx.smuggler.ease(fx.t) * (fx.smuggler.endy - fx.smuggler.starty) + fx.smuggler.originy;
+		fx.smuggler.data.delta.last = fx.smuggler.data.delta.current;
+		fx.smuggler.data.delta.current = {x: ease * fx.smuggler.scale.x, y: ease * fx.smuggler.scale.y};
 
-		(<Drawable>fx.drawable).scale.x = scalex;
-		(<Drawable>fx.drawable).scale.y = scaley;
-		(<Drawable>fx.drawable).draw((<Drawable>fx.drawable).context.context2D);
+		let scale: {x: number, y: number} = (<Drawable>fx.drawable).scale;
+		let diff: {x: number, y: number} = {x: fx.smuggler.data.delta.current.x - fx.smuggler.data.delta.last.x, y: fx.smuggler.data.delta.current.y - fx.smuggler.data.delta.last.y};
+		let adjust: {x: number, y: number} = {x: (scale.x - 1) + diff.x, y: (scale.y - 1) + diff.y};
+
+		let rad: number = (<Drawable>fx.drawable).rad;
+		let sin: number = Math.sin(rad);
+		let cos: number = Math.cos(rad);
+
+		(<Drawable>fx.drawable).matrix = new DOMMatrix([cos * (1 + adjust.x) || 0, sin * (1 + adjust.x) || 0, -sin * (1 + adjust.y) || 0, cos * (1 + adjust.y) || 0, (<Drawable>fx.drawable).matrix.e, (<Drawable>fx.drawable).matrix.f]);
 	}
 
 	/**

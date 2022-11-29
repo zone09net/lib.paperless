@@ -45,7 +45,7 @@ export interface IDrawableAttributes
 	/**
 	 * Determines the rotation values of the [[Drawable]] at the [[Context]] draw phase. Can be from 0 to 360 degrees.
 	 */
-	rotation?: number,
+	 angle?: number,
 	/**
 	 * @fixme					What is the use of that?
 	 */

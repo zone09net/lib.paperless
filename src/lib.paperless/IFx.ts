@@ -63,6 +63,10 @@ export interface IFx {
 	/** @ignore */
 	t0?: number,
 
+	t1?: boolean,
+
+	t9?: boolean,
+	
 	/** 
 	 * This variable represents the current time of the annimation depending on the [[duration]] that was given. The time goes from 0 to 1 and is calculated internaly.
 	 */
@@ -101,22 +105,7 @@ export interface IFx {
 	/** Used with the [[scale]] effect, it is the x and y scale that will be modified on the [[Drawable]]. */
 	scale?: {x: number, y: number},
 
-	/** Used to pass custom argument(s) to an home made [[effect]] callback function. */ 
-	custom?: any,
-
-	/** @ignore */
-	origin?: number | Point,
-	/** @ignore */
-	originx?: number,
-	/** @ignore */
-	originy?: number,
-	/** @ignore */
-	startx?: number,
-	/** @ignore */
-	endx?: number,
-	/** @ignore */
-	starty?: number,
-	/** @ignore */
-	endy?: number
+	/** Used to pass custom data to an [[effect]] callback function. */ 
+	data?: any,
 }
 

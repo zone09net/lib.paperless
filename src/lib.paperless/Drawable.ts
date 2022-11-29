@@ -23,7 +23,7 @@ export class Drawable
 	private _alpha: number;
 	private _visible: boolean;
 	private _scale: {x: number, y: number};
-	private _rotation: number;
+	private _angle: number;
 	private _nofill: boolean;
 	private _nostroke: boolean;
 	private _size: Size = null;
@@ -41,6 +41,7 @@ export class Drawable
 	private _removable: boolean;
 	private _hoverable: boolean;
 	private _offset: {x?: number, y?: number};
+	private _matrix: DOMMatrix = new DOMMatrix([1, 0, 0, 1, 0, 0]);
 	//---
 
 	public constructor(point: Point, attributes: IDrawableAttributes = {})
@@ -58,7 +59,7 @@ export class Drawable
 			alpha = 1,
 			visible = true,
 			scale = {x: 1, y: 1},
-			rotation = 0,
+			angle = 0,
 			autodraw = true,
 			sticky = false,
 			removable = true,
@@ -76,12 +77,18 @@ export class Drawable
 		this._alpha = alpha;
 		this._visible = visible;
 		this._scale = scale;
-		this._rotation = rotation;
+		this._angle = angle;
 		this._autodraw = autodraw;
 		this._sticky = sticky;
 		this._removable = removable;
 		this._hoverable = hoverable;
 		this._offset = offset;
+
+		let rad: number = (Math.PI / 180) * angle;
+		let sin: number = Math.sin(rad);
+		let cos: number = Math.cos(rad);
+
+		this._matrix = new DOMMatrix([cos * scale.x, sin * scale.x, -sin * scale.y, cos * scale.y, point.x, point.y]);
 	}
 
 	public generate(): void {}
@@ -94,9 +101,8 @@ export class Drawable
 		let context2D = this.context.context2D;
 
 		context2D.save();
-		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);
-		context2D.rotate((Math.PI / 180) * this.rotation);
-		context2D.scale(this._scale.x, this._scale.y);
+		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e, this.matrix.f);
+
 		context2D.lineWidth = this.linewidth;
 
 		if(context2D.isPointInPath(this.path, point.x, point.y) || context2D.isPointInStroke(this.path, point.x, point.y))
@@ -199,6 +205,8 @@ export class Drawable
 	public set point(point: Point)
 	{
 		this._point = point;
+		this._matrix.e = point.x;
+		this._matrix.f = point.y;
 	}
 
 	public get points(): Array<Point>
@@ -227,6 +235,7 @@ export class Drawable
 	{
 		this._shadow = shadow;
 	}
+
 	public get shadowcolor(): string
 	{
 		return this._shadowcolor;
@@ -263,15 +272,6 @@ export class Drawable
 		this._linewidth = linewidth;
 	}
 
-	public get rotation(): number
-	{
-		return this._rotation;
-	}
-	public set rotation(rotation: number)
-	{
-		this._rotation = rotation;
-	}
-
 	public get alpha(): number
 	{
 		return this._alpha;
@@ -290,6 +290,34 @@ export class Drawable
 		this._visible = visible;
 	}
 
+	public get rad(): number
+	{
+		return Math.atan2(this.matrix.b, this.matrix.a);
+	}
+
+	public get angle(): number
+	{
+		let rad: number = this.rad;
+		let angle: number = Math.round(rad * (180 / Math.PI));
+		if (rad < 0)
+			angle += 360; 
+
+		return angle;
+	}
+	public set angle(angle: number)
+	{
+		let scale: {x: number, y: number} = this.scale;
+		let rad: number = (Math.PI / 180) * angle;
+		let sin: number = Math.sin(rad);
+		let cos: number = Math.cos(rad);
+
+		this._angle = angle;
+		this._matrix.a = cos * scale.x;
+		this._matrix.b = sin * scale.x;
+		this._matrix.c = -sin * scale.y;
+		this._matrix.d = cos * scale.y;
+	}
+
 	public get autodraw(): boolean
 	{
 		return this._autodraw;
@@ -301,11 +329,53 @@ export class Drawable
 
 	public get scale(): {x: number, y: number}
 	{
-		return this._scale;
+		let denom: number = Math.pow(this._matrix.a, 2) + Math.pow(this._matrix.b, 2);
+   	let scalex: number = Math.sqrt(denom);
+   	let scaley = (this._matrix.a * this._matrix.d - this._matrix.c * this._matrix.b) / scalex;
+
+		return {x: scalex, y: scaley};
 	}
 	public set scale(scale: {x: number, y: number})
 	{
+		let rad: number = this.rad;
+		let sin: number = Math.sin(rad);
+		let cos: number = Math.cos(rad);
+
 		this._scale = scale;
+		this._matrix.a = cos * scale.x;
+		this._matrix.b = sin * scale.x;
+		this._matrix.c = -sin * scale.y;
+		this._matrix.d = cos * scale.y;
+	}
+
+	public set scalex(scalex: number)
+	{
+		let rad: number = this.rad;
+		let sin: number = Math.sin(rad);
+		let cos: number = Math.cos(rad);
+
+		this._scale.x = scalex;
+		this._matrix.a = cos * scalex;
+		this._matrix.b = sin * scalex;
+	}
+
+	public set scaley(scaley: number)
+	{
+		let rad: number = this.rad;
+		let sin: number = Math.sin(rad);
+		let cos: number = Math.cos(rad);
+
+		this._scale.y = scaley;
+		this._matrix.c = -sin * scaley;
+		this._matrix.d = cos * scaley;
+	}
+
+	public get skew(): {x: number, y: number}
+	{
+		let denom: number = Math.pow(this._matrix.a, 2) + Math.pow(this._matrix.b, 2);
+		let skewx = Math.atan2(this._matrix.a * this._matrix.c + this._matrix.b * this._matrix.d, denom);
+
+		return {x: skewx / (Math.PI / 180), y: 0};
 	}
 
 	public get nofill(): boolean
@@ -388,4 +458,35 @@ export class Drawable
 	{
 		this._offset = offset;
 	}
+
+	public get matrix(): DOMMatrix
+	{
+		return this._matrix;
+	}
+	public set matrix(matrix: DOMMatrix)
+	{
+		this._matrix = matrix;
+	}
+
+	public get x(): number
+	{
+		return this._matrix.e;
+	}
+	public set x(x: number)
+	{
+		this._point.x = x;
+		this._matrix.e = x;
+	}
+
+	public get y(): number
+	{
+		return this._matrix.f;
+	}
+	public set y(y: number)
+	{
+		this._point.y = y;
+		this._matrix.f = y;
+	}
+
+
 }

@@ -48,13 +48,13 @@ export class Artwork extends Rectangle
 
 	public generate(): void
 	{
-		let points: Array<Point> = [];
 		let point: Point = new Point(-this.size.width / 2, -this.size.height / 2);
-
-		points[0] = new Point(point.x, point.y);
-		points[1] = new Point(point.x + this.size.width, point.y);
-		points[2] = new Point(point.x + this.size.width, point.y + this.size.height);
-		points[3] = new Point(point.x, point.y + this.size.height);
+		let points: Array<Point> = [
+			new Point(point.x, point.y),
+			new Point(point.x + this.size.width, point.y),
+			new Point(point.x + this.size.width, point.y + this.size.height),
+			new Point(point.x, point.y + this.size.height)
+		];
 
 		this.clearPath();
 		this.path.rect(points[0].x, points[0].y, this.size.width, this.size.height);
@@ -68,22 +68,16 @@ export class Artwork extends Rectangle
 		if(this.points.length > 0)
 		{
 			context2D.save();
-			context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);
-			context2D.rotate((Math.PI / 180) * this.rotation);
-			context2D.scale(this.scale.x, this.scale.y);
+			context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
 
 			context2D.lineWidth = this.linewidth;
 			context2D.strokeStyle = this.strokecolor;
 			context2D.fillStyle = this.fillcolor;
 			context2D.globalAlpha = this.alpha;
+			context2D.shadowBlur = this.shadow;
+			context2D.shadowColor = this.shadowcolor;
 			context2D.imageSmoothingEnabled = false;
 			
-			if(this.shadow != 0)
-			{
-				context2D.shadowBlur = this.shadow;
-				context2D.shadowColor = this.shadowcolor;
-			}
-
 			if(!this.nostroke)
 				context2D.stroke(this.path);
 			if(!this.nofill)

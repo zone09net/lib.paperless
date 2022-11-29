@@ -38,22 +38,19 @@ export class Line extends Drawable
 
 	public generate(): void
 	{
-		let points: Array<Point> = [];
-
 		let distance1: number = Point.distance(this.point, this._point1);
 		let distance2: number = Point.distance(this.point, this._point2);
 
 		let angle1: number = Point.angle(this.point, this._point1);
 		let angle2: number = Point.angle(this.point, this._point2);
 
-		let point1: Point = new Point(0, 0);
-		let point2: Point = new Point(0, 0);
+		let points: Array<Point> = [
+			new Point(0, 0),
+			new Point(0, 0)
+		];
 
-		point1.translate(angle1, distance1);
-		point2.translate(angle2, distance2);
-
-		points[0] = point1;
-		points[1] = point2;
+		points[0].translate(angle1, distance1);
+		points[1].translate(angle2, distance2);
 
 		this.clearPath();
 		this.path.moveTo(points[0].x, points[0].y);
@@ -61,26 +58,19 @@ export class Line extends Drawable
 
 		this.points = points;
 		this.boundaries = { topleft: new Point(points[0].x, points[0].y), bottomright: new Point(points[1].x, points[1].y) };
-
 		this.size = new Size(points[1].x - points[0].x, points[1].y - points[0].y);
 	}
 
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
-		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);
-		context2D.rotate((Math.PI / 180) * this.rotation);
-		context2D.scale(this.scale.x, this.scale.y);
+		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
 
 		context2D.lineWidth = this.linewidth;
 		context2D.strokeStyle = this.strokecolor;
 		context2D.globalAlpha = this.alpha;
-
-		if(this.shadow != 0)
-		{
-			context2D.shadowBlur = this.shadow;
-			context2D.shadowColor = this.shadowcolor;
-		}
+		context2D.shadowBlur = this.shadow;
+		context2D.shadowColor = this.shadowcolor;
 
 		if(!this.nostroke)
 			context2D.stroke(this.path);

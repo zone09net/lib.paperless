@@ -23,12 +23,12 @@ export class Cross extends Drawable
 
 	public generate(): void
 	{
-		let points: Array<Point> = [];
-
-		points[0] = new Point(0, -this.size.height / 2);
-		points[1] = new Point(0, this.size.height / 2);
-		points[2] = new Point(-this.size.width / 2, 0);
-		points[3] = new Point(this.size.width / 2, 0);
+		let points: Array<Point> = [
+			new Point(0, -this.size.height / 2),
+			new Point(0, this.size.height / 2),
+			new Point(-this.size.width / 2, 0),
+			new Point(this.size.width / 2, 0)
+		];
 
 		this.clearPath();
 		this.path.moveTo(points[0].x, points[0].y);
@@ -43,17 +43,13 @@ export class Cross extends Drawable
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
-		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);
-		context2D.rotate((Math.PI / 180) * this.rotation);
-		context2D.scale(this.scale.x, this.scale.y);
+		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
 
 		context2D.lineWidth = this.linewidth;
 		context2D.strokeStyle = this.strokecolor;
-		if(this.shadow != 0)
-		{
-			context2D.shadowBlur = this.shadow;
-			context2D.shadowColor = this.shadowcolor;
-		}
+		context2D.globalAlpha = this.alpha;
+		context2D.shadowBlur = this.shadow;
+		context2D.shadowColor = this.shadowcolor;
 
 		if(!this.nostroke)
 			context2D.stroke(this.path);

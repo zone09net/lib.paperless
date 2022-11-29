@@ -55,19 +55,14 @@ export class Hexagon extends Drawable
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
-		context2D.translate(this.point.x + this.offset.x, this.point.y + this.offset.y);
-		context2D.rotate((Math.PI / 180) * this.rotation);
-		context2D.scale(this.scale.x, this.scale.y);
+		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
 
 		context2D.lineWidth = this.linewidth;
 		context2D.strokeStyle = this.strokecolor;
 		context2D.fillStyle = this.fillcolor;
 		context2D.globalAlpha = this.alpha;
-		if(this.shadow != 0)
-		{
-			context2D.shadowBlur = this.shadow;
-			context2D.shadowColor = this.shadowcolor;
-		}
+		context2D.shadowBlur = this.shadow;
+		context2D.shadowColor = this.shadowcolor;
 
 		if(!this.nostroke)
 			context2D.stroke(this.path);
