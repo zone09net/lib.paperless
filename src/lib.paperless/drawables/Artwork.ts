@@ -58,6 +58,7 @@ export class Artwork extends Rectangle
 
 		this.clearPath();
 		this.path.rect(points[0].x, points[0].y, this.size.width, this.size.height);
+		this.path.closePath();
 
 		this.points = points;
 		this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x + (this.size.width / 2), this.point.y + (this.size.height / 2)) }
@@ -77,7 +78,7 @@ export class Artwork extends Rectangle
 			context2D.shadowBlur = this.shadow;
 			context2D.shadowColor = this.shadowcolor;
 			context2D.imageSmoothingEnabled = false;
-			
+
 			if(!this.nostroke)
 				context2D.stroke(this.path);
 			if(!this.nofill)

@@ -49,7 +49,8 @@ export class Rectangle extends Drawable
 
 		this.clearPath();
 		this.path.rect(points[0].x, points[0].y, this.size.width, this.size.height);
-
+		this.path.closePath();
+		
 		this.points = points;
 		this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x + (this.size.width / 2), this.point.y + (this.size.height / 2)) }
 	}

@@ -131,6 +131,8 @@ export class Label extends Drawable
 			this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x - (this.size.width / 2) + maxwidth, this.point.y - (this.size.height / 2) + y - this._attributes.spacing) }
 		}
 
+		this.path.closePath();
+		
 		this.points = [
 			this.boundaries.topleft,
 			new Point(this.boundaries.bottomright.x, this.boundaries.topleft.y),

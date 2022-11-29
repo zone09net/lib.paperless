@@ -54,6 +54,8 @@ export class Circle extends Drawable
 		if(this._angleStart != 0 || this._angleEnd != 360 || this._innerRadius != 0)
 			this.path.lineTo(point2.x, point2.y);
 
+		this.path.closePath();
+
 		this.boundaries = { topleft: new Point(this.point.x - this._outerRadius, this.point.y - this._outerRadius), bottomright: new Point(this.point.x + this._outerRadius, this.point.y + this._outerRadius) }
 	}
 

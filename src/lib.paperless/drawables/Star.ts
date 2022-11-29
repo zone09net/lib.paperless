@@ -48,7 +48,8 @@ export class Star extends Drawable
 		for(let i: number = 0; i < points.length; i++)
 			this.path.lineTo(points[i].x, points[i].y);
 		this.path.lineTo(points[0].x, points[0].y)
-
+		this.path.closePath();
+		
 		this.points = points;
 		this.boundaries = { topleft: new Point(this.point.x - this._outerRadius, this.point.y - this._outerRadius), bottomright: new Point(this.point.x + this._outerRadius, this.point.y + this._outerRadius) }
 	}
