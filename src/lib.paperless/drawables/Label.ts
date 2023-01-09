@@ -1,8 +1,8 @@
 import {Point} from '../Point.js';
 import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
-import {IDrawableLabelAttributes} from '../IDrawable.js';
-import {IDrawableLabelFilter} from '../IDrawable.js';
+import {IDrawableLabelAttributes} from '../interfaces/IDrawable.js';
+import {IDrawableLabelFilter} from '../interfaces/IDrawable.js';
 
 
 
@@ -109,7 +109,7 @@ export class Label extends Drawable
 			{		
 				boundingbox = this.boundingbox(this._content.replace(/\t/g, ' '.repeat(this._attributes.tabsize)));
 				this.size.width = boundingbox.width;
-				this.size.height = (boundingbox.height + this._attributes.spacing);
+				this.size.height = (boundingbox.height + this._attributes.spacing + 1);
 			}
 		}
 
@@ -123,16 +123,16 @@ export class Label extends Drawable
 		if(this._attributes.corner)
 		{
 			this.path.rect(0, 0, this.size.width, this.size.height);
-			this.boundaries = { topleft: new Point(this.point.x, this.point.y), bottomright: new Point(this.point.x + maxwidth, this.point.y + y - this._attributes.spacing) };
+			this.boundaries = { topleft: new Point(this.x, this.y), bottomright: new Point(this.x + maxwidth, this.y + y - this._attributes.spacing) };
 		}
 		else
 		{
 			this.path.rect(-this.size.width / 2, -this.size.height / 2, this.size.width, this.size.height);
-			this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x - (this.size.width / 2) + maxwidth, this.point.y - (this.size.height / 2) + y - this._attributes.spacing) }
+			this.boundaries = { topleft: new Point(this.x - (this.size.width / 2), this.y - (this.size.height / 2)), bottomright: new Point(this.x - (this.size.width / 2) + maxwidth, this.y - (this.size.height / 2) + y - this._attributes.spacing) }
 		}
 
 		this.path.closePath();
-		
+
 		this.points = [
 			this.boundaries.topleft,
 			new Point(this.boundaries.bottomright.x, this.boundaries.topleft.y),
@@ -146,14 +146,10 @@ export class Label extends Drawable
 		context2D.font = this._attributes.font;
 		context2D.textAlign = 'left';
 		context2D.textBaseline = 'top';
+		context2D.shadowBlur = this.shadow;
+		context2D.shadowColor = this.shadowcolor;
 
-		if(this.shadow != 0)
-		{
-			context2D.shadowBlur = this.shadow;
-			context2D.shadowColor = this.shadowcolor;
-		}
-
-
+		
 		// filling text with filters if needed
 		let maxline: number = this._attributes.multiline ? Math.floor(((this.size.height - (this._attributes.padding.top + this._attributes.padding.bottom)) / (boundingbox.height + this._attributes.spacing))) : 1;
 		let mark: boolean = false;

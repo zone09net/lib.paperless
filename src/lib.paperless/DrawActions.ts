@@ -1,23 +1,23 @@
-import {Context} from '../Context.js';
+import {Context} from './Context.js';
 
 
 
-export class MouseActions
+export class DrawActions
 {
-	private _context: Context = null;
-	private _guid: string = '';
+	private _context: Context = undefined;
+	private _guid: string = undefined;
 	//---
-	
-	public onMouseMove(): void {}
-	public onMouseDown(): void {}
-	public onMouseUp(): void {}
+
+	public onDrawBefore(context2D: OffscreenCanvasRenderingContext2D): void {}
+	public onDrawAfter(context2D: OffscreenCanvasRenderingContext2D): void {}
 	public onAttach(): void {}
 	public onDetach(): void {}
-	
 
 
-	// getter|setter
+
+	// Accessors
 	// --------------------------------------------------------------------------
+	
 	public get context(): Context
 	{
 		return this._context;
@@ -26,7 +26,6 @@ export class MouseActions
 	{
 		this._context = context;
 	}
-
 
 	public get guid(): string
 	{

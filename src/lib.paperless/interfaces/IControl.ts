@@ -1,3 +1,7 @@
+import {Restrict} from "../enums/Restrict";
+
+
+
 export interface IControlAttributes 
 {
 	/**
@@ -23,5 +27,5 @@ export interface IControlAttributes
 	/**
 	 * This property determine the movement the [[Control]] can have when dragging it. Value can be **vertical** or **horizontal**.
 	 */
-	movement?: string,
+	restrict?: Restrict,
 }

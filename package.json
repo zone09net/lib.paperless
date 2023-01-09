@@ -15,8 +15,8 @@
 		
    	"build": "tsc --build && tsc-alias",
 		"build:watch": "concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc -w\" \"tsc-alias -w\"",
-		"build:demo": "tsc --build tsconfig.demo.json && tsc-alias",
-		"build:demo:watch": "concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc --build tsconfig.demo.json -w\" \"tsc-alias -w\"",
+		"build:demo": "tsc --build tsconfig.demo.json && tsc-alias -p tsconfig.demo.json",
+		"build:demo:watch": "concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc --build tsconfig.demo.json -w\" \"tsc-alias -p tsconfig.demo.json -w\"",
 		"rollup": "tsc --build --force && rollup -c rollup.config.js",
 		"obfuscator": "javascript-obfuscator ./.rollup --output ./.obfuscator --compact true --exclude ./.rollup/extlib/**/**",
 		"minify": "if not exist .minify mkdir .minify && minify ./.rollup/lib.paperless.js > ./.minify/lib.paperless.js"

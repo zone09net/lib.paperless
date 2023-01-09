@@ -1,7 +1,7 @@
 import {Point} from '../Point.js';
 import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
-import {IDrawableAttributes} from '../IDrawable.js';
+import {IDrawableAttributes} from '../interfaces/IDrawable.js';
 
 
 
@@ -49,9 +49,9 @@ export class Star extends Drawable
 			this.path.lineTo(points[i].x, points[i].y);
 		this.path.lineTo(points[0].x, points[0].y)
 		this.path.closePath();
-		
+
 		this.points = points;
-		this.boundaries = { topleft: new Point(this.point.x - this._outerRadius, this.point.y - this._outerRadius), bottomright: new Point(this.point.x + this._outerRadius, this.point.y + this._outerRadius) }
+		this.boundaries = { topleft: new Point(this.x - this._outerRadius, this.y - this._outerRadius), bottomright: new Point(this.x + this._outerRadius, this.y + this._outerRadius) }
 	}
 
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void

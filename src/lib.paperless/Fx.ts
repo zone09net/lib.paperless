@@ -1,6 +1,8 @@
-import {Point} from './Point.js';
 import {Drawable} from './Drawable.js';
-import {IFx} from './IFx.js';
+import {Context} from './Context.js';
+import {IFx} from './interfaces/IFx.js';
+
+
 
 /** 
  * The library offer 
@@ -37,6 +39,7 @@ export class Fx
 
 	private _stack: Array<IFx> = []
 	private _id: number = undefined;
+	private _context: Context;
 	//---
 
 	public constructor() {}
@@ -73,6 +76,9 @@ export class Fx
 					t9: t9,
 					t: t
 				});
+
+				if(fx.drawable[i].context)
+					this._context = fx.drawable[i].context;
 			}
 		}
 		else
@@ -97,6 +103,9 @@ export class Fx
 						t9: t9,
 						t: t
 					});
+
+					if((<Drawable>map[1].object).context)
+						this._context = (<Drawable>map[1].object).context;
 				});
 			}
 			else
@@ -113,6 +122,9 @@ export class Fx
 					t9: t9,
 					t: t
 				});
+
+				if((<Drawable>drawable).context)
+					this._context = (<Drawable>drawable).context;
 			}
 		}
 
@@ -124,6 +136,20 @@ export class Fx
 	{
 		for(let i: number = 0; i < this._stack.length; i++)
 		{
+			if((<Drawable>this._stack[i].drawable).guid == undefined)
+			{
+				this._stack.splice(i, 1);
+
+				if(this._stack.length === 0)
+				{
+					window.cancelAnimationFrame(this._id);
+					this._id = undefined;
+					break;
+				}
+
+				continue;
+			}
+
 			// t value from 0 to 1 depending on the duration
 			this._stack[i].t = (1 / this._stack[i].duration * (new Date().getTime() - this._stack[i].t0));
 
@@ -164,7 +190,8 @@ export class Fx
 		{
 			this._id = window.requestAnimationFrame(() => { 
 				this.loop(); 
-				(<Drawable>this._stack[0].drawable).context.draw(); 
+				if(this._stack.length > 0 && !this._context.states.drag)
+					this._context.draw(); 
 			});
 		}
 	}
@@ -184,7 +211,6 @@ export class Fx
 	public rotate(fx: IFx): void
 	{
 		let ease: number = fx.smuggler.ease(fx.t);
-		let degree: number = ease * fx.smuggler.angle;
 
 		if(fx.t1)
 		{
@@ -201,10 +227,6 @@ export class Fx
 
 		fx.smuggler.data.angle.last = fx.smuggler.data.angle.current;
 		fx.smuggler.data.angle.current = ease * fx.smuggler.angle;
-
-		//console.log(fx.smuggler.data.angle.current - fx.smuggler.data.angle.last)
-		//fx.smuggler.data.delta = degree - fx.smuggler.data.degree;
-		//fx.smuggler.data.degree = degree;
 
 		let rad: number = (Math.PI / 180) * (fx.smuggler.data.angle.current - fx.smuggler.data.angle.last);
 		let sin: number = Math.sin(rad);
@@ -226,6 +248,7 @@ export class Fx
 
 			fx.t1 = false;
 			fx.smuggler.data = {
+				origin: {x: (<Drawable>fx.drawable).matrix.e, y: (<Drawable>fx.drawable).matrix.f},
 				delta: 0,
 				distance: 0,
 				sin: sin,
@@ -240,8 +263,10 @@ export class Fx
 		
 		if(fx.t9)
 		{
-			(<Drawable>fx.drawable).matrix.e = Math.round((<Drawable>fx.drawable).matrix.e);
-			(<Drawable>fx.drawable).matrix.f = Math.round((<Drawable>fx.drawable).matrix.f);
+			(<Drawable>fx.drawable).matrix.e = fx.smuggler.data.origin.x + (fx.smuggler.data.cos * fx.smuggler.distance);
+			(<Drawable>fx.drawable).matrix.f = fx.smuggler.data.origin.y + (fx.smuggler.data.sin * fx.smuggler.distance);
+			//(<Drawable>fx.drawable).matrix.e = Math.round((<Drawable>fx.drawable).matrix.e);
+			//(<Drawable>fx.drawable).matrix.f = Math.round((<Drawable>fx.drawable).matrix.f);
 		}
 	}
 
@@ -663,5 +688,15 @@ export class Fx
 		return t < 0.5
 				 ? (1 - Fx.easeOutBounce(1 - 2 * t)) / 2
 				 : (1 + Fx.easeOutBounce(2 * t - 1)) / 2;
+	}
+
+
+
+	// Accessors
+	// --------------------------------------------------------------------------
+	
+	public get id(): number
+	{
+		return this._id;
 	}
 }

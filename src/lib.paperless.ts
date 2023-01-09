@@ -51,19 +51,12 @@ export {Drawable} from './lib.paperless/Drawable.js';
 export {Control} from './lib.paperless/Control.js';
 export {Component} from './lib.paperless/Component.js';
 export {Group} from './lib.paperless/Group.js';
+export {MouseActions} from './lib.paperless/MouseActions.js';
+export {DrawActions} from './lib.paperless/DrawActions.js';
 export {Context} from './lib.paperless/Context.js';
 export {Fx} from './lib.paperless/Fx.js';
 export {Filter} from './lib.paperless/Filter.js';
 export * as Interfaces from './lib.paperless/interfaces/Interfaces.js' ;
 export * as Controls from './lib.paperless/controls/Controls.js' ;
 export * as Drawables from './lib.paperless/drawables/Drawables.js' ;
-
-export {IDrawableAttributes, IDrawableHexagonAttributes, IDrawableCircleAttributes, IDrawableArtworkAttributes, IDrawableLabelAttributes, IDrawableLabelFilter} from './lib.paperless/IDrawable.js';
-export {IControlAttributes} from './lib.paperless/IControl.js';
-export {IComponentAttributes} from './lib.paperless/IComponent.js';
-export {IGroupAttributes} from './lib.paperless/IGroup.js';
-export {IFx, IFxSmuggler} from './lib.paperless/IFx.js';
-export {ISize} from './lib.paperless/ISize.js';
-export {IPoint} from './lib.paperless/IPoint.js';
-
 export * as Enums from './lib.paperless/enums/Enums.js';

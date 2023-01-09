@@ -1,5 +1,5 @@
 import {Control} from '../Control.js';
-import {IControlAttributes} from '../IControl.js';
+import {IControlAttributes} from '../interfaces/IControl.js';
 
 
 

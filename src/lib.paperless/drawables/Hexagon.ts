@@ -1,7 +1,7 @@
 import {Point} from '../Point.js';
 import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
-import {IDrawableHexagonAttributes} from '../IDrawable.js';
+import {IDrawableHexagonAttributes} from '../interfaces/IDrawable.js';
 
 
 
@@ -50,7 +50,7 @@ export class Hexagon extends Drawable
 		this.path.closePath();
 
 		this.points = points;
-		this.boundaries = { topleft: new Point(this.point.x - this._radius, this.point.y - ybounding), bottomright: new Point(this.point.x + this._radius, this.point.y + ybounding) }
+		this.boundaries = { topleft: new Point(this.x - this._radius, this.y - ybounding), bottomright: new Point(this.x + this._radius, this.y + ybounding) }
 	}
 
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
@@ -58,13 +58,13 @@ export class Hexagon extends Drawable
 		context2D.save();
 		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
 
-		context2D.lineWidth = this.linewidth;
 		context2D.strokeStyle = this.strokecolor;
 		context2D.fillStyle = this.fillcolor;
+		context2D.lineWidth = this.linewidth;
 		context2D.globalAlpha = this.alpha;
 		context2D.shadowBlur = this.shadow;
 		context2D.shadowColor = this.shadowcolor;
-
+		
 		if(!this.nostroke)
 			context2D.stroke(this.path);
 		if(!this.nofill)

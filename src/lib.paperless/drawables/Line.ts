@@ -1,7 +1,7 @@
 import {Point} from '../Point.js';
 import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
-import {IDrawableAttributes} from '../IDrawable.js';
+import {IDrawableAttributes} from '../interfaces/IDrawable.js';
 
 
 
@@ -38,11 +38,12 @@ export class Line extends Drawable
 
 	public generate(): void
 	{
-		let distance1: number = Point.distance(this.point, this._point1);
-		let distance2: number = Point.distance(this.point, this._point2);
+		let point: Point = new Point(this.x, this.y);
+		let distance1: number = Point.distance(point, this._point1);
+		let distance2: number = Point.distance(point, this._point2);
 
-		let angle1: number = Point.angle(this.point, this._point1);
-		let angle2: number = Point.angle(this.point, this._point2);
+		let angle1: number = Point.angle(point, this._point1);
+		let angle2: number = Point.angle(point, this._point2);
 
 		let points: Array<Point> = [
 			new Point(0, 0),

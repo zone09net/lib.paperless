@@ -1,4 +1,4 @@
-import {IPoint} from './IPoint.js';
+import {IPoint} from './interfaces/IPoint.js';
 
 
 
@@ -34,7 +34,7 @@ export class Point
 	 * 
 	 * @param	point			Should be a string format 'x, y'
 	 */
-	public toPoint(point: string, gaga: string): Point
+	public toPoint(point: string): Point
 	{
 		const match = point.match(/([0-9]+),\s*([0-9]+)/);
 
@@ -84,7 +84,7 @@ export class Point
 	 * 
 	 * @param 	points 		Should be a list of Points that start from a point and comes back to the same point.
 	 */
-	isInPolygon(points: Array<Point>): boolean
+	public isInPolygon(points: Array<Point>): boolean
 	{
 		let inside = false;
 		let point1 = new Point(0, 0);
@@ -117,6 +117,34 @@ export class Point
 		}
 
 		return inside;
+	}
+
+	/**
+	 * Validates if this Point is inside the a rectangle defined by it's top leftand bottom right corners.
+	 * 
+	 * @param 	topleft 			Top left point on the canvas.
+	 * @param	bottomright		Bottom right point on the canvas.
+	 */
+	public isInQuad(topleft: Point, bottomright: Point)
+	{
+		if(this.x >= topleft.x && this.x <= bottomright.x && this.y >= topleft.y && this.y <= bottomright.y) 
+			return true;
+  		else
+			return false;
+	}
+
+	/**
+	 * Validates if this Point is inside the radius of the given point.
+	 * 
+	 * @param 	point 		Should be a list of Points that start from a point and comes back to the same point.
+	 * @param	radius		Radius surrounding the point to validate.
+	 */
+	public isInCircle(point: Point, radius: number)
+	{
+		if((point.x - this._x) * (point.x - this._x) + (point.y - this._y) * (point.y - this._y) <= radius * radius)
+			return true;
+  		else
+			return false;
 	}
 
 	/**

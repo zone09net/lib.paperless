@@ -3,7 +3,7 @@ import {Context} from './Context.js';
 import {Drawable} from './Drawable.js';
 import {Control} from './Control.js';
 import {Component} from './Component.js';
-import {IGroupAttributes} from './IGroup.js';
+import {IGroupAttributes} from './interfaces/IGroup.js';
 
 
 
@@ -46,6 +46,7 @@ export class Group
 	private _context: Context = null;
 	private _guid: string = '';
 	private _map: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+	private _enrolled: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	//---
 
 	/**
@@ -53,7 +54,24 @@ export class Group
 	 */
 	public constructor(attributes: IGroupAttributes = {}) 
 	{
+	}
 
+	public enroll(entity: Drawable | Array<Drawable>): void
+	{
+		if(entity instanceof Array)
+		{
+			for(let item of entity)
+			{
+				if(!this._enrolled.has(item.guid))
+					this._enrolled.set(item.guid, item);
+			}
+		}
+		else
+		{
+			console.log(entity.guid)
+			if(!this._enrolled.has(entity.guid))
+				this._enrolled.set(entity.guid, entity);
+		}
 	}
 
 	/**
@@ -195,8 +213,13 @@ export class Group
 	 * console.log(drawables)
 	 * ```
 	 */
-	public get map(): Array<any>
+	public get map(): Map<string, any>
 	{
-		return this._map.sorted;
+		return this._map.map;
+	}
+
+	public get enrolled(): Map<string, any>
+	{
+		return this._enrolled.map;
 	}
 }

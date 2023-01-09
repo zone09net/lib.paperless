@@ -1,7 +1,7 @@
 import {Point} from '../Point.js';
 import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
-import {IDrawableCircleAttributes} from '../IDrawable.js';
+import {IDrawableCircleAttributes} from '../interfaces/IDrawable.js';
 
 
 
@@ -56,7 +56,7 @@ export class Circle extends Drawable
 
 		this.path.closePath();
 
-		this.boundaries = { topleft: new Point(this.point.x - this._outerRadius, this.point.y - this._outerRadius), bottomright: new Point(this.point.x + this._outerRadius, this.point.y + this._outerRadius) }
+		this.boundaries = { topleft: new Point(this.x - this._outerRadius, this.y - this._outerRadius), bottomright: new Point(this.x + this._outerRadius, this.y + this._outerRadius) }
 	}
 
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void

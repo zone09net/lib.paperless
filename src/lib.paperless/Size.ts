@@ -1,4 +1,4 @@
-import {ISize} from './ISize.js';
+import {ISize} from './interfaces/ISize.js';
 
 
 

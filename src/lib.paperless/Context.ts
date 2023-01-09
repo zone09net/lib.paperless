@@ -6,75 +6,14 @@ import {Drawable} from './Drawable.js';
 import {Control} from './Control.js';
 import {Component} from './Component.js';
 import {Group} from './Group.js';
-import {DrawActions} from './interfaces/DrawActions.js';
-import {MouseActions} from './interfaces/MouseActions.js';
+import {DrawActions} from './DrawActions.js';
+import {MouseActions} from './MouseActions.js';
 import {Fx} from './Fx.js';
-
-
-
-interface IAttributes {
-	fillcolor?: string,
-	stageScale?: number,
-	stageSize?: Size,
-	stageOffset?: number,
-	autosize?: boolean,
-	dragRate?: number,
-	dragDelay?: number,
-	dragOffset?: number
-	dragSnapping?: number,
-}
-
-type view = {
-	canvas: {
-		buffer: OffscreenCanvas,
-		main: HTMLCanvasElement
-	},
-	context:  {
-		buffer: OffscreenCanvasRenderingContext2D,
-		main: ImageBitmapRenderingContext
-	},
-	fillcolor: string,
-	size: Size,
-	autosize: boolean,
-	offset: number,
-	scale: number,
-	idResizing: number,
-	idAnimationFrame: number,
-	//animated: Array<string>,
-}
-
-type cursor = {
-	current: Point,
-	last: Point,
-	clicked: Point,
-	control: string,
-	radius: number
-}
-
-type drag = {
-	rate: number,
-	delay: number,
-	offset: number,
-	snapping: number,
-	diff: Point,
-	timeout: number,
-	interval: number,
-	//excluded: Array<string>
-}
-
-type states = {
-	mobile: boolean,
-	mousedown: boolean,
-	drag: boolean,
-	focussed: string
-}
-
-export type stage = {
-	view: view,
-	cursor: cursor,
-	drag: drag,
-	states: states
-}
+import {Restrict} from './enums/Restrict.js';
+import {IContextAttributes} from './interfaces/IContext.js';
+import {IDragging} from './interfaces/IContext.js';
+import {IFeatures} from './interfaces/IContext.js';
+import {IStates} from './interfaces/IContext.js';
 
 
 
@@ -88,81 +27,117 @@ export class Context
 	private _drawActions: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _mouseActions: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _fx: Fx = new Fx();
-	private _stage: stage;
+	private _attributes: IContextAttributes;
+	private _viewport: {
+		canvas: {
+			buffer: OffscreenCanvas,
+			main: HTMLCanvasElement
+		},
+	
+		context:  {
+			buffer: OffscreenCanvasRenderingContext2D,
+			main: ImageBitmapRenderingContext
+		},
+	
+		smuggler: any,
+		states: IStates,
+	};
 	//---
 
-	public constructor(attributes: IAttributes = {})
+	public constructor(attributes: IContextAttributes = {})
 	{
 		const {
 			fillcolor = '#000000',
-			stageScale = 1,
-			stageSize = new Size(window.innerWidth, window.innerHeight),
-			stageOffset = 0,
+			strokecolor = '#a0a0a0',
+			font = '16px system-ui',
+			linewidth = 2,
+			shadow = 0,
+			shadowcolor = '#ffffff',
+			alpha = 1,
+			scale = 1,
+			size = new Size(window.innerWidth, window.innerHeight),
 			autosize = false,
-			dragRate = 20,
-			dragDelay = 180,
-			dragOffset = 0,
-			dragSnapping = 0
+			features = {},
+			dragging = {},
 		} = attributes;
 
-		this._stage = {
-			view: {
-				canvas: {
-					buffer: new OffscreenCanvas(0, 0), //document.createElement("canvas"),
-					main: document.createElement("canvas")
-				},
-				context: {
-					buffer: undefined,
-					main: undefined
-				},
-
-				fillcolor: fillcolor,
-				size: new Size(stageSize.width, stageSize.height),
-				autosize: autosize,
-				offset: stageOffset,
-				scale: stageScale,
-				idResizing: undefined,									// setInterval id for resize event (interna)
-				idAnimationFrame: undefined,							// window.requestAnimationFrame id (internal) 
-				//animated: [],
+		this._attributes = {
+			strokecolor: strokecolor,
+			fillcolor: fillcolor,
+			font: font,
+			linewidth: linewidth,
+			shadow: shadow,
+			shadowcolor: shadowcolor,
+			alpha: alpha,
+			scale: scale,
+			size: size,
+			autosize: autosize,
+			features: {
+				...{ nohover: false, nodragging: false, nosnapping: true, nodefault: false },
+				...features
 			},
-			cursor: {
-				current: new Point(-1, -1),               		// current mouse position
-				last: new Point(-1, -1),                        // last mouse position
-				clicked: new Point(-1, -1),                     // last clicked mouse position
-				control: undefined,                             // control below mouse pointer when moving and clicking (internal)
-				radius: undefined                               // radius around pointer for the controls filter (internal)
-			},
-			drag: {
-				rate: dragRate,                                 // interval of drag redraw
-				delay: dragDelay,                               // timeout on hold mouse button to drag
-				offset: dragOffset,                             // offset to redraw from background when dragging
-				snapping: dragSnapping,                         // snapping pixel to drop when mouseup
-				diff: undefined,                                // mouse x,y difference from center of object when dragging (internal)
-				timeout: undefined,                             // setTimeout id for dragging (internal)
-				interval: undefined,                            // setInterval id for dragging (internal)
-				//excluded: []
-			},
-			states: {
-				mobile: false,
-				mousedown: false,
-				drag: false,
-				focussed: undefined
+			dragging: {
+				...{ delay: 180, restrict: Restrict.none, grid: {...{x: 1, y: 1}, ...dragging.grid}},
+				...dragging
 			}
-		}
+		};
 
-		this._stage.view.context.main = this._stage.view.canvas.main.getContext("bitmaprenderer", {alpha: false});
-		this._stage.view.context.buffer = this._stage.view.canvas.buffer.getContext("2d", {alpha: false});
-		this.size = this._stage.view.size;
+		this._viewport = {
+			canvas: {
+				buffer: new OffscreenCanvas(0, 0), 
+				main: document.createElement("canvas")
+			},
 
-		this._stage.view.canvas.main.addEventListener("mousemove", Events.handleMouseMove.bind(null, this, this._stage), false);
-		this._stage.view.canvas.main.addEventListener("mousedown", Events.handleMouseDown.bind(null, this, this._stage), false);
-		this._stage.view.canvas.main.addEventListener("mouseup", Events.handleMouseUp.bind(null, this, this._stage), false);
-		this._stage.view.canvas.main.addEventListener("resize", Events.handleResize.bind(null, this, this._stage), false);
-		this._stage.view.canvas.main.addEventListener("contextmenu", Events.handleRightMouseClick.bind(null, this, this._stage), false);		// preventDefault
-		this._stage.view.canvas.main.addEventListener("dragstart", Events.handleDragStart.bind(null, this, this._stage), false);				// preventDefault
-		window.addEventListener("resize", Events.handleResize.bind(null, this, this._stage), false);
+			context: {
+				buffer: undefined,
+				main: undefined
+			},
 
-		this.refresh();
+			smuggler: {
+				id: {
+					resizing: undefined,
+					dragging: undefined,
+				},
+				dragdiff: undefined,
+			},
+
+			states: {
+				mobile: Foundation.Mobile.isMobile(),
+				mousedown: false,
+				pinch: false,
+				drag: false,
+				focussed: undefined,
+				sorted: true,
+
+				pointer: {
+					current: new Point(-1, -1),
+					last: new Point(-1, -1), 
+					clicked: new Point(-1, -1),
+					control: undefined, 
+				},
+
+				touch: {
+				}
+			},
+		};
+
+		this._viewport.context.main = this._viewport.canvas.main.getContext("bitmaprenderer", {alpha: false});
+		this._viewport.context.buffer = this._viewport.canvas.buffer.getContext("2d", {alpha: false});
+		this.size = this._attributes.size;
+
+
+		this._viewport.canvas.main.addEventListener("touchmove", Events.handleTouchMove.bind(null, this),  {passive: false});
+		this._viewport.canvas.main.addEventListener("touchstart", Events.handleTouchStart.bind(null, this),  {passive: false});
+		this._viewport.canvas.main.addEventListener("touchend", Events.handleTouchEnd.bind(null, this), false);
+		window.addEventListener("touchmove", Events.handleWindowTouchMove.bind(null, this), {passive: false});
+
+		this._viewport.canvas.main.addEventListener("mousemove", Events.handleMouseMove.bind(null, this), {passive: false});
+		this._viewport.canvas.main.addEventListener("mousedown", Events.handleMouseDown.bind(null, this, this._viewport.smuggler), false);
+		this._viewport.canvas.main.addEventListener("mouseup", Events.handleMouseUp.bind(null, this, this._viewport.smuggler), false);
+		this._viewport.canvas.main.addEventListener("resize", Events.handleResize.bind(null, this, this._viewport.smuggler), false);
+		this._viewport.canvas.main.addEventListener("contextmenu", Events.handleRightMouseClick.bind(null, this), false);		// preventDefault
+		this._viewport.canvas.main.addEventListener("dragstart", Events.handleDragStart.bind(null, this), false);				// preventDefault
+		window.addEventListener("resize", Events.handleResize.bind(null, this, this._viewport.smuggler), false);
 	}
 
 	public link(source: string, destination: string): void
@@ -176,8 +151,7 @@ export class Context
 
 		d.index = s.index;
 
-		this._drawables.sort();
-		this._controls.reverse();
+		this.states.sorted = false;
 	}
 
 	public register(object: Drawable | Control | Component):  Drawable | Control | Component
@@ -192,110 +166,76 @@ export class Context
 		if(object instanceof Drawable)
 		{
 			let guid: string = this.getGuidGenerator().create('1', 'a');
+			let entry: any = this._drawables.set(guid, object);
 
-			if(!this._drawables.has(guid))
-			{
-				let entry: any = this._drawables.set(guid, object);
-
-				entry.context = this;
-				entry.guid = guid;
-				entry.fx = this._fx;
-				entry.onAttach();
-
-				return entry;
-			}
-			else
-				throw new Error('Context.attach, drawable guid not unique');
+			entry.context = this;
+			entry.guid = guid;
+			entry.fx = this._fx;
+			entry.onAttach();
+			this.states.sorted = false;
+			
+			return entry;
 		}
 		else if(object instanceof Control)
 		{
 			let guid: string = this.getGuidGenerator().create('1', 'b');
+			let entry: any = this._controls.set(guid, object);
 
-			if(!this._controls.has(guid))
-			{
-				let entry: any = this._controls.set(guid, object);
+			entry.context = this;
+			entry.guid = guid;
+			entry.fx = this._fx;
+			entry.onAttach();
+			this.states.sorted = false;
 
-				entry.context = this;
-				entry.guid = guid;
-				entry.fx = this._fx;
-				entry.onAttach();
-
-				return entry;
-			}
-			else
-				throw new Error('Context.attach, control guid not unique');
+			return entry;
 		}
 		else if(object instanceof Component)
 		{
 			let guid: string = this.getGuidGenerator().create('1', '9');
+			let entry: any = this._components.set(guid, object);
 
-			if(!this._components.has(guid))
-			{
-				let entry: any = this._components.set(guid, object);
+			entry.context = this;
+			entry.guid = guid;
+			entry.fx = this._fx;
+			entry.onAttach();
 
-				entry.context = this;
-				entry.guid = guid;
-				entry.fx = this._fx;
-				entry.onAttach();
-
-				return entry;
-			}
-			else
-				throw new Error('Context.attach, component guid not unique');
+			return entry;
 		}
 		else if(object instanceof Group)
 		{
 			let guid: string = this.getGuidGenerator().create('1', '8');
+			let entry: any = this._groups.set(guid, object);
 
-			if(!this._groups.has(guid))
-			{
-				let entry: any = this._groups.set(guid, object);
+			entry.context = this;
+			entry.guid = guid;
+			entry.onAttach();
 
-				entry.context = this;
-				entry.guid = guid;
-				entry.onAttach();
-
-				return entry;
-			}
-			else
-				throw new Error('Context.attach, group guid not unique');
+			return entry;
 		}
 		else if(object instanceof DrawActions)
 		{
 			let guid: string = this.getGuidGenerator().create('2', 'a');
+			let entry: any = this._drawActions.set(guid, object);
 
-			if(!this._drawActions.has(guid))
-			{
-				let entry: any = this._drawActions.set(guid, object);
+			entry.context = this;
+			entry.guid = guid;
+			entry.onAttach();
 
-				entry.context = this;
-				entry.guid = guid;
-				entry.onAttach();
-
-				return entry;
-			}
-			else
-				throw new Error('Context.attach, drawaction guid not unique');
+			return entry;
 		}
 		else if(object instanceof MouseActions)
 		{
 			let guid: string = this.getGuidGenerator().create('2', 'b');
+			let entry: any = this._mouseActions.set(guid, object);
 
-			if(!this._mouseActions.has(guid))
-			{
-				let entry: any = this._mouseActions.set(guid, object);
+			entry.context = this;
+			entry.guid = guid;
+			entry.onAttach();
 
-				entry.context = this;
-				entry.guid = guid;
-				entry.onAttach();
-
-				return entry;
-			}
-			else
-				throw new Error('Context.attach, mouseaction guid not unique');
+			return entry;
 		}
 		else if(object instanceof HTMLElement)
-			object.appendChild(this._stage.view.canvas.main);
+			object.appendChild(this._viewport.canvas.main);
 		else
 			throw new Error('Context.attach need either a Drawable/Control/Component/Group/DrawActions/MouseActions/HTMLElement type');
 	}
@@ -311,6 +251,9 @@ export class Context
 
 		for(let guid of guidlist)
 		{
+			if(typeof guid != 'string')
+				continue;
+
 			let version = guid.charAt(14);
 			let variant = guid.charAt(19);
 
@@ -320,6 +263,9 @@ export class Context
 				if(drawable && drawable.removable)
 				{
 					drawable.onDetach();
+					drawable.context = undefined;
+					drawable.guid = undefined;
+					drawable.fx = undefined;
 					this._drawables.delete(guid);
 				}
 			}
@@ -329,6 +275,9 @@ export class Context
 				if(control && control.removable)
 				{
 					control.onDetach();
+					control.context = undefined;
+					control.guid = undefined;
+					control.fx = undefined;
 					this._controls.delete(guid);
 				}
 			}
@@ -338,6 +287,8 @@ export class Context
 				if(group)
 				{
 					group.onDetach();
+					group.context = undefined;
+					group.guid = undefined;
 					this._groups.delete(guid);
 				}
 			}
@@ -347,6 +298,9 @@ export class Context
 				if(component)
 				{
 					component.onDetach();
+					component.context = undefined;
+					component.guid = undefined;
+					component.fx = undefined;
 					this._components.delete(guid);
 				}
 			}
@@ -356,6 +310,8 @@ export class Context
 				if(drawaction)
 				{
 					drawaction.onDetach();
+					drawaction.context = undefined;
+					drawaction.guid = undefined;
 					this._drawActions.delete(guid);
 				}
 			}
@@ -365,18 +321,14 @@ export class Context
 				if(mouseaction)
 				{
 					mouseaction.onDetach();
+					mouseaction.context = undefined;
+					mouseaction.guid = undefined;
 					this._mouseActions.delete(guid);
 				}
 			}
 		}
 
-		this._drawActions.sort();
-		this._mouseActions.sort();
-		this._components.sort();
-		this._groups.sort();
-		this._drawables.sort();
-		this._controls.reverse();
-		this.refresh();
+		this.states.sorted = false;
 	}
 
 	public get<Type extends Drawable | Control | Component | Group>(guid: string): Type
@@ -403,235 +355,167 @@ export class Context
 
 	public refresh(): void
 	{
-		this._stage.view.idAnimationFrame = window.requestAnimationFrame(() => this.draw());
+		window.requestAnimationFrame(() => this.draw());
 	}
 
+	/*
 	private clearBuffer(): void
 	{
-		this._stage.view.context.buffer.fillStyle = this._stage.view.fillcolor;
-		this._stage.view.context.buffer.fillRect(-this._stage.view.offset, -this._stage.view.offset, this._stage.view.canvas.main.width + this._stage.view.offset, this._stage.view.canvas.main.height + this._stage.view.offset);
-		this._stage.view.context.buffer.scale(this._stage.view.scale, this._stage.view.scale);
+		if(!this._attributes.features.nodefault)
+		{
+			this.context2D.font = this._attributes.font;
+			this.context2D.strokeStyle = this._attributes.strokecolor;
+			this.context2D.shadowBlur = this._attributes.shadow;
+			this.context2D.shadowColor = this._attributes.shadowcolor;
+			this.context2D.globalAlpha = this._attributes.alpha;
+			this.context2D.lineWidth = this._attributes.linewidth;
+		}
+		this.context2D.imageSmoothingEnabled = false;
+		this.context2D.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		this.context2D.scale(this._attributes.scale, this._attributes.scale);
 	}
 
 	private fillMain(): void
 	{
-		let bitmap = this._stage.view.canvas.buffer.transferToImageBitmap();
-		this._stage.view.context.main.transferFromImageBitmap(bitmap);
+		let bitmap = this._viewport.canvas.buffer.transferToImageBitmap();
+		this._viewport.context.main.transferFromImageBitmap(bitmap);
+	}
+	*/
+
+	public drag(control: Control): void
+	{
+		if(this.states.drag)
+		{
+			if(control.restrict == Restrict.none)
+			{
+				control.drawable.matrix.e = this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x;
+				control.drawable.matrix.f = this.states.pointer.current.y - this._viewport.smuggler.dragdiff.y;
+			}
+			else if(control.restrict == Restrict.horizontal)
+				control.drawable.matrix.e = this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x;
+			else if(control.restrict == Restrict.vertical)
+				control.drawable.matrix.f = this.states.pointer.current.y - this._viewport.smuggler.dragdiff.y;
+
+			if(!this.features.nosnapping && this.dragging.restrict == Restrict.ondrag)
+			{
+				control.drawable.matrix.e = Math.round((this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x) / (this.dragging.grid.x || 1)) * (this.dragging.grid.x || 1);
+				control.drawable.matrix.f = Math.round((this.states.pointer.current.y - this._viewport.smuggler.dragdiff.y) / (this.dragging.grid.y || 1)) * (this.dragging.grid.y || 1);
+			}
+
+			if(control.drawable.group)
+			{
+				let group: Group = this.get(control.drawable.group);
+
+				[...group.map, ...group.enrolled].forEach((entry: any) => {
+					entry[1].object.matrix.e = control.drawable.matrix.e - entry[1].object.points['origin'].x;
+					entry[1].object.matrix.f = control.drawable.matrix.f - entry[1].object.points['origin'].y;
+				});
+			}
+
+			this.draw(control);
+			window.requestAnimationFrame(() => this.drag(control));
+		}
 	}
 
-	public drag(context: Context, control: Control): void
+	public draw(control?: Control): void
 	{
-		let stickies: Array<Drawable> = [];
-		let grouped: Array<Drawable> = [];
-
-		context.clearBuffer();
-
-		if(control.movement == undefined)
+		if(!this.states.sorted)
 		{
-			//control.drawable.point = new Point(context._stage.cursor.current.x - context._stage.drag.diff.x, context._stage.cursor.current.y - context._stage.drag.diff.y);
-			control.drawable.point.x = context._stage.cursor.current.x - context._stage.drag.diff.x;
-			control.drawable.point.y = context._stage.cursor.current.y - context._stage.drag.diff.y;
-		}
-		else if(control.movement == 'horizontal')
-		{
-			//control.drawable.point = new Point(context._stage.cursor.current.x - context._stage.drag.diff.x, control.drawable.point.y);
-			control.drawable.point.x = context._stage.cursor.current.x - context._stage.drag.diff.x;
-		}
-		else if(control.movement == 'vertical')
-		{
-			//control.drawable.point = new Point(control.drawable.point.x, context._stage.cursor.current.y - context._stage.drag.diff.y);
-			control.drawable.point.y = context._stage.cursor.current.y - context._stage.drag.diff.y;
-		}
-			
-
-		if(control.drawable.group)
-		{
-			let group: Group = context.get(control.drawable.group);
-
-			group.map.forEach((entry: any) => {
-				//entry[1].object.point = new Point(control.drawable.point.x - entry[1].object.origin.x, control.drawable.point.y - entry[1].object.origin.y);
-				entry[1].object.point.x = control.drawable.point.x - entry[1].object.origin.x;
-				entry[1].object.point.y = control.drawable.point.y - entry[1].object.origin.y;
-				grouped.push(entry[1].object);
-			});
+			//this._drawActions.sort();
+			//this._mouseActions.sort();
+			//this._components.sort();
+			//this._groups.sort();
+			this._drawables.sort();
+			this._controls.reverse();
+			this.states.sorted = true;
 		}
 
-		context._drawables.sorted.forEach((entry: any) => {
-			if(entry[1].object.visible/* && !grouped.includes(entry[1].object)*/)
-			{
-				if(entry[1].object.sticky)
-					stickies.push(entry[1].object);
-				else
-				{
-					context._stage.view.context.buffer.save();
-					
-					if(entry[1].object.guid == control.drawable.guid)
-						control.onDrag();
-
-					entry[1].object.draw(context._stage.view.context.buffer);
-					context._stage.view.context.buffer.restore();
-				}
-			}
-		});
-
-		for(let drawable of [...grouped, ...stickies])
+		if(!this._attributes.features.nodefault)
 		{
-			context._stage.view.context.buffer.save();
-			
-			if(drawable.guid == control.drawable.guid)
-				control.onDrag();
-
-			drawable.draw(context._stage.view.context.buffer);
-			context._stage.view.context.buffer.restore();
+			this.context2D.font = this._attributes.font;
+			this.context2D.strokeStyle = this._attributes.strokecolor;
+			this.context2D.shadowBlur = this._attributes.shadow;
+			this.context2D.shadowColor = this._attributes.shadowcolor;
+			this.context2D.globalAlpha = this._attributes.alpha;
+			this.context2D.lineWidth = this._attributes.linewidth;
 		}
+		this.context2D.imageSmoothingEnabled = false;
 
-		//for(let drawable of stickies)
-		//	drawable.draw(context._stage.view.context.buffer);
-
-		context.fillMain();
-
-		/*
-
-		context.clearBuffer();
-
-		if(control.movement == undefined)
-			control.drawable.point = new Point(context._stage.cursor.current.x - context._stage.drag.diff.x, context._stage.cursor.current.y - context._stage.drag.diff.y);
-		else if(control.movement == 'horizontal')
-			control.drawable.point = new Point(context._stage.cursor.current.x - context._stage.drag.diff.x, control.drawable.point.y);
-		else if(control.movement == 'vertical')
-			control.drawable.point = new Point(control.drawable.point.x, context._stage.cursor.current.y - context._stage.drag.diff.y);
-
-		
-		//control.drawable.generate();
-
-		if(control.drawable.group)
-		{
-			let group: Group = context.get(control.drawable.group);
-
-			group.map.forEach((entry: any) => {
-				//if(entry[0] != control.drawable.guid)
-				{
-					entry[1].object.point = new Point(control.drawable.point.x - entry[1].object.origin.x, control.drawable.point.y - entry[1].object.origin.y);
-					//entry[1].object.generate();
-				}
-			});
-		}
-
-		context._drawables.sorted.forEach((entry: any) => {
-			if(entry[1].object.visible)
-			{
-				if(context._stage.drag.excluded.includes(entry[0]))
-				{
-					context._stage.view.context.buffer.save();
-					control.onDrag();
-					entry[1].object.draw(context._stage.view.context.buffer);
-					context._stage.view.context.buffer.restore();
-				}
-				else
-				{
-					if(entry[1].object.visible && entry[1].object.autodraw && !entry[1].object.sticky)
-						entry[1].object.draw(context._stage.view.context.buffer);
-				}
-			}
-		});
-
-		context._drawables.sorted.forEach((entry: any) => {
-			if(entry[1].object.sticky)
-				entry[1].object.draw(context._stage.view.context.buffer);
-		});
-			
-		context.fillMain();
-		*/		
-	}
-
-	public draw(): void
-	{
-		let drawables: Array<Drawable> = [];
-
-		this.clearBuffer();
+		//this.clearBuffer();
 
 		this._drawActions.map.forEach((entry: any) => {
 			if(entry.object.onDrawBefore)
-				entry.object.onDrawBefore(this._stage.view.context.buffer);
+				entry.object.onDrawBefore(this.context2D);
 		});
 
-		this._drawables.sorted.forEach((entry: any) => {
-			if((!this._stage.states.drag /*|| !this._stage.view.animated.includes(entry[0])*/) && entry[1].object.visible && entry[1].object.autodraw)
-			{
-				if(entry[1].object.point.x > -entry[1].object.size.width &&
-					entry[1].object.point.x < this._stage.view.canvas.buffer.width + entry[1].object.size.width &&
-					entry[1].object.point.y > -entry[1].object.size.height &&
-					entry[1].object.point.y < this._stage.view.canvas.buffer.height + entry[1].object.size.height)
-				{
-					if(entry[1].object.sticky)
-						drawables.push(entry[1].object);
-					else
-						entry[1].object.draw(this._stage.view.context.buffer);
-				}
-			}
-		});
+		let length: number = this._drawables.sorted.length;
+		let stickies: Array<{guid: string, map: Map<string, any>}> = this._drawables.sorted.filter(([guid, map]: any) =>
+			map.object.sticky && map.object.visible
+		);
 
-		for(let drawable of drawables)
-			drawable.draw(this._stage.view.context.buffer);
-
-		if(!this._stage.states.drag)
+		for(let i: number = 0; i < length; i++)
 		{
-			this._drawActions.map.forEach((entry: any) => {
-				if(entry.object.onDrawAfter)
-					entry.object.onDrawAfter(this._stage.view.context.buffer);
-			});
+			let drawable: Drawable = (<any>this._drawables.sorted[i])[1].object;
 
-			this.fillMain();
+			if(control && this.states.drag && drawable.guid == control.drawable.guid)
+			{
+				this.context2D.save();
+				control.onDrag();
+				drawable.draw(this.context2D);
+				this.context2D.restore();
+			}
+
+			else if(drawable.visible && !drawable.sticky &&
+				drawable.matrix.e > -drawable.size.width && 
+				drawable.matrix.e < this._viewport.canvas.buffer.width + drawable.size.width &&
+				drawable.matrix.f > -drawable.size.height &&
+				drawable.matrix.f < this._viewport.canvas.buffer.height + drawable.size.height)
+			{
+				drawable.draw(this.context2D);	
+			}
 		}
+
+		for(let entry of stickies)
+			(<any>entry)[1].object.draw(this.context2D);
+
+		this._drawActions.map.forEach((entry: any) => {
+			if(entry.object.onDrawAfter)
+				entry.object.onDrawAfter(this.context2D);
+		});
+
+		let bitmap: ImageBitmap = this._viewport.canvas.buffer.transferToImageBitmap();
+		this._viewport.context.main.transferFromImageBitmap(bitmap);
 	}
-
-	public static near(map: Foundation.ExtendedMap, point: Point, radius: number, list: Array<string>)
-	{
-		let near: any = [...map.filter(([name, entry]: any) =>
-			entry.object.point.x >= point.x - radius &&
-			entry.object.point.y >= point.y - radius &&
-			entry.object.point.x <= point.x + radius &&
-			entry.object.point.y <= point.y + radius &&
-			entry.object.visible != false &&
-			!list.includes(entry.object.guid)
-		)];
-
-		for(let entry of near)
-			list.push(entry[0]);
-
-		for(let entry of near)
-			this.near(map, entry[1].object.point, radius, list);
-	}
-
+	
 	public setFocus(guid: string): void 
 	{
 		let focusControl: Control = this.get(guid);
 
-		if(focusControl instanceof Control && guid != this._stage.states.focussed)
+		if(focusControl instanceof Control && guid != this.states.focussed)
 		{
-			if(this._stage.states.focussed != undefined)
+			if(this.states.focussed != undefined)
 			{
-				let unfocusControl: Control = this.get(this._stage.states.focussed);
+				let unfocusControl: Control = this.get(this.states.focussed);
 
 				if(unfocusControl instanceof Control)
 					unfocusControl.onLostFocus();
 			}
 
-			this._stage.states.focussed = guid;
+			this.states.focussed = guid;
 			focusControl.onFocus();
 		}
 	}
 
 	public removeFocus(): void 
 	{
-		if(this._stage.states.focussed != undefined)
+		if(this.states.focussed != undefined)
 		{
-			let unfocusControl: Control = this.get(this._stage.states.focussed);
+			let unfocusControl: Control = this.get(this.states.focussed);
 
 			if(unfocusControl instanceof Control)
 				unfocusControl.onLostFocus();
 
-			this._stage.states.focussed = undefined;
+			this.states.focussed = undefined;
 		}
 	}
 
@@ -670,29 +554,22 @@ export class Context
 		return this._mouseActions;
 	}
 
-	public getStates(): {pointCurrent: Point, pointLast: Point, pointClicked: Point, pointDragMouseOffset: Point, currentControl: string, focussed: string, isMobile: boolean, isDragging: boolean}
+	public static near(map: Foundation.ExtendedMap, point: Point, radius: number, list: Array<string>)
 	{
-		return {
-			pointCurrent: this._stage.cursor.current,
-			pointLast: this._stage.cursor.last,
-			pointClicked: this._stage.cursor.clicked,
-			pointDragMouseOffset: this._stage.drag.diff,
-			currentControl: this._stage.cursor.control,
-			focussed: this._stage.states.focussed,
-			isMobile: this._stage.states.mobile,
-			isDragging: this._stage.states.drag,
-		};
-	}
+		let near: any = [...map.filter(([name, entry]: any) =>
+			entry.object.x >= point.x - radius &&
+			entry.object.y >= point.y - radius &&
+			entry.object.x <= point.x + radius &&
+			entry.object.y <= point.y + radius &&
+			entry.object.visible != false &&
+			!list.includes(entry.object.guid)
+		)];
 
-	public getStage(): {size: Size, scale: number, offset: number, snapping: number}
-	{
-		return {
-			size: this.size,
-			scale: this._stage.view.scale,
-			offset: this._stage.view.offset,
-			snapping: this._stage.drag.snapping,
-			//renderingEngine: this._stage.view.render
-		};
+		for(let entry of near)
+			list.push(entry[0]);
+
+		for(let entry of near)
+			this.near(map, new Point(entry[1].object.x, entry[1].object.y), radius, list);
 	}
 
 
@@ -705,19 +582,19 @@ export class Context
 	 */
 	public get canvas(): HTMLCanvasElement
 	{
-		return this._stage.view.canvas.main;
+		return this._viewport.canvas.main;
 	}
 
 	/**
-	 * Gets the CanvasRenderingContext2D objet of the canvas. Paperless is using a buffer so this accessor always return the buffer context.
+	 * Gets the OffscreenCanvasRenderingContext2D objet of the canvas. Paperless is using a buffer so this accessor always return the buffer context.
 	 */
 	public get context2D(): OffscreenCanvasRenderingContext2D
 	{
-		return this._stage.view.context.buffer;
+		return this._viewport.context.buffer;
 	}
 
 	/**
-	 * Gets the [[Fx]] instance of the Context.
+	 * Gets the [[Fx]] instance that has been created on a new Context.
 	 */
 	public get fx(): Fx
 	{
@@ -729,7 +606,7 @@ export class Context
 	 */
 	public get size(): Size
 	{
-		return this._stage.view.size;
+		return this._attributes.size;
 	}
 	/**
 	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are setted with new width and height values. 
@@ -737,39 +614,122 @@ export class Context
 	 */
 	public set size(size: Size)
 	{
-		let ratio: number = window.devicePixelRatio;
+		//let ratio: number = window.devicePixelRatio;
+		let ratio: number = 1;
 
-		this._stage.view.size = size;
+		this._attributes.size = size;
 
-		this._stage.view.canvas.main.width = (size.width + (this._stage.view.offset * 2)) * ratio;
-		this._stage.view.canvas.main.height = (size.height + (this._stage.view.offset * 2)) * ratio;
-		this._stage.view.canvas.buffer.width = (size.width + (this._stage.view.offset * 2)) * ratio;
-		this._stage.view.canvas.buffer.height = (size.height + (this._stage.view.offset * 2)) * ratio;
+		this.canvas.width = size.width * ratio;
+		this.canvas.height = size.height * ratio;
+		this._viewport.canvas.buffer.width = size.width * ratio;
+		this._viewport.canvas.buffer.height = size.height * ratio;
 
-		this._stage.view.canvas.main.style.width = this._stage.view.canvas.main.width / ratio + 'px';
-		this._stage.view.canvas.main.style.height = this._stage.view.canvas.main.height / ratio + 'px';
+		//this._stage.view.canvas.main.style.width = this._stage.view.canvas.main.width / ratio + 'px';
+		//this._stage.view.canvas.main.style.height = this._stage.view.canvas.main.height / ratio + 'px';
 
-		this._stage.view.context.buffer.translate(this._stage.view.offset, this._stage.view.offset);
+		//this.context2D.translate(this._attributes.offset.x, this._attributes.offset.y);
+
 		this.refresh();
 	}
 
-	/**
-	 * Gets the current offset of the Context in pixels.
-	 */
-	public get offset(): number
+	public get fillcolor(): string
 	{
-		return this._stage.view.offset;
+		return this._attributes.fillcolor;
 	}
-	/**
-	 * Sets the current Context pixels offset. When calling this accessor a call to set [[size]] accessor is also made to reflect the change.
-	 * 
-	 * @todo						Add a callback to Drawable.onOffsetChange() 
-	 * @fixme					When dragging, need to validate point because we can drag inside offset.
-	 */
-	public set offset(offset: number)
+	public set fillcolor(fillcolor: string)
 	{
-		this._stage.view.offset = offset;
-		this.size = this._stage.view.size;
+		this._attributes.fillcolor = fillcolor;
+	}
+
+	public get strokecolor(): string
+	{
+		return this._attributes.strokecolor;
+	}
+	public set strokecolor(strokecolor: string)
+	{
+		this._attributes.strokecolor = strokecolor;
+	}
+
+	public get linewidth(): number
+	{
+		return this._attributes.linewidth;
+	}
+	public set linewidth(linewidth: number)
+	{
+		this._attributes.linewidth = linewidth;
+	}
+
+	public get alpha(): number
+	{
+		return this._attributes.alpha;
+	}
+	public set alpha(alpha: number)
+	{
+		this._attributes.alpha = alpha;
+	}
+
+	public get shadow(): number
+	{
+		return this._attributes.shadow;
+	}
+	public set shadow(shadow: number)
+	{
+		this._attributes.shadow = shadow;
+	}
+
+	public get shadowcolor(): string
+	{
+		return this._attributes.shadowcolor;
+	}
+	public set shadowcolor(shadowcolor: string)
+	{
+		this._attributes.shadowcolor = shadowcolor;
+	}
+
+	public get scale(): number
+	{
+		return this._attributes.scale;
+	}
+	public set scale(scale: number)
+	{
+		this._attributes.scale = scale;
+	}
+
+	public get features(): IFeatures
+	{
+		return this._attributes.features;
+	}
+	public set features(features: IFeatures)
+	{
+		this._attributes.features = features;
+	}
+
+	public get dragging(): IDragging
+	{
+		return this._attributes.dragging;
+	}
+	public set dragging(dragging: IDragging)
+	{
+		this._attributes.dragging = dragging;
+	}
+
+	public get autosize(): boolean
+	{
+		return this._attributes.autosize;
+	}
+	public set autosize(autosize: boolean)
+	{
+		this._attributes.autosize = autosize;
+	}
+
+	public get states(): IStates
+	{
+		return this._viewport.states;
+	}
+
+	public get smuggler(): any
+	{
+		return this._viewport.smuggler;
 	}
 }
 

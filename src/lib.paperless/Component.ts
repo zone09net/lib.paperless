@@ -2,7 +2,7 @@ import {Point} from './Point.js';
 import {Size} from './Size.js';
 import {Context} from './Context.js';
 import {Fx} from './Fx.js';
-import {IComponentAttributes} from './IComponent.js';
+import {IComponentAttributes} from './interfaces/IComponent.js';
 
 
 

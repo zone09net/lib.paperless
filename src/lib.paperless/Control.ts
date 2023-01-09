@@ -1,7 +1,9 @@
 import {Drawable} from './Drawable.js';
 import {Context} from './Context.js';
 import {Fx} from './Fx.js';
-import {IControlAttributes} from './IControl.js';
+import {IControlAttributes} from './interfaces/IControl.js';
+import {Restrict} from './enums/Restrict.js';
+
 
 
 /**
@@ -55,7 +57,7 @@ export class Control
 	private _movable: boolean;
 	private _removable: boolean;
 	private _focusable: boolean;
-	private _movement: string;
+	private _restrict: Restrict;
 	private _group: string = undefined;
 	//---
 
@@ -66,14 +68,14 @@ export class Control
 			movable = true,
 			removable = true,
 			focusable = true,
-			movement = undefined,
+			restrict = Restrict.none,
 		} = attributes;
 
 		this._enabled = enabled;
 		this._movable = movable;
 		this._removable = removable;
 		this._focusable = focusable;
-		this._movement = movement;
+		this._restrict = restrict;
 	}
 
 	public attach(drawable: Drawable): void
@@ -183,12 +185,12 @@ export class Control
 		this._focusable = focusable;
 	}
 
-	public get movement(): string
+	public get restrict(): Restrict
 	{
-		return this._movement;
+		return this._restrict;
 	}
-	public set movement(movement: string)
+	public set restrict(restrict: Restrict)
 	{
-		this._movement = movement;
+		this._restrict = restrict;
 	}
 }

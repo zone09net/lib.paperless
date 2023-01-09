@@ -5,7 +5,7 @@ import {IDrawableAttributes} from '../interfaces/IDrawable.js';
 
 
 
-export class Rectangle extends Drawable
+export class Arrow extends Drawable
 {
 	public constructor(point: Point, size: Size, attributes: IDrawableAttributes = {})
 	{
@@ -23,32 +23,27 @@ export class Rectangle extends Drawable
 
 	public generate(): void
 	{
-		/*
-		function defineRoundedRect(x,y,width,height,radius) {
-			ctx.beginPath();
-			ctx.moveTo(x + radius, y);
-			ctx.lineTo(x + width - radius, y);
-			ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-			ctx.lineTo(x + width, y + height - radius);
-			ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-			ctx.lineTo(x + radius, y + height);
-			ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-			ctx.lineTo(x, y + radius);
-			ctx.quadraticCurveTo(x, y, x + radius, y);
-			ctx.closePath();
-		}
-		*/
-		
+		let basewidth: number = 25;
+		let baseheight: number = 20;
+		let diff: number = (this.size.height - baseheight) / 2;
+
 		let point: Point = new Point(-this.size.width / 2, -this.size.height / 2);
 		let points: Array<Point> = [
-			new Point(point.x, point.y),
-			new Point(point.x + this.size.width, point.y),
-			new Point(point.x + this.size.width, point.y + this.size.height),
-			new Point(point.x, point.y + this.size.height),
+			new Point(point.x + basewidth, point.y + diff),
+			new Point(point.x, point.y + diff),
+			new Point(point.x, point.y + this.size.height - diff),
+			new Point(point.x + basewidth, point.y + this.size.height - diff),
+			new Point(point.x + basewidth, point.y + this.size.height),
+			new Point(point.x + this.size.width, point.y + (this.size.height / 2)),
+			new Point(point.x + basewidth, point.y),
 		];
 
 		this.clearPath();
-		this.path.rect(points[0].x, points[0].y, this.size.width, this.size.height);
+		this.path.moveTo(points[0].x, points[0].y);
+		this.path.lineTo(points[1].x, points[1].y);
+		for(let i: number = 1; i < points.length; i++)
+			this.path.lineTo(points[i].x, points[i].y);
+		this.path.lineTo(points[0].x, points[0].y)
 		this.path.closePath();
 
 		this.points = points;
@@ -60,9 +55,9 @@ export class Rectangle extends Drawable
 		context2D.save();
 		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
 
+		context2D.lineWidth = this.linewidth;
 		context2D.strokeStyle = this.strokecolor;
 		context2D.fillStyle = this.fillcolor;
-		context2D.lineWidth = this.linewidth;
 		context2D.globalAlpha = this.alpha;
 		context2D.shadowBlur = this.shadow;
 		context2D.shadowColor = this.shadowcolor;

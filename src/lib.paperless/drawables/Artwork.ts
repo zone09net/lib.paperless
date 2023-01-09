@@ -1,7 +1,7 @@
 import {Point} from '../Point.js';
 import {Size} from '../Size.js';
 import {Rectangle} from './Rectangle.js';
-import {IDrawableArtworkAttributes} from '../IDrawable.js';
+import {IDrawableArtworkAttributes} from '../interfaces/IDrawable.js';
 
 
 
@@ -61,7 +61,7 @@ export class Artwork extends Rectangle
 		this.path.closePath();
 
 		this.points = points;
-		this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x + (this.size.width / 2), this.point.y + (this.size.height / 2)) }
+		this.boundaries = { topleft: new Point(this.x - (this.size.width / 2), this.y - (this.size.height / 2)), bottomright: new Point(this.x + (this.size.width / 2), this.y + (this.size.height / 2)) }
 	}
 	
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void

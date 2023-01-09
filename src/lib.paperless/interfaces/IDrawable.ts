@@ -47,10 +47,6 @@ export interface IDrawableAttributes
 	 */
 	 angle?: number,
 	/**
-	 * @fixme					What is the use of that?
-	 */
-	autodraw?: boolean,
-	/**
 	 * Determines if the [[Drawable]] is going to be sticky or not. When set to true, the sticky property tells the [[Context]] to draw 
 	 * the Drawable at the top of the others. 
 	 */

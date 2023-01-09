@@ -1,5 +1,4 @@
-import {Drawable} from './Drawable.js';
-import {Point} from './Point.js';
+import {Drawable} from '../Drawable.js';
 
 
 

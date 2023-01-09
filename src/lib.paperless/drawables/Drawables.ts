@@ -7,3 +7,5 @@ export {Label} from './Label.js';
 export {Artwork} from './Artwork.js';
 export {Star} from './Star.js';
 export {Triangle} from './Triangle.js';
+export {Smiley} from './Smiley.js';
+export {Arrow} from './Arrow.js';

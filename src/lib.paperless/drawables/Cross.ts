@@ -1,7 +1,7 @@
 import {Point} from '../Point.js';
 import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
-import {IDrawableAttributes} from '../IDrawable.js';
+import {IDrawableAttributes} from '../interfaces/IDrawable.js';
 
 
 
@@ -37,7 +37,7 @@ export class Cross extends Drawable
 		this.path.lineTo(points[3].x, points[3].y);
 
 		this.points = points;
-		this.boundaries = { topleft: new Point(this.point.x - (this.size.width / 2), this.point.y - (this.size.height / 2)), bottomright: new Point(this.point.x + (this.size.width / 2), this.point.y + (this.size.height / 2)) }
+		this.boundaries = { topleft: new Point(this.x - (this.size.width / 2), this.y - (this.size.height / 2)), bottomright: new Point(this.x + (this.size.width / 2), this.y + (this.size.height / 2)) }
 	}
 
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
