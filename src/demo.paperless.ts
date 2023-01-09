@@ -1,16 +1,67 @@
-
-
-import * as Paperless from '@zone09.net/paperless';
-import {Triangle} from './demo.paperless/drawables/Triangle.js'
-import {Smiley} from './demo.paperless/drawables/Smiley.js'
-import {Vortex} from './demo.paperless/drawables/Vortex.js'
-import {Disappear} from './demo.paperless/controls/Disappear.js'
-import {Effects} from './demo.paperless/fx/Effects.js'
+import * as Paperless from './lib.paperless.js';
 
 
 
-let context: Paperless.Context = new Paperless.Context({stageOffset: 0, autosize: true});
+let context: Paperless.Context = new Paperless.Context({autosize: true, dragging: {delay: 0}});
 context.attach(document.body);
+
+
+/*
+let drawable1: Paperless.Drawable;
+let drawable2: Paperless.Drawable;
+let control: Paperless.Control;
+
+drawable1 = context.attach(new Smiley(new Paperless.Point(300, 300), 100));
+drawable2 = context.attach(new Smiley(new Paperless.Point(600, 600), 100, {offset: {x: 100, y: 100}}));
+drawable2.matrix = drawable1.matrix;
+
+control = context.attach(new Paperless.Controls.Button(() => {
+	drawable1.x = 600;
+	console.log(drawable1.matrix, drawable2.matrix)
+}))
+
+control.attach(drawable1);
+*/
+
+//let gaga: Paperless.Drawables.Rectangle = context.attach(new Paperless.Drawables.Rectangle(new Paperless.Point(200, 100), new Paperless.Size(100, 100), {rotation: 0, scale: {x:1, y:1}}));
+//gaga.scaley = 0.5;
+
+
+/*
+let drawable: Paperless.Drawables.Rectangle = context.attach(new Paperless.Drawables.Rectangle(new Paperless.Point(100, 100), new Paperless.Size(50, 100), {angle: 0, scale: {x:1, y:1}}));
+let control: Paperless.Control =  context.attach(new Paperless.Controls.Button(() => {
+	context.fx.add({
+		duration: 1000,
+		drawable: drawable, 
+		effect: context.fx.translate,
+		smuggler: { ease: Paperless.Fx.easeOutBounce, angle: 0, distance: 300 },
+		complete: () => {  
+
+		}
+	});
+	context.fx.add({
+		duration: 1000,
+		drawable: drawable,
+		effect: context.fx.scale,
+		//loop: true,
+		smuggler: { ease: Paperless.Fx.easeOutBounce, scale: {x: -0.2, y: -0.2}, angle: 45, distance: 300 },
+		complete: () => {  
+		}
+	});
+	context.fx.add({
+		duration: 250,
+		drawable: drawable,
+		effect: context.fx.rotate,
+		//loop: true,
+		smuggler: { ease: Paperless.Fx.easeLinear, scale: {x: 0.5, y: 0.5}, angle: 90, distance: 300 },
+		complete: () => {  
+		}
+	});
+}));
+control.attach(drawable);
+*/
+
+
 
 
 
@@ -103,106 +154,6 @@ context.attach(new Paperless.Drawables.Cross(point, new Paperless.Size(100, 100)
 
 
 
-/*
-// group
-let group: Paperless.Group = context.attach(new Paperless.Group());
-let smiley1: Smiley = context.attach(new Smiley(new Paperless.Point((window.innerWidth / 2) - 100, (window.innerHeight / 2) - 100), 50))
-let smiley2: Smiley = context.attach(new Smiley(new Paperless.Point((window.innerWidth / 2) + 100, (window.innerHeight / 2) + 100), 50))
-let smiley3: Smiley = context.attach(new Smiley(new Paperless.Point((window.innerWidth / 2) + 100, (window.innerHeight / 2) - 100), 50))
-let smiley4: Smiley = context.attach(new Smiley(new Paperless.Point((window.innerWidth / 2) - 100, (window.innerHeight / 2) + 100), 50))
-let control1: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank);
-let control2: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank);
-let control3: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank);
-let control4: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank);
-
-control1.attach(smiley1);
-control2.attach(smiley2);
-control3.attach(smiley3);
-control4.attach(smiley4);
-
-group.attach([smiley1, smiley2])
-*/
-
-
-/*
-// kill the 500
-for(let i: number = 0; i < 500; i++)
-{
-	let drawable: Paperless.Drawable;
-	let control: Paperless.Control;
-	let radius: number = Math.floor(Math.random() * 30 + 20);
-	let x: number = (Math.random() * (window.innerWidth - (radius * 2))) + radius;
-	let y: number = (Math.random() * (window.innerHeight - (radius * 2) )) + radius;
-
-	drawable = context.attach(new Smiley(new Paperless.Point(x, y), radius));
-	control = context.attach(new Disappear())
-
-	control.attach(drawable);
-}
-*/
-
-
-/*
-// vortex
-for(let adder: number = 10, space: number = 4; adder < 400; adder+= space)
-{
-	context.fx.add({
-		duration: Math.floor(Math.random() * 2000 + 2000),
-		drawable: context.attach(new Vortex(new Paperless.Point(window.innerWidth / 2, window.innerHeight / 2), adder + space, adder)),
-		effect: Effects.fullRotate,
-		loop: true,
-		smuggler: { ease: Paperless.Fx.easeLinear, custom: {reverse: Math.round(Math.random())} },
-	});
-}
-*/
-
-
-/*
-// bouncing smileys
-for(let i: number = 0; i < 1; i++){
-	context.fx.add({
-		duration: 1,
-		drawable: context.attach(new Smiley(new Paperless.Point(window.innerWidth / 2, window.innerHeight / 2), 50)),
-		effect: Effects.bounce,
-		loop: true,
-		smuggler: { ease: Paperless.Fx.easeLinear, custom: {} },
-	});
-}
-*/
-
-
-/*
-// falling smileys
-for(let i: number = 0; i < 50; i++)
-{
-	let radius: number = Math.floor(Math.random() * 30 + 20);
-	let x: number = (Math.random() * (window.innerWidth - (radius * 2))) + radius;
-	let y: number = (Math.random() * (window.innerHeight - (radius * 2))) + radius;
-
-	let drawable: Paperless.Drawable = context.attach(new Smiley(new Paperless.Point(x, y), radius));
-	let control: Paperless.Control = context.attach(new Paperless.Controls.Button(() => {
-		let guids: Array<string> = [];
-		
-		Paperless.Context.near(drawable.context.getDrawables(), drawable.point, 100, guids)
-
-		for(let guid of guids)
-		{
-			let drawable: Paperless.Drawable = context.get(guid);
-			let distance: number = Math.floor(window.innerHeight - drawable.point.y - (drawable.size.height / 2));
-
-			context.fx.add({
-				duration: distance * 2,
-				drawable: drawable,
-				effect: context.fx.move,
-				smuggler: { ease: Paperless.Fx.easeOutBounce, angle: 90, distance: distance },
-			});
-		}
-	}))
-
-	control.attach(drawable);
-}
-*/
-
 
 
 /*
@@ -224,100 +175,49 @@ context.attach(slider)
 
 
 
-// polygon
-// ----------
-
-//context.attach(group1);
-//context.attach(group2);
-
-for(let i: number = 0; i < 20; i++)
-{
-	let random: number = Math.floor(Math.random() * 4);
-	let color: string = '#' + Math.floor(16777215 - (Math.random() * 15000000)).toString(16);
-	let radius: number = Math.floor(Math.random() * 30 + 20);
-	let width: number = Math.floor(Math.random() * 60 + 20);
-	let height: number = Math.floor(Math.random() * 60 + 20);
-	let x: number = (Math.random() * (window.innerWidth - width - 486)) + (width / 2) + 486;
-	let y: number = (Math.random() * (window.innerHeight - height - 300)) + (height / 2) + 300;
-	let rx: number = (Math.random() * (window.innerWidth - (radius * 2) - 486)) + radius + 486;
-	let ry: number = (Math.random() * (window.innerHeight - (radius * 2) - 300)) + radius + 300;
-	let drawable: Paperless.Drawable;
-	let control: Paperless.Control;
-
-	switch(random)
-	{
-		case 0:
-			drawable = context.attach(new Paperless.Drawables.Circle(new Paperless.Point(rx, ry), radius));
-			control = context.attach(new Paperless.Controls.Button(() => {drawable.visible = false; console.log('hit')}));
-			control.attach(drawable);
-			drawable.fillcolor = color;
-			//group1.attach(drawable);
-			break;
-
-		case 1:
-			console.log('akjha')
-			drawable = context.attach(new Paperless.Drawables.Hexagon(new Paperless.Point(rx, ry), radius));
-			control = context.attach(new Paperless.Controls.Button(() => {
-				//context.get(control.id).enabled = false;
-				//context.get(control.id).movable = false;
-
-				let scale: {x: number, y: number} = undefined;
-				drawable.scale.x == 1 ? scale = {x: 0.5, y: 0.5} : scale = {x: 1, y: 1};
-
-				context.fx.add({
-					duration: 1000,
-					drawable: drawable,
-					effect: context.fx.scale,
-					smuggler: { ease: Paperless.Fx.easeOutElastic, angle: 60, distance: 250, scale: scale },
-					complete: () => {
-						//context.get(control.id).enabled = true;
-						//context.get(control.id).movable = true;
-					}
-				});
-
-				context.fx.add({
-					duration: 1000,
-					loop: true,
-					drawable: drawable,
-					effect: context.fx.rotate,
-					smuggler: { ease: Paperless.Fx.easeOutBounce, angle: 60},
-					complete: undefined
-				});
-			}));
-
-			control.attach(drawable);
-			control.movement = 'horizontal';
-			drawable.fillcolor = color;
-			//group2.attach(drawable);
-			break;
-
-		case 2:
-			drawable = context.attach(new Paperless.Drawables.Rectangle(new Paperless.Point(x, y), new Paperless.Size(width, height)));
-			control = context.attach(new Paperless.Controls.Button(() => {
-				let guids: Array<string> = [drawable.guid];
-				Paperless.Context.near(drawable.context.getDrawables(), drawable.point, 100, guids)
-
-				console.log(guids);
-			}))
-
-			control.attach(drawable);
-			drawable.fillcolor = color;
-			break;
-
-		case 3:
-			drawable = context.attach(new Paperless.Drawables.Hexagon(new Paperless.Point(rx, ry), radius, {sides: 3}));
-			control = context.attach(new Paperless.Controls.Blank())
-
-			control.attach(drawable);
-			drawable.fillcolor = color;
-			drawable.rotation = 30;
-			break;
-	}
-}
 
 /*
+let t1: number;
+let t2: number;
+
+t1 = new Date().getTime();
+for(let i: number = 0; i < 1000; i++)
+	context.getGuidGenerator().create('1', 'b');
+t2 = new Date().getTime();
+console.log((t2 - t1) + ' ms');
+
+t1 = new Date().getTime();
+for(let k: number = 0; k < 1000; k++)
+{
+	//let pattern: string = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
+	let random: string = Math.random().toString(16).substring(2) + Math.random().toString(16).substring(2) + Math.random().toString(16).substring(2);
+	let splitted: Array<string> = random.substring(0, 36).split('');
+	splitted[8] = '-';
+	splitted[13] = '-';
+	splitted[14] = 'V'
+	splitted[18] = '-';
+	splitted[19] = 'V'
+	splitted[23] = '-';
+	random = splitted.join('');
+}
+
+t2 = new Date().getTime();
+console.log((t2 - t1) + ' ms');
 
 
+let random: string = Math.random().toString(16).substring(2) + Math.random().toString(16).substring(2) + Math.random().toString(16).substring(2);
+let splitted: Array<string> = random.substring(0, 36).split('');
+splitted[8] = '-';
+splitted[13] = '-';
+splitted[18] = '-';
+splitted[23] = '-';
+random = splitted.join('');
+
+console.log(random)
+*/
+
+
+/*
 
 let label: Paperless.Drawables.Label = new Paperless.Drawables.Label(new Paperless.Point(20, 220), new Paperless.Size(200, 100), 'This is a huge test for the sake of the label because I want this to be perfect!!!', {
 	font: '14px CPMono_v07_Light',
