@@ -5,5 +5,6 @@ export enum Restrict
 	vertical = 2,
 	ondrag = 3,
 	onrelease = 4,
+	norefresh = 5
  }
  

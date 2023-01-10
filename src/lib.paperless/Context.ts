@@ -240,7 +240,7 @@ export class Context
 			throw new Error('Context.attach need either a Drawable/Control/Component/Group/DrawActions/MouseActions/HTMLElement type');
 	}
 
-	public detach(guids: Array<string> | string): void
+	public detach(guids: Array<string> | string, restrict: Restrict.norefresh | Restrict.none = Restrict.norefresh): void
 	{
 		let guidlist: Array<string>;
 
@@ -329,6 +329,9 @@ export class Context
 		}
 
 		this.states.sorted = false;
+
+		if(restrict == Restrict.none)
+			this.refresh();
 	}
 
 	public get<Type extends Drawable | Control | Component | Group>(guid: string): Type

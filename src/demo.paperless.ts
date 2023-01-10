@@ -125,7 +125,7 @@ context.attach(drawable)
 */
 
 
-/*
+
 // label
 let point: Paperless.Point = new Paperless.Point(window.innerWidth / 2, window.innerHeight / 2);
 let zone09net: Paperless.Drawable = context.attach(new Paperless.Drawables.Label(point, new Paperless.Size(100, 100), {
@@ -147,7 +147,7 @@ let zone09net: Paperless.Drawable = context.attach(new Paperless.Drawables.Label
 }));
 
 context.attach(new Paperless.Drawables.Cross(point, new Paperless.Size(100, 100), {strokecolor: '#666666'}));
-*/
+
 
 //context.attach(new Paperless.Drawables.Cross(new Paperless.Point(zone09net.boundaries.topleft.x, zone09net.boundaries.topleft.y), new Paperless.Size(10, 10), {nofill: true, strokecolor: '#deaf2f'}));
 //context.attach(new Paperless.Drawables.Cross(new Paperless.Point(zone09net.boundaries.bottomright.x, zone09net.boundaries.bottomright.y), new Paperless.Size(10, 10), {nofill: true, strokecolor: '#deaf2f'}));
