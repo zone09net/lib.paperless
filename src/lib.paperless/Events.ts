@@ -14,7 +14,7 @@ export class Events
 		event.preventDefault();
 
 		let refresh: boolean = false;
-		let pointer: Point = new Point(event.clientX * window.devicePixelRatio, event.clientY * window.devicePixelRatio, { scale: context.scale });
+		let pointer: Point = new Point(event.clientX, event.clientY, { scale: window.devicePixelRatio * context.scale });
 
 		context.states.pointer.last = context.states.pointer.current;
 		context.states.pointer.current = pointer.toRealPosition(<HTMLElement>event.currentTarget);
@@ -90,7 +90,7 @@ export class Events
 
 		event.preventDefault();
 
-		context.states.pointer.clicked = new Point(context.states.pointer.current.x, context.states.pointer.current.y);
+		context.states.pointer.clicked = new Point(context.states.pointer.current.x, context.states.pointer.current.y, { scale: 1 });
 		context.states.mousedown = true;
 
 		context.getExtendedMouseActions().map.forEach((entry: any) => {
@@ -113,12 +113,12 @@ export class Events
 						{
 							context.states.drag = true;
 							//(<any>drawable.points)['dragdiff'] = new Point(context.states.pointer.current.x - drawable.matrix.e, context.states.pointer.current.y - drawable.matrix.f);
-							smuggler.dragdiff = new Point(context.states.pointer.current.x - drawable.matrix.e, context.states.pointer.current.y - drawable.matrix.f);
+							smuggler.dragdiff = new Point((context.states.pointer.current.x / context.scale / window.devicePixelRatio) - drawable.matrix.e, (context.states.pointer.current.y / context.scale / window.devicePixelRatio) - drawable.matrix.f, { scale: context.scale * window.devicePixelRatio });
 
 							if(group)
 							{
 								[...group.map, ...group.enrolled].forEach((entry: any) => {
-									entry[1].object.points['origin'] = new Point(drawable.matrix.e - entry[1].object.matrix.e, drawable.matrix.f - entry[1].object.matrix.f);
+									entry[1].object.points['origin'] = new Point(drawable.matrix.e - entry[1].object.matrix.e, drawable.matrix.f - entry[1].object.matrix.f, { scale: 1 });
 								});
 							}
 

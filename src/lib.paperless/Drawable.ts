@@ -103,7 +103,7 @@ export class Drawable
 		context2D.save();
 		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
 		context2D.lineWidth = this.linewidth;
-		hover = context2D.isPointInPath(this.path, point.x, point.y) || context2D.isPointInStroke(this.path, point.x, point.y);
+		hover = context2D.isPointInPath(this.path, point.x / this.context.scale / window.devicePixelRatio, point.y / this.context.scale / window.devicePixelRatio) || context2D.isPointInStroke(this.path, point.x / this.context.scale / window.devicePixelRatio, point.y / this.context.scale / window.devicePixelRatio);
 		context2D.restore();
 		
 		return hover;

@@ -17,14 +17,13 @@ export class Point
 	 */
 	public constructor(x: number, y: number, attributes: IPoint = {})
 	{
-		this._x = x;
-		this._y = y;
-
 		const {
 			blocked = { x: false, y: false },
 			scale = 1,
 		} = attributes;
 
+		this._x = x * scale;
+		this._y = y * scale;
 		this._blocked = blocked;
 		this._scale = scale;
 	}
@@ -52,8 +51,8 @@ export class Point
 
 		this._x -= rect.left;
 		this._y -= rect.top;
-		this._x /= this._scale;
-		this._y /= this._scale;
+		this._x /= this._scale / this._scale;
+		this._y /= this._scale / this._scale; 
 
 		return this;
 	}

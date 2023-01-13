@@ -70,7 +70,6 @@ export class Context
 			shadowcolor: shadowcolor,
 			alpha: alpha,
 			scale: scale,
-			size: size,
 			autosize: autosize,
 			features: {
 				...{ nohover: false, nodragging: false, nosnapping: true, nodefault: false },
@@ -110,9 +109,9 @@ export class Context
 				sorted: true,
 
 				pointer: {
-					current: new Point(-1, -1),
-					last: new Point(-1, -1), 
-					clicked: new Point(-1, -1),
+					current: new Point(-1, -1, {scale: scale}),
+					last: new Point(-1, -1, {scale: scale}), 
+					clicked: new Point(-1, -1, {scale: scale}),
 					control: undefined, 
 				},
 
@@ -123,7 +122,7 @@ export class Context
 
 		this._viewport.context.main = this._viewport.canvas.main.getContext("bitmaprenderer", {alpha: false});
 		this._viewport.context.buffer = this._viewport.canvas.buffer.getContext("2d", {alpha: false});
-		this.size = this._attributes.size;
+		this.size = size;
 
 
 		this._viewport.canvas.main.addEventListener("touchmove", Events.handleTouchMove.bind(null, this),  {passive: false});
@@ -393,6 +392,9 @@ export class Context
 			{
 				control.drawable.matrix.e = this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x;
 				control.drawable.matrix.f = this.states.pointer.current.y - this._viewport.smuggler.dragdiff.y;
+
+				control.drawable.matrix.e /= (window.devicePixelRatio * this.scale);
+				control.drawable.matrix.f /= (window.devicePixelRatio * this.scale);
 			}
 			else if(control.restrict == Restrict.horizontal)
 				control.drawable.matrix.e = this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x;
@@ -609,7 +611,7 @@ export class Context
 	 */
 	public get size(): Size
 	{
-		return this._attributes.size;
+		return new Size(this.canvas.width, this.canvas.height);
 	}
 	/**
 	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are setted with new width and height values. 
@@ -620,17 +622,13 @@ export class Context
 		//let ratio: number = window.devicePixelRatio;
 		let ratio: number = 1;
 
-		this._attributes.size = size;
-
 		this.canvas.width = size.width * ratio;
 		this.canvas.height = size.height * ratio;
 		this._viewport.canvas.buffer.width = size.width * ratio;
 		this._viewport.canvas.buffer.height = size.height * ratio;
-
-		//this._stage.view.canvas.main.style.width = this._stage.view.canvas.main.width / ratio + 'px';
-		//this._stage.view.canvas.main.style.height = this._stage.view.canvas.main.height / ratio + 'px';
-
-		//this.context2D.translate(this._attributes.offset.x, this._attributes.offset.y);
+		
+		//this._viewport.canvas.main.style.width = (this._viewport.canvas.main.width ) * ratio + 'px';
+		//this._viewport.canvas.main.style.height = (this._viewport.canvas.main.height ) * ratio + 'px';
 
 		this.refresh();
 	}
