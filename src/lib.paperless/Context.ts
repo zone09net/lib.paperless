@@ -505,9 +505,9 @@ export class Context
 				if(unfocusControl instanceof Control)
 					unfocusControl.onLostFocus();
 			}
-
-			this.states.focussed = guid;
+			
 			focusControl.onFocus();
+			this.states.focussed = guid;
 		}
 	}
 
