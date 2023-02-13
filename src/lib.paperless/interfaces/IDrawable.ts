@@ -45,7 +45,7 @@ export interface IDrawableAttributes
 	/**
 	 * Determines the rotation values of the [[Drawable]] at the [[Context]] draw phase. Can be from 0 to 360 degrees.
 	 */
-	 angle?: number,
+	angle?: number,
 	/**
 	 * Determines if the [[Drawable]] is going to be sticky or not. When set to true, the sticky property tells the [[Context]] to draw 
 	 * the Drawable at the top of the others. 
