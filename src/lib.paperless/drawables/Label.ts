@@ -68,10 +68,10 @@ export class Label extends Drawable
 	public generate(): void
 	{
 		let x: number = 0;
-		let y: number = 0;
+		let y: number = 2;
 		let maxwidth = 0;
 		let context2D: CanvasRenderingContext2D = this._canvas.getContext("2d");
-		let boundingbox = this.boundingbox('j');
+		let boundingbox = this.boundingbox('[j');
 		
 		// applying options to get the spitted array and size of label
 		if(this._attributes.multiline)
@@ -431,7 +431,7 @@ export class Label extends Drawable
 			boundingbox.width = context2D.measureText(text).width;
 		else
 			boundingbox.width = 0;
-		boundingbox.height = context2D.measureText('j').actualBoundingBoxDescent + context2D.measureText('j').actualBoundingBoxAscent;
+		boundingbox.height = context2D.measureText('[j').actualBoundingBoxDescent + context2D.measureText('[j').actualBoundingBoxAscent;
 
 		context2D.restore();
 
@@ -451,7 +451,6 @@ export class Label extends Drawable
 
 		return newlines;
 	}
-
 
 
 	// Accessors
