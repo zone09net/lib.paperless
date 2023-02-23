@@ -136,6 +136,7 @@ export class Context
 		this._viewport.canvas.main.addEventListener("resize", Events.handleResize.bind(null, this, this._viewport.smuggler), false);
 		this._viewport.canvas.main.addEventListener("contextmenu", Events.handleRightMouseClick.bind(null, this), false);		// preventDefault
 		this._viewport.canvas.main.addEventListener("dragstart", Events.handleDragStart.bind(null, this), false);				// preventDefault
+		this._viewport.canvas.main.addEventListener("dragover", Events.handleMouseMove.bind(null, this), {passive: false});
 		window.addEventListener("resize", Events.handleResize.bind(null, this, this._viewport.smuggler), false);
 	}
 
