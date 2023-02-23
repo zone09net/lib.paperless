@@ -9,9 +9,8 @@ import {IDrawableLabelFilter} from '../interfaces/IDrawable.js';
 export class Label extends Drawable
 {
 	private _content: string;
-	private _canvas: HTMLCanvasElement = document.createElement("canvas");
+	private _canvas: OffscreenCanvas = new OffscreenCanvas(0, 0);
 	private _splitted: Array<string> = [];
-	private _image: HTMLImageElement = new Image();
 	private _attributes: IDrawableLabelAttributes;
 	//---
 
@@ -70,7 +69,7 @@ export class Label extends Drawable
 		let x: number = 0;
 		let y: number = 2;
 		let maxwidth = 0;
-		let context2D: CanvasRenderingContext2D = this._canvas.getContext("2d");
+		let context2D: OffscreenCanvasRenderingContext2D = this._canvas.getContext("2d");
 		let boundingbox = this.boundingbox('[j');
 		
 		// applying options to get the spitted array and size of label
@@ -264,8 +263,6 @@ export class Label extends Drawable
 			else
 				break;
 		}
-
-		this._image.src = this._canvas.toDataURL('image/png');
 	}
 
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
@@ -290,9 +287,9 @@ export class Label extends Drawable
 		context2D.shadowColor = this.shadowcolor;
 		
 		if(this._attributes.corner)
-			context2D.drawImage(this._image, this._attributes.padding.left, this._attributes.padding.top);
+			context2D.drawImage(this._canvas, this._attributes.padding.left, this._attributes.padding.top);
 		else
-			context2D.drawImage(this._image, (-this._image.width / 2) + this._attributes.padding.left,  (-this._image.height / 2) + this._attributes.padding.top);
+			context2D.drawImage(this._canvas, (-this._canvas.width / 2) + this._attributes.padding.left,  (-this._canvas.height / 2) + this._attributes.padding.top);
 
 		context2D.restore();
 	}
@@ -313,7 +310,7 @@ export class Label extends Drawable
 
 	private wrap(maxWidth: number, maxLine: number): Array<string>
 	{
-		let context2D: CanvasRenderingContext2D = this._canvas.getContext("2d");
+		let context2D: OffscreenCanvasRenderingContext2D = this._canvas.getContext("2d");
 		let nLine: number = 0;
 		let aOut: Array<string> = [];
 		let nCount: number = 0;
@@ -419,7 +416,7 @@ export class Label extends Drawable
 
 	public boundingbox(text?: string): {width: number, height: number}
 	{
-		let context2D: CanvasRenderingContext2D = this._canvas.getContext("2d");
+		let context2D: OffscreenCanvasRenderingContext2D = this._canvas.getContext("2d");
 		let boundingbox: {width: number, height: number} = {width: 0, height: 0};
 
 		context2D.save();
@@ -465,12 +462,12 @@ export class Label extends Drawable
 		this._content = content;
 	}
 
-	get contentAs(): {splitted: Array<string>, image: HTMLImageElement}
+	get contentAs(): {splitted: Array<string>}
 	{
 		if(!this._splitted[0])
 			this._splitted[0] = '';
 			
-		return { splitted: this._splitted, image: this._image};
+		return { splitted: this._splitted };
 	}
 
 	get font(): string
