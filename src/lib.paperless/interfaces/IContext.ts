@@ -42,6 +42,7 @@ export interface IStates
 	drag: boolean,
 	focussed: string,
 	sorted: boolean,
+	norefresh: boolean, 
 
 	pointer: {
 		current: Point,

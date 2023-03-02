@@ -107,6 +107,7 @@ export class Context
 				drag: false,
 				focussed: undefined,
 				sorted: true,
+				norefresh: false,
 
 				pointer: {
 					current: new Point(-1, -1, {scale: scale}),
@@ -358,7 +359,8 @@ export class Context
 
 	public refresh(): void
 	{
-		window.requestAnimationFrame(() => this.draw());
+		if(!this._viewport.states.norefresh)
+			window.requestAnimationFrame(() => this.draw());
 	}
 
 	/*
