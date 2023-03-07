@@ -199,6 +199,7 @@ export class Context
 			entry.guid = guid;
 			entry.fx = this._fx;
 			entry.onAttach();
+			this.states.sorted = false;
 
 			return entry;
 		}
@@ -363,30 +364,6 @@ export class Context
 			window.requestAnimationFrame(() => this.draw());
 	}
 
-	/*
-	private clearBuffer(): void
-	{
-		if(!this._attributes.features.nodefault)
-		{
-			this.context2D.font = this._attributes.font;
-			this.context2D.strokeStyle = this._attributes.strokecolor;
-			this.context2D.shadowBlur = this._attributes.shadow;
-			this.context2D.shadowColor = this._attributes.shadowcolor;
-			this.context2D.globalAlpha = this._attributes.alpha;
-			this.context2D.lineWidth = this._attributes.linewidth;
-		}
-		this.context2D.imageSmoothingEnabled = false;
-		this.context2D.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		this.context2D.scale(this._attributes.scale, this._attributes.scale);
-	}
-
-	private fillMain(): void
-	{
-		let bitmap = this._viewport.canvas.buffer.transferToImageBitmap();
-		this._viewport.context.main.transferFromImageBitmap(bitmap);
-	}
-	*/
-
 	public drag(control: Control): void
 	{
 		if(this.states.drag)
@@ -431,7 +408,7 @@ export class Context
 		{
 			//this._drawActions.sort();
 			//this._mouseActions.sort();
-			//this._components.sort();
+			this._components.sort();
 			//this._groups.sort();
 			this._drawables.sort();
 			this._controls.reverse();
@@ -448,8 +425,6 @@ export class Context
 			this.context2D.lineWidth = this._attributes.linewidth;
 		}
 		this.context2D.imageSmoothingEnabled = false;
-
-		//this.clearBuffer();
 
 		this._drawActions.map.forEach((entry: any) => {
 			if(entry.object.onDrawBefore)

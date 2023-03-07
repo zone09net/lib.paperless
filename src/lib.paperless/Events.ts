@@ -197,6 +197,7 @@ export class Events
 				context.size = new Size(window.innerWidth, window.innerHeight);
 				
 				let drawables: Array<{guid: string, map: Map<string, any>}> = context.getDrawables().filter(([guid, map]: any) =>
+					/*
 					map.object.visible && 
 					map.object.boundaries &&
 					(
@@ -205,23 +206,28 @@ export class Events
 						map.object.boundaries.bottomright.y >= oldsize.height ||
 						map.object.boundaries.bottomright.y >= context.size.height 
 					)
+					*/
+					true
 				);
 				
 				drawables.forEach((map: any) => {
 					map[1].object.onResize();
 				});
-				
-//onsole.log(context.getComponents(), size);
-/*
-				let components: Array<{guid: guid, map: Map<string, any>}> = context.getComponents().filter(([guid, map]: any) =>
-					map.object.point.x + map.object.size.width > context.size.width &&
-					map.object.point.y + map.object.size.height > context.size.height
+
+				let components: Array<{guid: string, map: Map<string, any>}> = context.getComponents().filter(([guid, map]: any) =>
+					/*
+					map.object.point.x + map.object.size.width >= oldsize.width ||
+					map.object.point.x + map.object.size.width >= context.size.width ||
+					map.object.point.y + map.object.size.height >= oldsize.height ||
+					map.object.point.y + map.object.size.height >= context.size.height
+					*/
+					true
 				);
-				console.log(components)
+
 				components.forEach((map: any) => {
 					map[1].object.onResize();
 				});
-*/
+
 			}, 250);
 		}
 	}
