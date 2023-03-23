@@ -28,7 +28,7 @@ export class Drawable
 	private _nostroke: boolean;
 	private _size: Size = null;
 	private _hover: boolean = false;
-	private _point: Point;
+	//private _point: Point;
 	private _points: Array<Point> = [];
 	private _path = new Path2D();
 	private _context: Context = null;
@@ -478,6 +478,4 @@ export class Drawable
 	{
 		this._hoverable = hoverable;
 	}
-
-
 }
