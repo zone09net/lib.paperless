@@ -131,3 +131,15 @@ export interface IDrawableLabelFilter
 		}
 	}
 }
+
+export interface IDrawableArrowAttributes extends IDrawableAttributes
+{
+	/**
+	 * Will set the width of the arrow's base.
+	 */
+	basewidth?: number,
+	/**
+	* Will set the height of the arrow's base
+	*/
+	baseheight?: number,
+}
