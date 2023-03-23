@@ -10,6 +10,7 @@ export class Artwork extends Rectangle
 	private _image: HTMLImageElement = new Image();
 	private _padding: number;
 	private _autosize: boolean;
+	private _autoload: boolean;
 	//---
 
 	public constructor(point: Point, size: Size, attributes: IDrawableArtworkAttributes = {})
@@ -18,6 +19,7 @@ export class Artwork extends Rectangle
 
 		const {
 			content = 'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+			autoload = true,
 			padding = 0,
 			autosize = false,
 			nofill = true,
@@ -26,6 +28,7 @@ export class Artwork extends Rectangle
 
 		this._padding = padding;
 		this._autosize = autosize;
+		this._autoload = autoload;
 		this.nofill = nofill;
 		this.nostroke = nostroke;
 
@@ -41,15 +44,18 @@ export class Artwork extends Rectangle
 				this.size.height = this._image.height;
 			}
 
-			this.generate();
-			this.context.refresh();
+			if(this._autoload)
+			{
+				this.generate();
+				this.context.refresh();
+			}
 		};
 	}
 
 	public generate(): void
 	{
-		let point: Point = new Point(-this.size.width / 2, -this.size.height / 2);
-		let points: Array<Point> = [
+		const point: Point = new Point(-this.size.width / 2, -this.size.height / 2);
+		const points: Array<Point> = [
 			new Point(point.x, point.y),
 			new Point(point.x + this.size.width, point.y),
 			new Point(point.x + this.size.width, point.y + this.size.height),
@@ -119,5 +125,23 @@ export class Artwork extends Rectangle
 	set padding(padding: number)
 	{
 		this._padding = padding;
+	}
+
+	get autosize(): boolean
+	{
+		return this._autosize;
+	}
+	set autosize(autosize: boolean)
+	{
+		this._autosize = autosize;
+	}
+
+	get autoload(): boolean
+	{
+		return this._autoload;
+	}
+	set autoload(autoload: boolean)
+	{
+		this._autoload = autoload;
 	}
 }

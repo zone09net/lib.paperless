@@ -95,6 +95,7 @@ export interface IDrawableArtworkAttributes extends IDrawableAttributes
 	 * Default value is false.
 	 */
 	autosize?: boolean,
+	autoload?: boolean
 }
 
 export interface IDrawableLabelAttributes extends IDrawableAttributes
