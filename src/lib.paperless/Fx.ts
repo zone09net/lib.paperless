@@ -89,6 +89,7 @@ export class Fx
 					map.object.visible && 
 					map.object.group == (<Drawable>drawable).group
 				);
+				let first: {guid: string, map: Map<string, any>} = [...drawables][0];
 
 				drawables.forEach((map: any) => {
 					this._stack.push({
@@ -97,7 +98,7 @@ export class Fx
 						loop: loop,
 						effect: effect,
 						smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: {} },
-						complete: (map[1].index == 1 ? complete : null),
+						complete: (map == first ? complete : null),
 						t0: t0,
 						t1: t1,
 						t9: t9,
@@ -163,7 +164,7 @@ export class Fx
 				this._stack[i].effect(this._stack[i]);
 
 			if(this._stack[i].t === 1)
-			{				
+			{			
 				if(typeof this._stack[i].complete === 'function')
 					this._stack[i].complete(this._stack[i]);
 								
