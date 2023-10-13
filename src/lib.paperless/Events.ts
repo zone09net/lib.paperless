@@ -4,6 +4,9 @@ import {Group} from './Group.js';
 import {Drawable} from './Drawable.js';
 import {Context} from './Context.js';
 import {Size} from './Size.js';
+import {Restrict} from './enums/Restrict.js';
+import {Component} from './Component.js';
+import {MouseAction} from './MouseAction.js';
 
 
 
@@ -13,38 +16,32 @@ export class Events
 	{
 		event.preventDefault();
 
+		const pointer: Point = new Point(event.clientX, event.clientY, { scale: window.devicePixelRatio * context.scale });
 		let refresh: boolean = false;
-		let pointer: Point = new Point(event.clientX, event.clientY, { scale: window.devicePixelRatio * context.scale });
 
 		context.states.pointer.last = context.states.pointer.current;
 		context.states.pointer.current = pointer.toRealPosition(<HTMLElement>event.currentTarget);
 
-		context.getExtendedMouseActions().map.forEach((entry: any) => {
-			entry.object.onMouseMove(context);
+		context.getExtendedMouseActions().forEach((mouseaction: MouseAction) => {
+			mouseaction.onMouseMove(context);
 		});
 
 		if(!context.states.drag && !context.features.nohover)
 		{
-			let stickies: Array<{guid: string, map: Map<string, any>}> = context.getControls().sorted.filter(([guid, map]: any) =>
-				map.object.drawable.sticky
+			const stickies: Control[] = context.getControls().sorted.filter((control: Control) =>
+				control.drawable.sticky
 			);
 
-			let controls = [...stickies, ...context.getControls().sorted];
-			let length: number = controls.length;
-
-			for(let i: number = 0; i < length; i++)
-			{
-				let control: Control = (<any>controls[i])[1].object;
-
+			[...stickies, ...context.getControls().sorted].every((control: Control) => {
 				if(control.drawable && control.drawable.hoverable)
 				{
 					if(control.drawable.isHover(context.states.pointer.current))
 					{
 						if(context.states.pointer.control == control.guid)
-							break;
+							return false;
 						else
 						{
-							let unhover: Control = context.get(context.states.pointer.control);
+							const unhover: Control = context.get(context.states.pointer.control);
 
 							if(unhover)
 							{
@@ -58,7 +55,7 @@ export class Events
 						}
 
 						refresh = true;
-						break;
+						return false;
 					}
 					else
 					{
@@ -71,15 +68,19 @@ export class Events
 						}
 					}
 				}
-			}
+
+				return true;
+			});
 		}
 
-		if(refresh && !context.fx.id)
+		if(refresh && !context.fx.id && !context.states.drag)
 			context.refresh();
 	}
 
-	public static handleMouseDown(context: Context, smuggler: any, event: HTMLElementEventMap['mousedown']): void
+	public static handleMouseDown(context: Context, event: HTMLElementEventMap['mousedown']): void
 	{
+		event.preventDefault();
+		
 		context.canvas.dispatchEvent(new MouseEvent("mousemove", {
 			view: event.view,
 			bubbles: true,
@@ -88,45 +89,44 @@ export class Events
 			clientY: event.clientY
 		}));
 
-		event.preventDefault();
-
 		context.states.pointer.clicked = new Point(context.states.pointer.current.x, context.states.pointer.current.y, { scale: 1 });
 		context.states.mousedown = true;
 
-		context.getExtendedMouseActions().map.forEach((entry: any) => {
-			entry.object.onMouseDown(context);
+		context.getExtendedMouseActions().forEach((mouseaction: MouseAction) => {
+			mouseaction.onMouseDown(context);
 		});
 
 		if(event.button == 0 && context.states.pointer.control && !context.states.drag)
 		{
-			let control: Control = context.get(context.states.pointer.control);
+			const control: Control = context.get(context.states.pointer.control);
 
 			if(control)
 			{
-				let drawable: Drawable = control.drawable;
-				let group: Group = context.get(drawable.group);
-
 				if(control.movable && control.enabled)
 				{
-					smuggler.id.dragging = setTimeout(() => {
-						if(drawable.isHover(context.states.pointer.current))
+					context.id.dragging = setTimeout(() => {
+						if(control.drawable.isHover(context.states.pointer.current))
 						{
-							context.states.drag = true;
-							//(<any>drawable.points)['dragdiff'] = new Point(context.states.pointer.current.x - drawable.matrix.e, context.states.pointer.current.y - drawable.matrix.f);
-							smuggler.dragdiff = new Point((context.states.pointer.current.x / context.scale / window.devicePixelRatio) - drawable.matrix.e, (context.states.pointer.current.y / context.scale / window.devicePixelRatio) - drawable.matrix.f, { scale: context.scale * window.devicePixelRatio });
+							const group: Group = context.get(control.drawable.group);
 
 							if(group)
 							{
-								[...group.map, ...group.enrolled].forEach((entry: any) => {
-									entry[1].object.points['origin'] = new Point(drawable.matrix.e - entry[1].object.matrix.e, drawable.matrix.f - entry[1].object.matrix.f, { scale: 1 });
+								[...group.grouped, ...group.enrolled].forEach((drawable: Drawable) => {
+									(<any>drawable.points)['origin'] = new Point(control.drawable.x - drawable.x, control.drawable.y - drawable.y, { scale: 1 });
 								});
 							}
 
-							drawable.toFront();
+							context.states.pointer.dragdiff = new Point(
+								(context.states.pointer.current.x / context.scale / window.devicePixelRatio) - control.drawable.x, 
+								(context.states.pointer.current.y / context.scale / window.devicePixelRatio) - control.drawable.y, 
+								{ scale: context.scale * window.devicePixelRatio }
+							);
+
+							context.states.drag = true;
+							control.drawable.toFront();
 							context.setFocus(control.guid);
 							control.onDragBegin();
-							context.drag(control);
-							//window.requestAnimationFrame(() => context.drag(control));
+							context.drag();
 						}
 					}, context.dragging.delay);
 				}
@@ -134,23 +134,15 @@ export class Events
 		}
 	}
 
-	public static handleMouseUp(context: Context, smuggler: any, event: HTMLElementEventMap['mouseup']): void
+	public static handleMouseUp(context: Context, event: HTMLElementEventMap['mouseup']): void
 	{
 		event.preventDefault();
-		window.clearTimeout(smuggler.id.dragging);
+		window.clearTimeout(context.id.dragging);
 
-		let control: Control = context.getControls().get(context.states.pointer.control);
-		
-		/*
-		if(stage.states.drag && stage.drag.snapping)
-		{
-			control.drawable.matrix.e = Math.round((context.states.pointer.current.x - stage.drag.diff.x) / stage.drag.snapping) * stage.drag.snapping;
-			control.drawable.matrix.f = Math.round((context.states.pointer.current.y - stage.drag.diff.y) / stage.drag.snapping) * stage.drag.snapping;
-		}
-		*/
+		const control: Control = context.getControls().get(context.states.pointer.control);
 
-		context.getExtendedMouseActions().map.forEach((entry: any) => {
-			entry.object.onMouseUp(context);
+		context.getExtendedMouseActions().forEach((mouseaction: MouseAction) => {
+			mouseaction.onMouseUp(context);
 		});
 
 		if(control instanceof Control)
@@ -168,66 +160,43 @@ export class Events
 					control.onRightClick();
 			}
 			else if(context.states.drag)
+			{
+				if(!context.features.nosnapping && context.dragging.restrict == Restrict.onrelease)
+				{
+					control.drawable.x = Math.round((context.states.pointer.current.x - context.states.pointer.dragdiff.x) / (context.dragging.grid.x || 1)) * (context.dragging.grid.x || 1);
+					control.drawable.y = Math.round((context.states.pointer.current.y - context.states.pointer.dragdiff.y) / (context.dragging.grid.y || 1)) * (context.dragging.grid.y || 1);
+					control.drawable.x /= (window.devicePixelRatio * context.scale);
+					control.drawable.y /= (window.devicePixelRatio * context.scale);
+				}
+
 				control.onDragEnd();
+			}
 		}
 
+		window.cancelAnimationFrame(context.id.dragging);
 		context.states.mousedown = false;
 		context.states.drag = false;
 
-		/*
-		if(!context.features.nosnapping && context.dragging.restrict == Restrict.onrelease)
-		{
-			console.log('hit')
-			control.drawable.matrix.e = Math.round((context.states.pointer.current.x - smuggler.dragdiff.x) / (context.dragging.grid.x || 1)) * (context.dragging.grid.x || 1);
-			control.drawable.matrix.f = Math.round((context.states.pointer.current.y - smuggler.dragdiff.y) / (context.dragging.grid.y || 1)) * (context.dragging.grid.y || 1);
-		}
-		*/
-		context.refresh();
+		if(!context.fx.id)
+			context.refresh();
 	}
 
-	public static handleResize(context: Context, smuggler: any, event: HTMLElementEventMap['resize']): void
+	public static handleResize(context: Context, event: HTMLElementEventMap['resize']): void
 	{
 		if(context.autosize)
 		{
-			clearTimeout(smuggler.id.resizing);
+			clearTimeout(context.id.resizing);
 
-			smuggler.id.resizing = setTimeout(() => { 
-				let oldsize = new Size(context.size.width, context.size.height);
-
+			context.id.resizing = setTimeout(() => { 
 				context.size = new Size(window.innerWidth, window.innerHeight);
 				
-				let drawables: Array<{guid: string, map: Map<string, any>}> = context.getDrawables().filter(([guid, map]: any) =>
-					/*
-					map.object.visible && 
-					map.object.boundaries &&
-					(
-						map.object.boundaries.bottomright.x >= oldsize.width ||
-						map.object.boundaries.bottomright.x >= context.size.width ||
-						map.object.boundaries.bottomright.y >= oldsize.height ||
-						map.object.boundaries.bottomright.y >= context.size.height 
-					)
-					*/
-					true
-				);
-				
-				drawables.forEach((map: any) => {
-					map[1].object.onResize();
+				context.getDrawables().filter((drawable: Drawable) => {
+					drawable.onResize();
 				});
 
-				let components: Array<{guid: string, map: Map<string, any>}> = context.getComponents().filter(([guid, map]: any) =>
-					/*
-					map.object.point.x + map.object.size.width >= oldsize.width ||
-					map.object.point.x + map.object.size.width >= context.size.width ||
-					map.object.point.y + map.object.size.height >= oldsize.height ||
-					map.object.point.y + map.object.size.height >= context.size.height
-					*/
-					true
-				);
-
-				components.forEach((map: any) => {
-					map[1].object.onResize();
+				context.getComponents().filter((component: Component) => {
+					component.onResize();
 				});
-
 			}, 250);
 		}
 	}

@@ -1,4 +1,6 @@
 import {Restrict} from "../enums/Restrict";
+import {Drawable} from "../Drawable";
+import {Context} from "../Context";
 
 
 
@@ -28,4 +30,29 @@ export interface IControlAttributes
 	 * This property determine the movement the [[Control]] can have when dragging it. Value can be **vertical** or **horizontal**.
 	 */
 	restrict?: Restrict,
+
+	context?: Context,
+
+	drawable?: Drawable,
+
+	onLeftClick?: () => void,
+	onRightClick?: () => void,
+	onDragBegin?: () => void,
+	onDrag?: () => void,
+	onDragEnd?: () => void,
+	onInside?: () => void,
+	onOutside?: () => void,
+	onFocus?: () => void,
+	onLostFocus?: () => void,
+	onAttach?: () => void,
+	onDetach?: () => void,
+	onDrawable?: () => void,
+}
+
+export interface IControlButtonAttributes extends IControlAttributes
+{
+	callbackLeftClick?: (smuggler: any) => void,
+	callbackRightClick?: (smuggler: any) => void, 
+	smugglerLeftClick?: any, 
+	smugglerRightClick?: any
 }

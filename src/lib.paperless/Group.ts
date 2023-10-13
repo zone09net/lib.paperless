@@ -4,6 +4,7 @@ import {Drawable} from './Drawable.js';
 import {Control} from './Control.js';
 import {Component} from './Component.js';
 import {IGroupAttributes} from './interfaces/IGroup.js';
+import {Fx} from './Fx.js';
 
 
 
@@ -43,9 +44,10 @@ import {IGroupAttributes} from './interfaces/IGroup.js';
  */
 export class Group
 {
-	private _context: Context = null;
-	private _guid: string = '';
-	private _map: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+	private _context: Context = undefined;
+	private _guid: string = undefined;
+	private _fx: Fx = undefined;
+	private _grouped: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _enrolled: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	//---
 
@@ -85,9 +87,9 @@ export class Group
 		{
 			for(let item of entity)
 			{
-				if(!this._map.has(item.guid))
+				if(!this._grouped.has(item.guid))
 				{
-					let entry: any = this._map.set(item.guid, item);
+					let entry: any = this._grouped.set(item.guid, item);
 
 					entry.group = this.guid;
 				}
@@ -95,9 +97,9 @@ export class Group
 		}
 		else
 		{
-			if(!this._map.has(entity.guid))
+			if(!this._grouped.has(entity.guid))
 			{
-				let entry: any = this._map.set(entity.guid, entity);
+				let entry: any = this._grouped.set(entity.guid, entity);
 
 				entry.group = this.guid;
 			}
@@ -115,13 +117,13 @@ export class Group
 		{
 			for(let item of entity)
 			{
-				this._map.delete(item.guid);
+				this._grouped.delete(item.guid);
 				item.group = undefined;
 			}
 		}
 		else
 		{
-			this._map.delete(entity.guid);
+			this._grouped.delete(entity.guid);
 			entity.group = undefined;
 		}
 	}
@@ -148,11 +150,11 @@ export class Group
 	 */
 	public onDetach(): void 
 	{
-		this._map.map.forEach((entry: any) => {
+		this._grouped.map.forEach((entry: any) => {
 			entry.object.group = undefined;
 		});
 
-		this._map.clear();
+		this._grouped.clear();
 	}
 
 
@@ -193,6 +195,15 @@ export class Group
 	{
 		this._guid = guid;
 	}
+	
+	public get fx(): Fx
+	{
+		return this._fx;
+	}
+	public set fx(fx: Fx)
+	{
+		this._fx = fx;
+	}
 
 	/**
 	 * Gives the list of entities attached to this Group. 
@@ -213,13 +224,13 @@ export class Group
 	 * console.log(drawables)
 	 * ```
 	 */
-	public get map(): Map<string, any>
+	public get grouped(): Foundation.ExtendedMap
 	{
-		return this._map.map;
+		return this._grouped;
 	}
 
-	public get enrolled(): Map<string, any>
+	public get enrolled(): Foundation.ExtendedMap
 	{
-		return this._enrolled.map;
+		return this._enrolled;
 	}
 }

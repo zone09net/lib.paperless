@@ -1,7 +1,7 @@
 export interface IPadding
 {
 	top?: number, 
-	down?: number, 
+	bottom?: number, 
 	left?: number, 
 	right?: number
 }

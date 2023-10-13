@@ -1,16 +1,18 @@
 import {Context} from './Context.js';
+import {Fx} from './Fx.js';
 
 
 
-export class MouseActions
+export class MouseAction
 {
 	private _context: Context = undefined;
 	private _guid: string = undefined;
+	private _fx: Fx = undefined;
 	//---
 	
-	public onMouseMove(): void {}
-	public onMouseDown(): void {}
-	public onMouseUp(): void {}
+	public onMouseMove(context: Context): void {}
+	public onMouseDown(context: Context): void {}
+	public onMouseUp(context: Context): void {}
 	public onAttach(): void {}
 	public onDetach(): void {}
 	
@@ -34,5 +36,14 @@ export class MouseActions
 	public set guid(guid: string)
 	{
 		this._guid = guid;
+	}
+
+	public get fx(): Fx
+	{
+		return this._fx;
+	}
+	public set fx(fx: Fx)
+	{
+		this._fx = fx;
 	}
 }

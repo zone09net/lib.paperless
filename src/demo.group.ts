@@ -2,49 +2,127 @@ import * as Paperless from './lib.paperless.js';
 
 
 
-let context: Paperless.Context = new Paperless.Context({autosize: true, dragging: {delay: 0}});
+const context: Paperless.Context = new Paperless.Context({autosize: true, dragging: {delay: 0}});
+const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
+const vertical: Paperless.Group = context.attach(new Paperless.Group());
+const horizontal: Paperless.Group = context.attach(new Paperless.Group());
+const everyone: Paperless.Group = context.attach(new Paperless.Group());
+
+const left: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
+	context: context,
+	point: {x: (window.innerWidth / 2) - 100, y: (window.innerHeight / 2) - 30},
+	fillcolor: colors[3], 
+	angle: 270,
+	nostroke: true
+});
+
+const right: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
+	context: context,
+	point: {x: (window.innerWidth / 2) - 100, y: (window.innerHeight / 2) + 30},
+	fillcolor: colors[3], 
+	angle: 90,
+	nostroke: true
+});
+
+const top: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
+	context: context,
+	point: {x: (window.innerWidth / 2) - 30, y: (window.innerHeight / 2) - 100},
+	fillcolor: colors[4], 
+	angle: 180,
+	nostroke: true
+});
+
+const bottom: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
+	context: context,
+	point: {x: (window.innerWidth / 2) + 30, y: (window.innerHeight / 2) - 100},
+	fillcolor: colors[4], 
+	angle: 0,
+	nostroke: true
+});
+
+const orange: Paperless.Drawables.Circle = new Paperless.Drawables.Circle({
+	context: context,
+	fillcolor: colors[2],
+	nostroke: true
+});
+
+const blue: Paperless.Drawables.Circle = orange.clone({
+	context: context,
+	offset: {x: 100, y: 100},
+	fillcolor: colors[1]
+});
+
+const pink1: Paperless.Drawables.Circle = orange.clone({
+	context: context,
+	offset: {x: -100, y: -100},
+	fillcolor: colors[0]
+});
+
+const pink2: Paperless.Drawables.Circle = pink1.clone({
+	context: context,
+	offset: {x:-100, y: 100}, 
+	matrix: pink1.matrix
+})
+
+const pink3: Paperless.Drawables.Circle = pink1.clone({
+	context: context,
+	offset: {x: 100, y: -100}, 
+	matrix: pink1.matrix	
+})
+
+new Paperless.Control({
+	context: context,
+	drawable: left,
+	restrict: Paperless.Enums.Restrict.vertical
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: right,
+	restrict: Paperless.Enums.Restrict.vertical
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: top,
+	restrict: Paperless.Enums.Restrict.horizontal
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: bottom,
+	restrict: Paperless.Enums.Restrict.horizontal
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: pink1
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: pink2
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: pink3
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: blue
+});
+
+new Paperless.Control({
+	context: context,
+	drawable: orange
+});
+
 context.attach(document.body);
 
+horizontal.attach([left, right]);
+vertical.attach([top, bottom]);
 
-let colors: Array<string> = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
-let vertical: Paperless.Group = context.attach(new Paperless.Group());
-let horizontal: Paperless.Group = context.attach(new Paperless.Group());
-let group: Paperless.Group = context.attach(new Paperless.Group());
-
-let arrow1: Paperless.Drawables.Arrow = context.attach(new Paperless.Drawables.Arrow(new Paperless.Point((window.innerWidth / 2) - 100, (window.innerHeight / 2) - 30), new Paperless.Size(50, 30), {fillcolor: colors[3], angle: 270}))
-let arrow2: Paperless.Drawables.Arrow = context.attach(new Paperless.Drawables.Arrow(new Paperless.Point((window.innerWidth / 2) - 100, (window.innerHeight / 2) + 30), new Paperless.Size(50, 30), {fillcolor: colors[3], angle: 90}))
-let arrow3: Paperless.Drawables.Arrow = context.attach(new Paperless.Drawables.Arrow(new Paperless.Point((window.innerWidth / 2) - 30, (window.innerHeight / 2) - 100), new Paperless.Size(50, 30), {fillcolor: colors[4], angle: 180}))
-let arrow4: Paperless.Drawables.Arrow = context.attach(new Paperless.Drawables.Arrow(new Paperless.Point((window.innerWidth / 2) + 30, (window.innerHeight / 2) - 100), new Paperless.Size(50, 30), {fillcolor: colors[4], angle: 0}))
-let control1: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank({restrict: Paperless.Enums.Restrict.vertical}));
-let control2: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank({restrict: Paperless.Enums.Restrict.vertical}));
-let control3: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank({restrict: Paperless.Enums.Restrict.horizontal}));
-let control4: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank({restrict: Paperless.Enums.Restrict.horizontal}));
-control1.attach(arrow1);
-control2.attach(arrow2);
-control3.attach(arrow3);
-control4.attach(arrow4);
-horizontal.attach([arrow1, arrow2]);
-vertical.attach([arrow3, arrow4]);
-
-let circle1: Paperless.Drawables.Circle = context.attach(new Paperless.Drawables.Circle(new Paperless.Point((window.innerWidth / 2) - 100, (window.innerHeight / 2) - 100), 30, 0, {fillcolor: colors[0]}))
-let circle2: Paperless.Drawables.Circle = context.attach(new Paperless.Drawables.Circle(new Paperless.Point(0,0), 30, 0, {fillcolor: colors[0], offset: {x: 0, y: 200}}))
-let circle3: Paperless.Drawables.Circle = context.attach(new Paperless.Drawables.Circle(new Paperless.Point(0, 0), 30, 0, {fillcolor: colors[0], offset: {x: 200, y: 0}}))
-let circle4: Paperless.Drawables.Circle = context.attach(new Paperless.Drawables.Circle(new Paperless.Point((window.innerWidth / 2) + 100, (window.innerHeight / 2) + 100), 30, 0, {fillcolor: colors[1]}))
-let control5: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank());
-let control6: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank());
-let control7: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank());
-let control8: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank());
-control5.attach(circle1);
-control6.attach(circle2);
-control7.attach(circle3);
-control8.attach(circle4);
-circle2.matrix = circle1.matrix;
-circle3.matrix = circle1.matrix;
-
-let circle5: Paperless.Drawables.Circle = context.attach(new Paperless.Drawables.Circle(new Paperless.Point(window.innerWidth / 2, window.innerHeight / 2), 30, 0, {fillcolor: colors[2]}))
-let control9: Paperless.Controls.Blank = context.attach(new Paperless.Controls.Blank());
-control9.attach(circle5);
-group.attach(circle5);
-group.enroll([arrow1, arrow2, arrow3, arrow4, circle1, circle2, circle3, circle4, circle5])
-
-
+everyone.attach(orange);
+everyone.enroll([left, right, top, bottom, pink1, pink2, pink3, blue])

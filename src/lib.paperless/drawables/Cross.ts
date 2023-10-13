@@ -1,59 +1,86 @@
 import {Point} from '../Point.js';
-import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
-import {IDrawableAttributes} from '../interfaces/IDrawable.js';
+import {IDrawableCrossAttributes} from '../interfaces/IDrawable.js';
 
 
-
+/**
+ * The Cross class creates a new cross [[Drawable]] with the specified attributes.
+ *
+ * ```typescript
+ * const context: Paperless.Context;
+ * const cross: Paperless.Drawables.Cross;
+ *
+ * cross = new Paperless.Drawables.Cross({
+ * 	linewidth: 15,
+ * 	angle: 30
+ * });
+ * 
+ * context.attach(document.body);
+ * context.attach(cross);
+ * ```
+ */
 export class Cross extends Drawable
 {
-	public constructor(point: Point, size: Size, attributes: IDrawableAttributes = {})
+	/**
+	 * Contructs an Cross drawable.
+	 */	
+	public constructor(attributes: IDrawableCrossAttributes = {})
 	{
-		super(point, attributes);
+		super({
+			...{linewidth: 10}, 
+			...attributes,
+			...{nofill: true}
+		});
 
 		const {
 			generate = true,
 		} = attributes;
 
-		this.size = size || new Size(10, 10);
-
 		if(generate)
 			this.generate();
 	}
 
+	/**
+	 * Generates the [[Drawable]]. By default, this is called by the constructor but can be deactivated by passing 
+	 * the *generate: false* in the attributes. After the method is called, [[points]], [[path]] and [[boundaries]] are sets.
+	 */
 	public generate(): void
 	{
-		let points: Array<Point> = [
-			new Point(0, -this.size.height / 2),
-			new Point(0, this.size.height / 2),
-			new Point(-this.size.width / 2, 0),
-			new Point(this.size.width / 2, 0)
+		const points: Point[] = [
+			new Point(0, -this.height / 2),
+			new Point(0, this.height / 2),
+			new Point(-this.width / 2, 0),
+			new Point(this.width / 2, 0)
 		];
 
-		this.clearPath();
+		this.path = new Path2D();
 		this.path.moveTo(points[0].x, points[0].y);
 		this.path.lineTo(points[1].x, points[1].y);
 		this.path.moveTo(points[2].x, points[2].y);
 		this.path.lineTo(points[3].x, points[3].y);
+		this.path.closePath();
 
 		this.points = points;
-		this.boundaries = { topleft: new Point(this.x - (this.size.width / 2), this.y - (this.size.height / 2)), bottomright: new Point(this.x + (this.size.width / 2), this.y + (this.size.height / 2)) }
+		this.boundaries = { 
+			topleft: new Point(this.x - (this.width / 2) - (this.nostroke ? 0 : this.linewidth / 2), this.y - (this.height / 2) - (this.nostroke ? 0 : this.linewidth / 2)), 
+			bottomright: new Point(this.x + (this.width / 2) + (this.nostroke ? 0 : this.linewidth / 2), this.y + (this.height / 2) + (this.nostroke ? 0 : this.linewidth / 2)) 
+		}
 	}
 
-	public draw(context2D: OffscreenCanvasRenderingContext2D): void
+
+	/**
+	 * Clones this [[Drawable]] with attributes only.
+	 * 
+	 * @param 	attributes 			Attributes that you would like to override.
+	 * @returns 						A new clone of this Drawable.
+	 */
+	public clone(attributes: IDrawableCrossAttributes = {}): Cross
 	{
-		context2D.save();
-		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
+		const cloned: Cross = new Cross({
+			...this.attributes,
+			...attributes
+		});
 
-		context2D.lineWidth = this.linewidth;
-		context2D.strokeStyle = this.strokecolor;
-		context2D.globalAlpha = this.alpha;
-		context2D.shadowBlur = this.shadow;
-		context2D.shadowColor = this.shadowcolor;
-
-		if(!this.nostroke)
-			context2D.stroke(this.path);
-
-		context2D.restore();
+		return cloned;
 	}
 }

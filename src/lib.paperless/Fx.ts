@@ -37,7 +37,7 @@ export class Fx
 		easeInBounce, easeOutBounce, easeInOutBounce
 	*/
 
-	private _stack: Array<IFx> = []
+	public _stack: IFx[] = []
 	private _id: number = undefined;
 	private _context: Context;
 	//---
@@ -55,9 +55,10 @@ export class Fx
 			smuggler = { ease: Fx.easeLinear, angle: 0, distance: 0, scale: {x: 1, y: 1}, data: {} },
 			complete = null,
 			t0 = new Date().getTime(),
+			tdelta = 0,
 			t1 = true,
 			t9 = false,
-			t = 0        
+			t = 0,
 		} = fx;
 		
 		if(fx.drawable instanceof Array)
@@ -69,44 +70,46 @@ export class Fx
 					duration: duration,
 					loop: loop,
 					effect: effect,
-					smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: {} },
+					smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: smuggler.data },
 					complete: (i == 0 ? complete : null),
 					t0: t0,
+					tdelta: tdelta,
 					t1: t1,
 					t9: t9,
-					t: t
+					t: t,
 				});
 
-				if(fx.drawable[i].context)
-					this._context = fx.drawable[i].context;
+				//if(fx.drawable[i].context)
+				//	this._context = fx.drawable[i].context;
 			}
 		}
 		else
 		{
 			if((<Drawable>drawable).group && !fx.nogroup)
 			{
-				let drawables: Array<{guid: string, map: Map<string, any>}> = (<Drawable>drawable).context.getDrawables().filter(([guid, map]: any) =>
-					map.object.visible && 
-					map.object.group == (<Drawable>drawable).group
+				let drawables: Drawable[] = (<Drawable>drawable).context.getDrawables().filter((drawable_: Drawable) =>
+					drawable_.visible && 
+					drawable_.group == (<Drawable>drawable).group
 				);
-				let first: {guid: string, map: Map<string, any>} = [...drawables][0];
+				let first: Drawable = [...drawables][0];
 
-				drawables.forEach((map: any) => {
+				drawables.forEach((drawable: Drawable) => {
 					this._stack.push({
-						drawable: map[1].object,
+						drawable: drawable,
 						duration: duration,
 						loop: loop,
 						effect: effect,
-						smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: {} },
-						complete: (map == first ? complete : null),
+						smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: smuggler.data },
+						complete: (drawable == first ? complete : null),
 						t0: t0,
+						tdelta: tdelta,
 						t1: t1,
 						t9: t9,
 						t: t
 					});
 
-					if((<Drawable>map[1].object).context)
-						this._context = (<Drawable>map[1].object).context;
+					//if((<Drawable>map[1].object).context)
+					//	this._context = (<Drawable>map[1].object).context;
 				});
 			}
 			else
@@ -119,13 +122,14 @@ export class Fx
 					smuggler: smuggler,
 					complete: complete,
 					t0: t0,
+					tdelta: tdelta,
 					t1: t1,
 					t9: t9,
 					t: t
 				});
 
-				if((<Drawable>drawable).context)
-					this._context = (<Drawable>drawable).context;
+				//if((<Drawable>drawable).context)
+				//	this._context = (<Drawable>drawable).context;
 			}
 		}
 
@@ -151,8 +155,11 @@ export class Fx
 				continue;
 			}
 
+			this._stack[i].stack = i;
+
 			// t value from 0 to 1 depending on the duration
 			this._stack[i].t = (1 / this._stack[i].duration * (new Date().getTime() - this._stack[i].t0));
+			this._stack[i].tdelta = this._stack[i].t - this._stack[i].tdelta;
 
 			if(this._stack[i].t > 1)
 			{
@@ -173,7 +180,7 @@ export class Fx
 				{
 					this._stack[i].t = 0;
 					this._stack[i].t0 = new Date().getTime();
-					this._stack[i].t1 = true;
+					this._stack[i].tdelta = 0;
 				}
 				else
 					this._stack.splice(i, 1);
@@ -189,12 +196,19 @@ export class Fx
 
 		if(this._stack.length > 0)
 		{
-			this._id = window.requestAnimationFrame(() => { 
+			this._id = window.requestAnimationFrame((timestamp: number) => { 
 				this.loop(); 
 				if(this._stack.length > 0 && !this._context.states.drag)
-					this._context.draw(); 
+					this._context.draw(timestamp); 
 			});
 		}
+	}
+
+	public get(guid: string): IFx
+	{
+		const filter: IFx[] = this._stack.filter((fx: IFx) => (<Drawable>fx.drawable).guid == guid);
+
+		return filter[0];
 	}
 
 	public fadeIn(fx: IFx): void
@@ -249,7 +263,7 @@ export class Fx
 
 			fx.t1 = false;
 			fx.smuggler.data = {
-				origin: {x: (<Drawable>fx.drawable).matrix.e, y: (<Drawable>fx.drawable).matrix.f},
+				origin: {x: (<Drawable>fx.drawable).x, y: (<Drawable>fx.drawable).y},
 				delta: 0,
 				distance: 0,
 				sin: sin,
@@ -264,10 +278,10 @@ export class Fx
 		
 		if(fx.t9)
 		{
-			(<Drawable>fx.drawable).matrix.e = fx.smuggler.data.origin.x + (fx.smuggler.data.cos * fx.smuggler.distance);
-			(<Drawable>fx.drawable).matrix.f = fx.smuggler.data.origin.y + (fx.smuggler.data.sin * fx.smuggler.distance);
-			//(<Drawable>fx.drawable).matrix.e = Math.round((<Drawable>fx.drawable).matrix.e);
-			//(<Drawable>fx.drawable).matrix.f = Math.round((<Drawable>fx.drawable).matrix.f);
+			(<Drawable>fx.drawable).x = fx.smuggler.data.origin.x + (fx.smuggler.data.cos * fx.smuggler.distance);
+			(<Drawable>fx.drawable).y = fx.smuggler.data.origin.y + (fx.smuggler.data.sin * fx.smuggler.distance);
+			//(<Drawable>fx.drawable).x = Math.round((<Drawable>fx.drawable).x);
+			//(<Drawable>fx.drawable).y = Math.round((<Drawable>fx.drawable).y);
 		}
 	}
 
@@ -696,6 +710,23 @@ export class Fx
 	// Accessors
 	// --------------------------------------------------------------------------
 	
+	/**
+	 * Gets the the current [[Context]] GUID that this Group is attached to. This will be undefined if this Group has not been attached to a Context yet.
+	 */
+	public get context(): Context
+	{
+		return this._context;
+	}
+	/** 
+	 * Sets the current [[Context]] GUID to this Group. This is called internaly when this Group is attached to a Context.
+	 * 
+	 * @internal 
+	 * */
+	public set context(context: Context)
+	{
+		this._context = context;
+	}
+
 	public get id(): number
 	{
 		return this._id;

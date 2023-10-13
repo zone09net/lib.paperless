@@ -42,7 +42,7 @@
  * context.attach(new Paperless.Drawables.Hexagon(new Paperless.Point(200, 100), 30));
  * ```
  * 
- * @module
+ * @module lib.paperless
  */
 
 export {Point} from './lib.paperless/Point.js';
@@ -51,12 +51,17 @@ export {Drawable} from './lib.paperless/Drawable.js';
 export {Control} from './lib.paperless/Control.js';
 export {Component} from './lib.paperless/Component.js';
 export {Group} from './lib.paperless/Group.js';
-export {MouseActions} from './lib.paperless/MouseActions.js';
-export {DrawActions} from './lib.paperless/DrawActions.js';
+export {MouseAction} from './lib.paperless/MouseAction.js';
+export {DrawAction} from './lib.paperless/DrawAction.js';
 export {Context} from './lib.paperless/Context.js';
 export {Fx} from './lib.paperless/Fx.js';
-export {Filter} from './lib.paperless/Filter.js';
+//export {Filter} from './lib.pazperless/Filter.js';
+export {Matrix} from './lib.paperless/Matrix.js';
+export {Vector} from './lib.paperless/Vector.js';
+export {Physic} from './lib.paperless/Physic.js';
 export * as Interfaces from './lib.paperless/interfaces/Interfaces.js' ;
 export * as Controls from './lib.paperless/controls/Controls.js' ;
 export * as Drawables from './lib.paperless/drawables/Drawables.js' ;
 export * as Enums from './lib.paperless/enums/Enums.js';
+
+

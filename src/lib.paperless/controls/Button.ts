@@ -1,5 +1,5 @@
 import {Control} from '../Control.js';
-import {IControlAttributes} from '../interfaces/IControl.js';
+import {IControlButtonAttributes} from '../interfaces/IControl.js';
 
 
 
@@ -11,9 +11,16 @@ export class Button extends Control
 	private _smugglerRightClick: any;
 	//---
 
-	public constructor(callbackLeftClick: (smuggler: any) => void = null, callbackRightClick: (smuggler: any) => void = null, smugglerLeftClick: any = null, smugglerRightClick: any = null, attributes: IControlAttributes = {})
+	public constructor(attributes: IControlButtonAttributes = {})
 	{
 		super(attributes);
+
+		const {
+			callbackLeftClick = () => {},
+			callbackRightClick = () => {},
+			smugglerLeftClick = null,
+			smugglerRightClick = null
+		} = attributes;
 
 		this._callbackLeftClick = callbackLeftClick;
 		this._callbackRightClick = callbackRightClick;

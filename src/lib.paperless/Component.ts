@@ -1,3 +1,5 @@
+import * as Foundation from '@zone09.net/foundation';
+import {Drawable} from './Drawable.js';
 import {Point} from './Point.js';
 import {Size} from './Size.js';
 import {Context} from './Context.js';
@@ -12,27 +14,39 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  */
 export class Component 
 {
-	private _point: Point;
-	private _size: Size;
-	private _guid: string = '';
-	private _context: Context = null;
-	private _fx: Fx = null;
+	private _point: {x?: number, y?: number};
+	private _size: {width?: number, height?: number};
+	private _guid: string = undefined;
+	private _context: Context = undefined;
+	private _fx: Fx = undefined;
 	private _sticky: boolean;
 	private _group: string = undefined;
 
 	/**
 	 * Contructs a Component.
 	 */
-	public constructor(point: Point, size: Size, attributes: IComponentAttributes = {}) 
+	public constructor(attributes: IComponentAttributes = {}) 
 	{
-		this._point = point;
-		this._size = size;
-
 		const {
 			sticky = false,
+			point = {x: window.innerWidth / 2, y: window.innerHeight / 2},
+			size = {width: 50, height: 50},
+			context = null,
+
+			onAttach = null,
+			onDetach = null,
+			onResize = null,
 		} = attributes;
 
+		this._point = point;
+		this._size = size;
 		this._sticky = sticky;
+
+		context ? context.attach(this) : null;	
+
+		onAttach ? this.onAttach = onAttach : null;
+		onDetach ? this.onDetach = onDetach : null;
+		onResize ? this.onResize = onResize : null;
 	}
 
 	/**
@@ -127,37 +141,92 @@ export class Component
 		this._guid = guid;
 	}	
 
+	public get width(): number
+	{
+		return this._size.width;
+	}
+	public set width(width: number)
+	{
+		this._size.width = width;
+	}
+
+	public get height(): number
+	{
+		return this._size.height;
+	}
+	public set height(height: number)
+	{
+		this._size.height = height;
+	}
+
+	public get size(): Size
+	{
+		return new Size(this._size.width, this._size.height);
+	}
+
 	/**
 	 * Gets the width and height of this Component. 
 	 */
+	/*
 	public get size(): Size
 	{
 		return this._size;
 	}
+	*/
 	/**
 	 * Sets the width and height of this Component. When setting size, it is the duty of the user to resize the childs entities
 	 * that this Component may have.
 	 */
+	/*
 	public set size(size: Size)
 	{
 		this._size = size;
 	}
+	*/
+
+	public get x(): number
+	{
+		return this._point.x;
+	}
+	public set x(x: number)
+	{
+		this._point.x = x;
+	}
+
+	public get y(): number
+	{
+		return this._point.y;
+	}
+	public set y(y: number)
+	{
+		this._point.y = y;
+	}
+
+	public get point(): Point
+	{
+		return new Point(this._point.x, this._point.y);
+	}
+
 
 	/**
 	 * Gets the x and y position in [[Context]] of this Component.
 	 */
+	/*
 	public get point(): Point
 	{
 		return this._point;
 	}
+	*/
 	/**
 	 * Sets the x and y coordinate in the [[Context]] of this Component. When setting point, it is the duty of the user to translate the position
 	 * of the entities that this Component may have.
 	 */
+	/*
 	public set point(point: Point)
 	{
 		this._point = point;
 	}
+	*/
 
 	/**
 	 * Gets the current status of the sticky, default is false.

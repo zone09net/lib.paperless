@@ -1,11 +1,13 @@
 import {Context} from './Context.js';
+import {Fx} from './Fx.js';
 
 
 
-export class DrawActions
+export class DrawAction
 {
 	private _context: Context = undefined;
 	private _guid: string = undefined;
+	private _fx: Fx = undefined;
 	//---
 
 	public onDrawBefore(context2D: OffscreenCanvasRenderingContext2D): void {}
@@ -34,5 +36,14 @@ export class DrawActions
 	public set guid(guid: string)
 	{
 		this._guid = guid;
+	}
+
+	public get fx(): Fx
+	{
+		return this._fx;
+	}
+	public set fx(fx: Fx)
+	{
+		this._fx = fx;
 	}
 }

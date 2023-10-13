@@ -49,10 +49,10 @@ import {Restrict} from './enums/Restrict.js';
  */
 export class Control
 {
-	private _context: Context = null;
-	private _fx: Fx = null;
-	private _drawable: Drawable = null;
-	private _guid: string = '';
+	private _context: Context = undefined;
+	private _fx: Fx = undefined;
+	private _drawable: Drawable = undefined;
+	private _guid: string = undefined;
 	private _enabled: boolean;
 	private _movable: boolean;
 	private _removable: boolean;
@@ -69,6 +69,21 @@ export class Control
 			removable = true,
 			focusable = true,
 			restrict = Restrict.none,
+			context = null,
+			drawable = null,
+			
+			onLeftClick = null,
+			onRightClick = null,
+			onDragBegin = null,
+			onDrag = null,
+			onDragEnd = null,
+			onInside = null,
+			onOutside = null,
+			onFocus = null,
+			onLostFocus = null,
+			onAttach = null,
+			onDetach = null,
+			onDrawable = null,
 		} = attributes;
 
 		this._enabled = enabled;
@@ -76,12 +91,28 @@ export class Control
 		this._removable = removable;
 		this._focusable = focusable;
 		this._restrict = restrict;
+
+		context ? context.attach(this) : null;
+		drawable ? this.attach(drawable) : null;
+
+		onLeftClick ? this.onLeftClick = onLeftClick : null;
+		onRightClick ? this.onRightClick = onRightClick : null;
+		onDragBegin ? this.onDragBegin = onDragBegin : null;
+		onDrag ? this.onDrag = onDrag : null;
+		onDragEnd ? this.onDragEnd = onDragEnd : null;
+		onInside ? this.onInside = onInside : null;
+		onOutside ? this.onOutside = onOutside : null;
+		onFocus ? this.onFocus = onFocus : null;
+		onLostFocus ? this.onLostFocus = onLostFocus : null;
+		onAttach ? this.onAttach = onAttach : null;
+		onDetach ? this.onDetach = onDetach : null;
+		onDrawable ? this.onDrawable = onDrawable : null;
 	}
 
 	public attach(drawable: Drawable): void
 	{
 		this.drawable = this.context.get(drawable.guid);
-		this.context.link(drawable.guid, this.guid);
+		this.context.link(drawable, this);
 
 		if(this.drawable)
 			this.onDrawable();
@@ -99,6 +130,7 @@ export class Control
 	public onAttach(): void {}
 	public onDetach(): void {}
 	public onDrawable(): void {}
+
 
 
 	// Accessors

@@ -62,6 +62,8 @@ export interface IFx {
 	/** @ignore */
 	t0?: number,
 
+	tdelta?: number,
+
 	t1?: boolean,
 
 	t9?: boolean,
@@ -69,7 +71,9 @@ export interface IFx {
 	/** 
 	 * This variable represents the current time of the annimation depending on the [[duration]] that was given. The time goes from 0 to 1 and is calculated internaly.
 	 */
-	t?: number
+	t?: number,
+
+	stack?: number
 }
 
 /**

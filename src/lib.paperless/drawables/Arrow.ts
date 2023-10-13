@@ -1,5 +1,4 @@
 import {Point} from '../Point.js';
-import {Size} from '../Size.js';
 import {Drawable} from '../Drawable.js';
 import {IDrawableArrowAttributes} from '../interfaces/IDrawable.js';
 
@@ -8,63 +7,71 @@ import {IDrawableArrowAttributes} from '../interfaces/IDrawable.js';
 /**
  * The Arrow class creates a new arrow [[Drawable]] with the specified attributes.
  * 
- * The following code creates a red arrow facing top with a 10x10 base.
+ * The following code creates a red arrow facing top with a 20x20 base.
  * 
  * 
  * ```typescript
- * let arrow: Paperless.Drawables.Arrow;
+ * const context: Paperless.Context;
+ * const arrow: Paperless.Drawables.Arrow;
  *
- * arrow = context.attach(new Paperless.Drawables.Arrow(new Paperless.Point(100, 100), new Paperless.Size(50, 30), {
+ * context = new Paperless.Context();
+ * arrow = new Paperless.Drawables.Arrow({
  * 	fillcolor: '#ff0000',
  * 	nostroke: true,
  * 	angle: Paperless.Enums.Direction.top,
- * 	basewidth: 10,
- * 	baseheight: 10
- * }));
+ * 	basewidth: 20,
+ * 	baseheight: 20
+ * });
+ * 
+ * context.attach(document.body);
+ * context.attach(arrow);
  * ```
  */
 export class Arrow extends Drawable
 {
-	private _basewidth: number;
-	private _baseheight: number;
+	private _baseWidth: number;
+	private _baseHeight: number;
 	//---
 
-	public constructor(point: Point, size: Size, attributes: IDrawableArrowAttributes = {})
+	/**
+	 * Contructs an Arrow drawable.
+	 */
+	public constructor(attributes: IDrawableArrowAttributes = {})
 	{
-		super(point, attributes);
+		super(attributes);
 
 		const {
 			generate = true,
-			baseheight = 15,
-			basewidth = 15
+			baseHeight = 25,
+			baseWidth = 15
 		} = attributes;
 
-		this.size = size;
-		this._baseheight = baseheight;
-		this._basewidth = basewidth;
+		this._baseHeight = baseHeight;
+		this._baseWidth = baseWidth;
 
 		if(generate)
 			this.generate();
 	}
 
-  /**
-   * @param {Event} [e] Event object fired on wheel event
-   */
+	/**
+	 * Generates the [[Drawable]]. By default, this is called by the constructor but can be deactivated by passing 
+	 * the *generate: false* in the attributes. After the method is called, [[points]], [[path]] and [[boundaries]] are sets.
+	 */
 	public generate(): void
 	{
-		const diff: number = (this.size.height - this._baseheight) / 2;
-		const point: Point = new Point(-this.size.width / 2, -this.size.height / 2);
-		const points: Array<Point> = [
-			new Point(point.x + this._basewidth, point.y + diff),
+		const diff: number = (this.height - this._baseHeight) / 2;
+		const point: Point = new Point(-this.width / 2, -this.height / 2);
+		const points: Point[] = [
+			new Point(point.x + this._baseWidth, point.y + diff),
 			new Point(point.x, point.y + diff),
-			new Point(point.x, point.y + this.size.height - diff),
-			new Point(point.x + this._basewidth, point.y + this.size.height - diff),
-			new Point(point.x + this._basewidth, point.y + this.size.height),
-			new Point(point.x + this.size.width, point.y + (this.size.height / 2)),
-			new Point(point.x + this._basewidth, point.y),
+			new Point(point.x, point.y + this.height - diff),
+			new Point(point.x + this._baseWidth, point.y + this.height - diff),
+			new Point(point.x + this._baseWidth, point.y + this.height),
+			new Point(point.x + this.width, point.y + (this.height / 2)),
+			new Point(point.x + this._baseWidth, point.y),
 		];
 
-		this.clearPath();
+		this.path = new Path2D();
 		this.path.moveTo(points[0].x, points[0].y);
 		this.path.lineTo(points[1].x, points[1].y);
 		for(let i: number = 1; i < points.length; i++)
@@ -73,31 +80,30 @@ export class Arrow extends Drawable
 		this.path.closePath();
 
 		this.points = points;
-		this.boundaries = { topleft: new Point(this.x - (this.size.width / 2), this.y - (this.size.height / 2)), bottomright: new Point(this.x + (this.size.width / 2), this.y + (this.size.height / 2)) }
+		this.boundaries = { 
+			topleft: new Point(this.x - (this.width / 2) - (this.nostroke ? 0 : this.linewidth / 2), this.y - (this.height / 2) - (this.nostroke ? 0 : this.linewidth / 2)), 
+			bottomright: new Point(this.x + (this.width / 2) + (this.nostroke ? 0 : this.linewidth / 2), this.y + (this.height / 2) + (this.nostroke ? 0 : this.linewidth / 2)) 
+		}
 	}
 
 	/**
+	 * Clones this [[Drawable]] with attributes only.
 	 * 
-	 * @param context2D 
+	 * @param 	attributes 			Attributes that you would like to override.
+	 * @returns 						A new clone of this Drawable.
 	 */
-	public draw(context2D: OffscreenCanvasRenderingContext2D): void
+	public clone(attributes: IDrawableArrowAttributes = {}): Arrow
 	{
-		context2D.save();
-		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
+		const cloned: Arrow = new Arrow({
+			...this.attributes,
+			...{
+				baseHeight: this._baseHeight,
+				baseWidth: this._baseWidth,
+			},
+			...attributes
+		});
 
-		context2D.lineWidth = this.linewidth;
-		context2D.strokeStyle = this.strokecolor;
-		context2D.fillStyle = this.fillcolor;
-		context2D.globalAlpha = this.alpha;
-		context2D.shadowBlur = this.shadow;
-		context2D.shadowColor = this.shadowcolor;
-
-		if(!this.nostroke)
-			context2D.stroke(this.path);
-		if(!this.nofill)
-			context2D.fill(this.path);
-
-		context2D.restore();
+		return cloned;
 	}
 
 
@@ -105,21 +111,33 @@ export class Arrow extends Drawable
 	// Accessors
 	// --------------------------------------------------------------------------
 	
-	public get basewidth(): number
+	/**
+	 * Gets the width of the arrow's base.
+	 */
+	public get baseWidth(): number
 	{
-		return this._basewidth;
+		return this._baseWidth;
 	}
-	public set basewidth(basewidth: number)
+	/**
+	 * Set the width of the arrow's base.
+	 */
+	public set baseWidth(baseWidth: number)
 	{
-		this._basewidth = basewidth;
+		this._baseWidth = baseWidth;
 	}
 
-	public get baseheight(): number
+	/**
+	 * Gets the height of the arrow's base.
+	 */
+	public get baseHeight(): number
 	{
-		return this._baseheight;
+		return this._baseHeight;
 	}
-	public set baseheight(baseheight: number)
+	/**
+	 * Gets the width of the arrow's base.
+	 */
+	public set baseHeight(baseHeight: number)
 	{
-		this._baseheight = baseheight;
+		this._baseHeight = baseHeight;
 	}
 }

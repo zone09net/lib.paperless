@@ -47,7 +47,7 @@ export class Point
 	 */
 	public toRealPosition(element: HTMLElement): Point
 	{
-		let rect: DOMRect = element.getBoundingClientRect();
+		const rect: DOMRect = element.getBoundingClientRect();
 
 		this._x -= rect.left;
 		this._y -= rect.top;
@@ -62,12 +62,12 @@ export class Point
 	 * 
 	 * @param 	points 		The method will use only the first 3 values of the provided array.
 	 */
-	public isInTriangle(points: Array<Point>): boolean
+	public isInTriangle(points: Point[]): boolean
 	{
-		let as_x: number = this._x - points[0].x;
-		let as_y: number = this._y - points[0].y;
+		const as_x: number = this._x - points[0].x;
+		const as_y: number = this._y - points[0].y;
 
-		let s_ab: boolean = (points[1].x - points[0].x) * as_y - (points[1].y - points[0].y) * as_x > 0;
+		const s_ab: boolean = (points[1].x - points[0].x) * as_y - (points[1].y - points[0].y) * as_x > 0;
 
 		if((points[2].x - points[0].x) * as_y - (points[2].y - points[0].y) * as_x > 0 == s_ab)
 			return false;
@@ -83,7 +83,7 @@ export class Point
 	 * 
 	 * @param 	points 		Should be a list of Points that start from a point and comes back to the same point.
 	 */
-	public isInPolygon(points: Array<Point>): boolean
+	public isInPolygon(points: Point[]): boolean
 	{
 		let inside = false;
 		let point1 = new Point(0, 0);
@@ -135,11 +135,12 @@ export class Point
 	/**
 	 * Validates if this Point is inside the radius of the given point.
 	 * 
-	 * @param 	point 		Should be a list of Points that start from a point and comes back to the same point.
+	 * @param 	point 		Target point on the canvas.
 	 * @param	radius		Radius surrounding the point to validate.
 	 */
 	public isInCircle(point: Point, radius: number)
 	{
+		//if(Math.pow(this._x - point.x, 2) + Math.pow(this._y - point.y, 2) <= radius * radius)
 		if((point.x - this._x) * (point.x - this._x) + (point.y - this._y) * (point.y - this._y) <= radius * radius)
 			return true;
   		else
@@ -153,7 +154,7 @@ export class Point
 	 */
 	public translate(angle: number, distance: number): Point
 	{
-		let radian: number = (angle + 90) * Math.PI / 180;
+		const radian: number = (angle + 90) * Math.PI / 180;
 
 		this._x += distance * Math.sin(radian);
 		this._y -= distance * Math.cos(radian);
@@ -166,7 +167,7 @@ export class Point
 	 */
 	public static distance(point1: Point, point2: Point): number
 	{
-		return Math.hypot(point1.x - point2.x, point1.y - point2.y);
+		return Math.sqrt((point1.x - point2.x) * (point1.x - point2.x) + (point1.y - point2.y) * (point1.y - point2.y));
 	}
 
 	/**
@@ -182,7 +183,7 @@ export class Point
 	 */
 	public static angle(point1: Point, point2: Point): number
 	{
-		let delta: Point = Point.delta(point1, point2);
+		const delta: Point = Point.delta(point1, point2);
 		let theta: number = Math.atan2(delta.y, delta.x);
 
 		theta *= 180 / Math.PI;
@@ -194,7 +195,7 @@ export class Point
 	/**
 	 * Gets the delta between 2 points. Each x and y are calculated individualy in a new [[Point]].
 	 */
-	static delta(point1: Point, point2: Point): Point
+	public static delta(point1: Point, point2: Point): Point
 	{
 		// Delta is put in a Point to be practical.
 		return new Point(point2.x - point1.x || 0, point2.y - point1.y || 0);

@@ -4,61 +4,95 @@ import * as Paperless from './lib.paperless.js';
 
 
 
-let context: Paperless.Context = new Paperless.Context( {features: { nohover: false }});
-context.attach(document.body);
-
-
+const context: Paperless.Context = new Paperless.Context( {features: { nohover: false }});
+const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
+const step: number = 250;
+const max: number = 3000;
 let count: number = 1000;
-let step: number = 250;
-let colors: Array<string> = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
-let radius: number = 20;
-let limit: {left: number, top: number, right: number, bottom: number} = {
-	left: radius,
-	top: radius,
-	right: window.innerWidth - radius, 
-	bottom: window.innerHeight - radius
+
+const virus: Paperless.Drawables.Circle = new Paperless.Drawables.Circle({
+	outerRadius: 20, 
+	nostroke: true, 
+	hoverable: false 
+});
+
+const number: Paperless.Drawables.Label = new Paperless.Drawables.Label({
+	context: context,
+	point: {x: 150, y: 55}, 
+	autosize: true, 
+	content: count.toString(), 
+	font: '60px bold system-ui', 
+	fillcolor: '#ffffff', 
+	sticky: true
+});
+
+const less: Paperless.Drawables.Triangle = new Paperless.Drawables.Triangle({
+	context: context,
+	point: {x: 50, y: 50}, 
+	radius: 30, 
+	nostroke: false, 
+	linewidth: 2, 
+	strokecolor: '#151515', 
+	fillcolor: '#ffffff', 
+	sticky: true, 
+	angle: 180
+});
+
+const more: Paperless.Drawables.Triangle = less.clone({
+	context: context,
+	point: {x: 250, y: 50}, 
+	angle: 0
+});
+
+const limit: {left: number, top: number, right: number, bottom: number} = {
+	left: virus.outerRadius,
+	top: virus.outerRadius,
+	right: window.innerWidth - virus.outerRadius, 
+	bottom: window.innerHeight - virus.outerRadius
 }
-let triangle1: Paperless.Drawables.Triangle = context.attach(new Paperless.Drawables.Triangle(new Paperless.Point(50, 50), 30, {nostroke: false, linewidth: 2, strokecolor: '#151515', fillcolor: '#ffffff', sticky: true, angle: 180}));
-let triangle2: Paperless.Drawables.Triangle = context.attach(new Paperless.Drawables.Triangle(new Paperless.Point(250, 50), 30, {nostroke: false, linewidth: 2, strokecolor: '#151515', fillcolor: '#ffffff', sticky: true, angle: 0}));
-let label1: Paperless.Drawables.Label = context.attach(new Paperless.Drawables.Label(new Paperless.Point(150, 55), new Paperless.Size(0, 0), {autosize: true, content: '1000', font: '60px bold system-ui', fillcolor: '#ffffff', sticky: true}));
-let control: Paperless.Control;
 
-control = context.attach(new Paperless.Controls.Button(() => {
-	if(count < 2000)
-	{
-		polygons();
-		count += step;
-		label1.content = count.toString();
-		label1.generate();
-	}
-}));
-control.onInside = () => { context.dragging.delay = 180; triangle2.fillcolor = '#c8af55'; };
-control.onOutside = () => { context.dragging.delay = 0; triangle2.fillcolor = '#ffffff'; };
-control.attach(triangle2);
-control.movable = false;
-
-control = context.attach(new Paperless.Controls.Button(() => {
-	if(count > 0)
-	{
-		let filtered: Array<{guid: string, map: Map<string, any>}> = context.getControls().filter(([guid, map]: any) =>
-			map.object.constructor.name == 'Blank'
-		);
-
-		for(let i: number = 0; i < step; i++)
+new Paperless.Controls.Button({
+	movable: false,
+	context: context,
+	drawable: more,
+	callbackLeftClick: () => {
+		if(count < max)
 		{
-			let control: Paperless.Control = (<any>filtered[i])[1].object;
-			context.detach([control.drawable.guid, control.guid]);
+			count += step;
+			number.content = count.toString();
+			number.generate();
+			polygons();
 		}
+	},
+	onInside: () => { more.fillcolor = '#c8af55'; },
+	onOutside: () => { more.fillcolor = '#ffffff'; }
+});
 
-		count -= step;
-		label1.content = count.toString();
-		label1.generate();
-	}
-}));
-control.onInside = () => { context.dragging.delay = 180; triangle1.fillcolor = '#c8af55'; };
-control.onOutside = () => { context.dragging.delay = 0; triangle1.fillcolor = '#ffffff'; };
-control.attach(triangle1);
-control.movable = false;
+new Paperless.Controls.Button({
+	movable: false,
+	context: context,
+	drawable: less,
+	callbackLeftClick: () => {
+		if(count > 0)
+		{
+			const filtered: Paperless.Drawable[] = context.getDrawables().filter((drawable: Paperless.Drawable) =>
+				drawable.constructor.name == 'Circle'
+			);
+
+			for(let i: number = 0; i < step; i++)
+				context.detach(filtered[i].guid);
+
+			count -= step;
+			number.content = count.toString();
+			number.generate();
+		}
+	},
+	onInside: () => { less.fillcolor = '#c8af55'; },
+	onOutside: () => { less.fillcolor = '#ffffff'; }
+});
+
+
+context.attach(document.body);
 
 polygons();
 polygons();
@@ -70,12 +104,16 @@ function polygons(): void
 {
 	for(let i: number = 0; i < step; i++)
 	{
-		let x: number = (Math.random() * (limit.right - limit.left)) + limit.left;
-		let y: number = (Math.random() * (limit.bottom - limit.top)) + limit.top;
-		let drawable: Paperless.Drawable = context.attach(new Paperless.Drawables.Circle(new Paperless.Point(x, y), radius, 0, { fillcolor: colors[Math.floor(Math.random() * 5)], nostroke: true, hoverable: false }));
-		let control: Paperless.Control = context.attach(new Paperless.Controls.Blank());
+		const rad: number = Math.random() * 6.28;
+		const drawable: Paperless.Drawables.Circle = virus.clone({
+			context: context,
+			fillcolor: colors[Math.floor(Math.random() * 5)],
+			point: {
+				x: (Math.random() * (limit.right - limit.left)) + limit.left,
+				y: (Math.random() * (limit.bottom - limit.top)) + limit.top,
+			}
+		});
 
-		control.attach(drawable);
 		context.fx.add({
 			duration: (Math.random() * 500) + 100,
 			drawable: drawable, 
@@ -83,8 +121,13 @@ function polygons(): void
 			loop: true,
 			smuggler: { 
 				ease: Paperless.Fx.easeLinear, 
+				distance: (Math.random() * 60) + 10,
 				data: {
-					limit: limit
+					limit: limit,
+					delta: 0,
+					distance: 0,
+					sin: Math.sin(rad),
+					cos: Math.cos(rad)
 				}
 			},
 		});
@@ -94,51 +137,43 @@ function polygons(): void
 
 function heretic(fx: Paperless.Interfaces.IFx): void
 {
-	if(fx.t1)
-	{
-		let rad: number = Math.random() * 6.28;
-		let sin: number = Math.sin(rad);
-		let cos: number = Math.cos(rad);
-
-		fx.t1 = false;
-		fx.smuggler.data = {
-			...fx.smuggler.data,
-			...{
-				delta: 0,
-				distance: 0,
-				sin: sin,
-				cos: cos
-			},
-		};
-		fx.smuggler.distance = (Math.random() * 60) + 5;
-	}
-
-	let distance: number = fx.t * fx.smuggler.distance;
-	let matrix: DOMMatrix = (<Paperless.Drawable>fx.drawable).matrix;
-	let point: Paperless.Point = new Paperless.Point(matrix.e, matrix.f);
-
+	const drawable: Paperless.Drawables.Circle = <Paperless.Drawables.Circle>fx.drawable;
+	const distance: number = fx.t * fx.smuggler.distance;
+	
 	fx.smuggler.data.delta = distance - fx.smuggler.data.distance;
 	fx.smuggler.data.distance = distance;
-	
-	if(point.isInCircle(context.states.pointer.current, 200))
+
+	if(drawable.point.isInCircle(context.states.pointer.current, 200))
 	{
-		let rad = Math.atan2(matrix.e - context.states.pointer.current.x, matrix.f - context.states.pointer.current.y);
+		let rad = Math.atan2(drawable.x - context.states.pointer.current.x, drawable.y - context.states.pointer.current.y);
 
 		fx.smuggler.data.cos = Math.cos(rad);
 		fx.smuggler.data.sin = -Math.sin(rad);
 		fx.smuggler.data.delta *= 20;
 	}
-
-	if(matrix.e < fx.smuggler.data.limit.left || matrix.e > fx.smuggler.data.limit.right || matrix.f < fx.smuggler.data.limit.top || matrix.f > fx.smuggler.data.limit.bottom) 
+	
+	if(drawable.x < fx.smuggler.data.limit.left || drawable.x > fx.smuggler.data.limit.right || drawable.y < fx.smuggler.data.limit.top || drawable.y > fx.smuggler.data.limit.bottom) 
 	{
-		let rad = Math.atan2(matrix.f - (fx.smuggler.data.limit.bottom / 2), matrix.e - (fx.smuggler.data.limit.right / 2));
+		let rad = Math.atan2(drawable.y - (fx.smuggler.data.limit.bottom / 2), drawable.x - (fx.smuggler.data.limit.right / 2));
 
 		fx.smuggler.data.cos = -Math.cos(rad);
 		fx.smuggler.data.sin = -Math.sin(rad);
 	}
 
-	matrix.e += fx.smuggler.data.cos * fx.smuggler.data.delta;
-	matrix.f += fx.smuggler.data.sin * fx.smuggler.data.delta;
+	drawable.x += fx.smuggler.data.cos * fx.smuggler.data.delta;
+	drawable.y += fx.smuggler.data.sin * fx.smuggler.data.delta;
+
+	if(fx.t9)
+	{
+		const rad: number = Math.random() * 6.28;
+
+		fx.smuggler.data.sin = Math.sin(rad);
+		fx.smuggler.data.cos = Math.cos(rad);
+		fx.smuggler.data.delta = 0;
+		fx.smuggler.data.distance = 0;
+
+		fx.t9 = false;
+	}
 }
 
 

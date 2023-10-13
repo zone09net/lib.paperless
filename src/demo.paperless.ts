@@ -2,29 +2,111 @@ import * as Paperless from './lib.paperless.js';
 
 
 
-let context: Paperless.Context = new Paperless.Context({autosize: true, dragging: {delay: 0}});
+const context: Paperless.Context = new Paperless.Context();
+
+const arrow: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
+	context: context,
+	point: {x: 50, y: 50},
+	nostroke: true,
+	angle: Paperless.Enums.Direction.right,
+	baseWidth: 20,
+	baseHeight: 20,
+});
+
+const artwork: Paperless.Drawables.Artwork = new Paperless.Drawables.Artwork({
+	context: context,
+	content: 'data:image/png;base64,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',
+	point: {x: 125, y: 50},
+});
+
+const circle: Paperless.Drawables.Circle = new Paperless.Drawables.Circle({
+	context: context,
+	point: {x: 200, y: 50},
+	innerRadius: 15,
+	angleStart: 90,
+});
+
+const cross = new Paperless.Drawables.Cross({
+	context: context,
+	point: {x: 275, y: 50},
+	angle: 0,
+});
+
+const hexagon = new Paperless.Drawables.Hexagon({
+	context: context,
+	point: {x: 350, y: 50},
+});
+
+const label = new Paperless.Drawables.Label({
+	context: context,
+	point: {x: 425, y: 50},
+	content: 'hello world',
+	fillbackground: '#a0a0a0',
+	fillcolor: '#000000',
+	autosize: false,
+	corner: false,
+	wrapping: true,
+	multiline: true,
+	padding: {left: 4, top: 4, right: 4},
+	font: '15px impact'
+});
+
+const line = new Paperless.Drawables.Line({
+	context: context,
+	point0: {x: 25, y: 100},
+	point1: {x: 825, y: 100},
+});
+
+const rectangle = new Paperless.Drawables.Rectangle({
+	context: context,
+	point: {x: 500, y: 50},
+	size: {width: 40, height: 40},
+	nofill: true,
+	rounded: {topLeft: 10, bottomRight: 10},
+	linewidth: 10
+});
+
+const smiley = new Paperless.Drawables.Smiley({
+	context: context,
+	point: {x: 575, y: 50},
+});
+
+const star = new Paperless.Drawables.Star({
+	context: context,
+	point: {x: 650, y: 50},
+	innerRadius: 10,
+	spikes: 10,
+	nostroke: true
+});
+
+const triangle = new Paperless.Drawables.Triangle({
+	context: context,
+	point: {x: 725, y: 50},
+	angle: 75,
+});
+
+const blade = new Paperless.Drawables.Blade({
+	context: context,
+	point: {x: 800, y: 50},
+	spikes: 6,
+	twist: 4
+});
+
+
+const polygon: Paperless.Drawable = line;
+const boundaries = new Paperless.Drawables.Rectangle({
+	context: context,
+	size: {width: polygon.boundaries.bottomright.x - polygon.boundaries.topleft.x, height: polygon.boundaries.bottomright.y - polygon.boundaries.topleft.y},
+	strokecolor: '#ff0000',
+	nofill: true,
+	point: {x: polygon.x, y: polygon.y},
+});
+
+
 context.attach(document.body);
 
 
-/*
-let drawable1: Paperless.Drawable;
-let drawable2: Paperless.Drawable;
-let control: Paperless.Control;
 
-drawable1 = context.attach(new Smiley(new Paperless.Point(300, 300), 100));
-drawable2 = context.attach(new Smiley(new Paperless.Point(600, 600), 100, {offset: {x: 100, y: 100}}));
-drawable2.matrix = drawable1.matrix;
-
-control = context.attach(new Paperless.Controls.Button(() => {
-	drawable1.x = 600;
-	console.log(drawable1.matrix, drawable2.matrix)
-}))
-
-control.attach(drawable1);
-*/
-
-//let gaga: Paperless.Drawables.Rectangle = context.attach(new Paperless.Drawables.Rectangle(new Paperless.Point(200, 100), new Paperless.Size(100, 100), {rotation: 0, scale: {x:1, y:1}}));
-//gaga.scaley = 0.5;
 
 
 /*
@@ -64,28 +146,21 @@ control.attach(drawable);
 
 
 
-
 /*
-context.attach(new Paperless.Drawables.Rectangle(new Paperless.Point(225, 600), new Paperless.Size(450, 1200), {fillcolor: '#323232', nostroke: true}));
-context.attach(new Paperless.Drawables.Artwork(new Paperless.Point(448, 600), new Paperless.Size(0, 0), '/separator.png', {nostroke: true, autosize: true}));
-//context.attach(new Paperless.Drawables.Artwork(new Paperless.Point(435, 181), new Paperless.Size(0, 0), '/hac.png', {nostroke: true, autosize: true}));
-context.attach(new Paperless.Drawables.Artwork(new Paperless.Point(219, 91), new Paperless.Size(0, 0), '/paperless.png', {nostroke: true, autosize: true}));
-//context.attach(new Paperless.Drawables.Artwork(new Paperless.Point(260, 142), new Paperless.Size(0, 0), '/hook.png', {nostroke: true, autosize: true}));
-*/
-
-
-
 let icon = 
 	[
 		{
-			d: 'm 15.545623,20.254616 c -1.997262,-0.299726 -4.27111,-1.780348 -4.59765,-2.993768 -0.18747,-0.696642 0.08663,-1.388163 0.700769,-1.767956 0.307549,-0.190193 0.503092,-0.229653 0.953025,-0.192318 0.505365,0.04194 0.650986,0.118305 1.357653,0.712013 0.891204,0.748749 1.58226,1.035053 2.502984,1.036984 0.766329,0.0016 1.354884,-0.170131 1.956176,-0.570805 0.264513,-0.17626 2.118216,-1.96896 4.119342,-3.983777 4.209404,-4.2382033 4.159005,-4.1682054 4.159005,-5.7764074 0,-0.9385739 -0.02836,-1.0806947 -0.321242,-1.6097949 C 25.681699,3.855081 24.489367,3.1944927 23.068963,3.2767628 21.785399,3.3511068 21.433204,3.5879957 18.862274,6.1062089 L 16.625265,8.2973497 16.029629,8.0831234 C 15.240631,7.7993522 13.392765,7.783971 12.672408,8.0551795 12.233541,8.2204089 12.540533,7.8847995 15.758885,4.6809799 19.079183,1.3756762 19.390318,1.0955037 20.144932,0.7314173 21.232392,0.2067405 22.100063,0 23.214636,0 c 1.16933,0 1.868927,0.146944 2.857428,0.6001752 1.509898,0.6922935 2.635813,1.8184318 3.326937,3.3275986 C 29.853137,4.919443 30,5.6187552 30,6.7895472 c 0,1.1128897 -0.205958,1.9806985 -0.728984,3.0715968 -0.367581,0.766679 -0.629509,1.052626 -4.6225,5.046373 -4.569219,4.570085 -4.672701,4.654362 -6.290492,5.123074 -0.932997,0.27031 -1.959245,0.352058 -2.812401,0.224025 z',
+			d: 'm 16.142704,15.985625 0.80804,-0.774003 1.136706,1.172236 1.137213,1.171736 0.226202,-1.011488 c 0.124149,-0.556392 0.450019,-2.011498 0.723707,-3.233328 0.273668,-1.221831 0.6099,-2.721831 0.746734,-3.3327522 0.193733,-0.863419 0.239949,-1.110324 0.2094,-1.104995 -0.02271,0.0043 -1.17863,0.214435 -2.569828,0.468532 -1.391663,0.253618 -3.281182,0.59824 -4.199541,0.7650412 -0.917894,0.167292 -1.738071,0.3165 -1.822351,0.331856 l -0.153285,0.02803 2.2701,2.359605 -1.615614,1.547537 2.295004,2.385489 z',
 			style: 'fill:#color2;'
 		},	
 		{
-			d: 'M 5.0883939,29.852682 C 3.2270509,29.345315 1.6134289,28.076005 0.77167893,26.457056 0.21665193,25.389567 0.00206493,24.494806 1.3926757e-5,23.239451 -0.00188607,22.063849 0.19038593,21.243532 0.72295593,20.155395 1.0943069,19.396658 1.3982279,19.064549 5.2975859,15.156475 c 2.647923,-2.653839 4.370324,-4.296886 4.7053921,-4.488604 2.334011,-1.3354631 5.101649,-1.2683141 7.259959,0.176142 1.41559,0.947388 2.036091,1.862898 1.806209,2.664945 -0.155434,0.5423 -0.311485,0.762381 -0.719475,1.014689 -0.307549,0.190193 -0.503092,0.229653 -0.953025,0.192318 -0.505365,-0.04194 -0.650986,-0.118305 -1.357653,-0.712014 -0.9364,-0.786721 -1.593871,-1.043863 -2.63414,-1.030238 -1.391356,0.01822 -1.506472,0.105737 -5.7832371,4.39651 -4.390192,4.404572 -4.32013,4.308439 -4.32013,5.927734 0,0.938574 0.02836,1.080695 0.321242,1.609795 0.693986,1.253706 1.886318,1.914294 3.306722,1.832024 1.283564,-0.07435 1.63576,-0.311233 4.2066891,-2.829446 l 2.237009,-2.191141 0.595636,0.204332 c 0.911563,0.312711 2.172356,0.350175 3.075843,0.0914 l 0.747446,-0.214082 -3.346585,3.352449 c -3.538576,3.544774 -4.132874,4.034005 -5.4793101,4.510603 -0.998882,0.353574 -2.928594,0.447524 -3.877784,0.188791 z',
-			style: 'fill:#color1;'
+			d: 'M 13.623366,28.960159 H 29.042014 V 0.9876048 h -5.424635 c -7.542163,-0.0096 -15.084274,0.0211 -22.62638398,0.04263 l -0.0052,14.9491082',
+			style: 'stroke:#color1;fill:none;stroke-width:1.97159px'
 		},	
-
+		{
+			d: 'M 11.696876,17.896805 H 0.01154302 V 29.961844 H 11.696876 Z',
+			style: 'clip-rule:evenodd;display:inline;fill:#color2;fill-opacity:1;fill-rule:evenodd;stroke-width:0.550855;stroke-linecap:round;stroke-linejoin:round'
+		},	
 	];
 
 
@@ -111,58 +186,10 @@ function toBase64(svg: string)
 	return 'data:image/svg+xml;base64,' + btoa(svg);
 }
 
-let svg: string = toSVG('#c8af55', '#769050', icon, new Paperless.Size(182, 128));
+let svg: string = toSVG('#769050', '#9a6c27', icon, new Paperless.Size(30, 30));
 let drawable: Paperless.Drawable = context.attach(new Paperless.Drawables.Artwork(new Paperless.Point(window.innerWidth / 2, window.innerHeight / 2), new Paperless.Size(182, 128), {content: toBase64(svg)}));
 context.attach(drawable)
-
-
-
-
-// label
-/*
-let point: Paperless.Point = new Paperless.Point(window.innerWidth / 2, window.innerHeight / 2);
-let zone09net: Paperless.Drawable = context.attach(new Paperless.Drawables.Label(point, new Paperless.Size(100, 100), {
-	content: '( zone09.net )',
-	fillcolor: '#ffffff', 
-	fillbackground: '#777777',
-	font: '24px SegoeUI-Bold', 
-	//corner: true, 
-	//autosize: true, 
-	wrapping: false, 
-	multiline: true, 
-	autosize: true,
-	filter: {
-		0: {
-			6: {fillcolor: '#deaf2f'}, 
-			8: {fillcolor: '#ffffff'}
-		}
-	} 
-}));
-
-context.attach(new Paperless.Drawables.Cross(point, new Paperless.Size(100, 100), {strokecolor: '#666666'}));
 */
-
-//context.attach(new Paperless.Drawables.Cross(new Paperless.Point(zone09net.boundaries.topleft.x, zone09net.boundaries.topleft.y), new Paperless.Size(10, 10), {nofill: true, strokecolor: '#deaf2f'}));
-//context.attach(new Paperless.Drawables.Cross(new Paperless.Point(zone09net.boundaries.bottomright.x, zone09net.boundaries.bottomright.y), new Paperless.Size(10, 10), {nofill: true, strokecolor: '#deaf2f'}));
-
-
-
-
-
-/*
-import * as HaC from './lib.hac.js';
-
-let selector1: HaC.Controls.Selector.Selector = context.attach(new HaC.Controls.Selector.Selector());
-let selector2: HaC.Controls.Selector.Selector = context.attach(new HaC.Controls.Selector.Selector());
-
-selector1.attach(context.attach(new Paperless.Drawables.Circle(new Paperless.Point(0, 0), 15, 0, {fillcolor: '#87172f'})));
-selector2.attach(context.attach(new Paperless.Drawables.Circle(new Paperless.Point(0, 0), 15, 0, {fillcolor: '#87aa2f'})));
-
-let relay: HaC.Controls.Selector.Relay = new HaC.Controls.Selector.Relay(HaC.Controls.Selector.Manipulator, [selector1, selector2]);
-let slider: HaC.Components.Slider = new HaC.Components.Slider(new Paperless.Point(200, 200), relay);
-context.attach(slider)
-*/
-
 
 
 
@@ -207,22 +234,6 @@ splitted[23] = '-';
 random = splitted.join('');
 
 console.log(random)
-*/
-
-
-/*
-
-let label: Paperless.Drawables.Label = new Paperless.Drawables.Label(new Paperless.Point(20, 220), new Paperless.Size(200, 100), 'This is a huge test for the sake of the label because I want this to be perfect!!!', {
-	font: '14px CPMono_v07_Light',
-	fillcolor: '#999999',
-	middlepoint: true,
-	multiline: true,
-	wrap: true,
-	autosize: false,
-	monofont: true
-});
-context.attach(label);
-
 */
 
 

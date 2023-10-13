@@ -6,8 +6,8 @@ import {Drawable} from './Drawable.js';
 import {Control} from './Control.js';
 import {Component} from './Component.js';
 import {Group} from './Group.js';
-import {DrawActions} from './DrawActions.js';
-import {MouseActions} from './MouseActions.js';
+import {DrawAction} from './DrawAction.js';
+import {MouseAction} from './MouseAction.js';
 import {Fx} from './Fx.js';
 import {Restrict} from './enums/Restrict.js';
 import {IContextAttributes} from './interfaces/IContext.js';
@@ -33,16 +33,18 @@ export class Context
 			buffer: OffscreenCanvas,
 			main: HTMLCanvasElement
 		},
-	
-		context:  {
+		context: {
 			buffer: OffscreenCanvasRenderingContext2D,
 			main: ImageBitmapRenderingContext
 		},
-	
-		smuggler: any,
+		id: {
+			resizing: number,
+			dragging: number
+		},
+		points: Point[],
 		states: IStates,
 	};
-	//---
+	//--
 
 	public constructor(attributes: IContextAttributes = {})
 	{
@@ -72,19 +74,28 @@ export class Context
 			scale: scale,
 			autosize: autosize,
 			features: {
-				...{ nohover: false, nodragging: false, nosnapping: true, nodefault: false },
-				...features
+				...{
+					nohover: false,
+					nodragging: false,
+					nosnapping: true,
+					nodefault: false,
+				},
+				...features,
 			},
 			dragging: {
-				...{ delay: 180, restrict: Restrict.none, grid: {...{x: 1, y: 1}, ...dragging.grid}},
-				...dragging
-			}
+				...{
+					delay: 180,
+					restrict: Restrict.none,
+					grid: { ...{ x: 1, y: 1 }, ...dragging.grid },
+				},
+				...dragging,
+			},
 		};
 
 		this._viewport = {
 			canvas: {
-				buffer: new OffscreenCanvas(0, 0), 
-				main: document.createElement("canvas")
+				buffer: new OffscreenCanvas(0, 0),
+				main: document.createElement('canvas')
 			},
 
 			context: {
@@ -92,13 +103,12 @@ export class Context
 				main: undefined
 			},
 
-			smuggler: {
-				id: {
-					resizing: undefined,
-					dragging: undefined,
-				},
-				dragdiff: undefined,
+			id: {
+				resizing: undefined,
+				dragging: undefined,
 			},
+
+			points: [],
 
 			states: {
 				mobile: Foundation.Mobile.isMobile(),
@@ -111,145 +121,123 @@ export class Context
 
 				pointer: {
 					current: new Point(-1, -1, {scale: scale}),
-					last: new Point(-1, -1, {scale: scale}), 
+					last: new Point(-1, -1, {scale: scale}),
 					clicked: new Point(-1, -1, {scale: scale}),
-					control: undefined, 
+					control: undefined,
+					dragdiff: new Point(-1, -1, {scale: scale})
 				},
 
-				touch: {
+				touch: {},
+
+				refresh: {
+					delta: 0,
+					elapsed: 0,
 				}
 			},
 		};
 
-		this._viewport.context.main = this._viewport.canvas.main.getContext("bitmaprenderer", {alpha: false});
-		this._viewport.context.buffer = this._viewport.canvas.buffer.getContext("2d", {alpha: false});
+		this._viewport.context.main = this._viewport.canvas.main.getContext('bitmaprenderer', {alpha: false});
+		this._viewport.context.buffer = this._viewport.canvas.buffer.getContext('2d', {alpha: false});
 		this.size = size;
 
+		this._viewport.canvas.main.addEventListener('touchmove',Events.handleTouchMove.bind(null, this), {passive: false});
+		this._viewport.canvas.main.addEventListener('touchstart', Events.handleTouchStart.bind(null, this), {passive: false});
+		this._viewport.canvas.main.addEventListener('touchend', Events.handleTouchEnd.bind(null, this),	false);
+		window.addEventListener('touchmove', Events.handleWindowTouchMove.bind(null, this), {passive: false});
 
-		this._viewport.canvas.main.addEventListener("touchmove", Events.handleTouchMove.bind(null, this),  {passive: false});
-		this._viewport.canvas.main.addEventListener("touchstart", Events.handleTouchStart.bind(null, this),  {passive: false});
-		this._viewport.canvas.main.addEventListener("touchend", Events.handleTouchEnd.bind(null, this), false);
-		window.addEventListener("touchmove", Events.handleWindowTouchMove.bind(null, this), {passive: false});
+		this._viewport.canvas.main.addEventListener('mousemove', Events.handleMouseMove.bind(null, this), {passive: false});
+		this._viewport.canvas.main.addEventListener('mousedown',	Events.handleMouseDown.bind(null, this), false);
+		this._viewport.canvas.main.addEventListener('mouseup', Events.handleMouseUp.bind(null, this), false);
+		this._viewport.canvas.main.addEventListener('resize', Events.handleResize.bind(null, this), false);
+		this._viewport.canvas.main.addEventListener('contextmenu', Events.handleRightMouseClick.bind(null, this), false);
+		this._viewport.canvas.main.addEventListener('dragstart', Events.handleDragStart.bind(null, this), false);
+		this._viewport.canvas.main.addEventListener('dragover', Events.handleMouseMove.bind(null, this), {passive: false});
+		window.addEventListener('resize', Events.handleResize.bind(null, this), false);
 
-		this._viewport.canvas.main.addEventListener("mousemove", Events.handleMouseMove.bind(null, this), {passive: false});
-		this._viewport.canvas.main.addEventListener("mousedown", Events.handleMouseDown.bind(null, this, this._viewport.smuggler), false);
-		this._viewport.canvas.main.addEventListener("mouseup", Events.handleMouseUp.bind(null, this, this._viewport.smuggler), false);
-		this._viewport.canvas.main.addEventListener("resize", Events.handleResize.bind(null, this, this._viewport.smuggler), false);
-		this._viewport.canvas.main.addEventListener("contextmenu", Events.handleRightMouseClick.bind(null, this), false);		// preventDefault
-		this._viewport.canvas.main.addEventListener("dragstart", Events.handleDragStart.bind(null, this), false);				// preventDefault
-		this._viewport.canvas.main.addEventListener("dragover", Events.handleMouseMove.bind(null, this), {passive: false});
-		window.addEventListener("resize", Events.handleResize.bind(null, this, this._viewport.smuggler), false);
+		this._fx.context = this;
 	}
 
-	public link(source: string, destination: string): void
+	public link(drawable: Drawable, control: Control): void 
 	{
-		let s: any = this._drawables.map.get(source);
-		let d: any = this._drawables.map.get(destination);
-		if(!s)
-			s = this._controls.map.get(source);
-		if(!d)
-			d = this._controls.map.get(destination);
+		const d: any = this._drawables.map.get(drawable.guid);
+		const c: any = this._controls.map.get(control.guid);
 
-		d.index = s.index;
-
+		c.index = d.index;
 		this.states.sorted = false;
 	}
 
-	public register(object: Drawable | Control | Component):  Drawable | Control | Component
+	public enroll(object: Drawable | Control | Component): Drawable | Control | Component
 	{
 		object.context = this;
 
 		return object;
 	}
 
-	public attach<Type>(object: Drawable | Control | Component | Group | DrawActions | MouseActions | HTMLElement): Type
+	public attach<Type>(object: | Drawable | Control | Component | Group | DrawAction | MouseAction | HTMLElement): Type 
 	{
+		let guid: string;
+		let entry: any;
+
 		if(object instanceof Drawable)
 		{
-			let guid: string = this.getGuidGenerator().create('1', 'a');
-			let entry: any = this._drawables.set(guid, object);
+			guid = this.getGuidGenerator().create('1', 'a');
+			entry = this._drawables.set(guid, object);
 
-			entry.context = this;
-			entry.guid = guid;
-			entry.fx = this._fx;
-			entry.onAttach();
 			this.states.sorted = false;
-			
-			return entry;
 		}
 		else if(object instanceof Control)
 		{
-			let guid: string = this.getGuidGenerator().create('1', 'b');
-			let entry: any = this._controls.set(guid, object);
+			guid = this.getGuidGenerator().create('1', 'b');
+			entry = this._controls.set(guid, object);
 
-			entry.context = this;
-			entry.guid = guid;
-			entry.fx = this._fx;
-			entry.onAttach();
 			this.states.sorted = false;
-
-			return entry;
-		}
+		} 
 		else if(object instanceof Component)
 		{
-			let guid: string = this.getGuidGenerator().create('1', '9');
-			let entry: any = this._components.set(guid, object);
+			guid = this.getGuidGenerator().create('1', '9');
+			entry = this._components.set(guid, object);
 
-			entry.context = this;
-			entry.guid = guid;
-			entry.fx = this._fx;
-			entry.onAttach();
 			this.states.sorted = false;
-
-			return entry;
 		}
 		else if(object instanceof Group)
 		{
-			let guid: string = this.getGuidGenerator().create('1', '8');
-			let entry: any = this._groups.set(guid, object);
-
-			entry.context = this;
-			entry.guid = guid;
-			entry.onAttach();
-
-			return entry;
+			guid = this.getGuidGenerator().create('1', '8');
+			entry = this._groups.set(guid, object);
 		}
-		else if(object instanceof DrawActions)
+		else if(object instanceof DrawAction)
 		{
-			let guid: string = this.getGuidGenerator().create('2', 'a');
-			let entry: any = this._drawActions.set(guid, object);
-
-			entry.context = this;
-			entry.guid = guid;
-			entry.onAttach();
-
-			return entry;
+			guid = this.getGuidGenerator().create('2', 'a');
+			entry = this._drawActions.set(guid, object);
 		}
-		else if(object instanceof MouseActions)
+		else if(object instanceof MouseAction)
 		{
-			let guid: string = this.getGuidGenerator().create('2', 'b');
-			let entry: any = this._mouseActions.set(guid, object);
-
-			entry.context = this;
-			entry.guid = guid;
-			entry.onAttach();
-
-			return entry;
+			guid = this.getGuidGenerator().create('2', 'b');
+			entry = this._mouseActions.set(guid, object);
 		}
 		else if(object instanceof HTMLElement)
+		{
 			object.appendChild(this._viewport.canvas.main);
+			return null;
+		}
 		else
 			throw new Error('Context.attach need either a Drawable/Control/Component/Group/DrawActions/MouseActions/HTMLElement type');
+
+		entry.context = this;
+		entry.guid = guid;
+		entry.fx = this._fx;
+		entry.onAttach();
+
+		return entry;
 	}
 
-	public detach(guids: Array<string> | string, restrict: Restrict.norefresh | Restrict.none = Restrict.norefresh): void
+	public detach(guids: Array<string> | string,	restrict: Restrict.norefresh | Restrict.none = Restrict.norefresh): void
 	{
 		let guidlist: Array<string>;
 
 		if(guids instanceof Array)
 			guidlist = guids;
 		else
-			guidlist = new Array(guids)
+			guidlist = new Array(guids);
 
 		for(let guid of guidlist)
 		{
@@ -262,8 +250,14 @@ export class Context
 			if(version == '1' && variant == 'a')
 			{
 				let drawable = this._drawables.get(guid);
+
 				if(drawable && drawable.removable)
 				{
+					const group: Group = this.get(drawable.group);
+
+					if(group)
+						group.detach(drawable);
+
 					drawable.onDetach();
 					drawable.context = undefined;
 					drawable.guid = undefined;
@@ -274,6 +268,7 @@ export class Context
 			else if(version == '1' && variant == 'b')
 			{
 				let control = this._controls.get(guid);
+
 				if(control && control.removable)
 				{
 					control.onDetach();
@@ -286,6 +281,7 @@ export class Context
 			else if(version == '1' && variant == '8')
 			{
 				let group = this._groups.get(guid);
+
 				if(group)
 				{
 					group.onDetach();
@@ -297,6 +293,7 @@ export class Context
 			else if(version == '1' && variant == '9')
 			{
 				let component = this._components.get(guid);
+
 				if(component)
 				{
 					component.onDetach();
@@ -309,6 +306,7 @@ export class Context
 			else if(version == '2' && variant == 'a')
 			{
 				let drawaction = this._drawActions.get(guid);
+
 				if(drawaction)
 				{
 					drawaction.onDetach();
@@ -320,6 +318,7 @@ export class Context
 			else if(version == '2' && variant == 'b')
 			{
 				let mouseaction = this._mouseActions.get(guid);
+
 				if(mouseaction)
 				{
 					mouseaction.onDetach();
@@ -332,11 +331,11 @@ export class Context
 
 		this.states.sorted = false;
 
-		if(restrict == Restrict.none)
+		if(restrict == Restrict.none && !this.fx.id && this.states.drag)
 			this.refresh();
 	}
 
-	public get<Type extends Drawable | Control | Component | Group>(guid: string): Type
+	public get<Type extends	Drawable | Control | Component | Group	| DrawAction | MouseAction>(guid: string): Type
 	{
 		if(guid)
 		{
@@ -361,49 +360,64 @@ export class Context
 	public refresh(): void
 	{
 		if(!this._viewport.states.norefresh)
-			window.requestAnimationFrame(() => this.draw());
+			window.requestAnimationFrame((timestamp: number) => this.draw(timestamp));
 	}
 
-	public drag(control: Control): void
+	public drag(): void
 	{
 		if(this.states.drag)
 		{
+			const control: Control = this.get(this.states.pointer.control);
+
 			if(control.restrict == Restrict.none)
 			{
-				control.drawable.matrix.e = this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x;
-				control.drawable.matrix.f = this.states.pointer.current.y - this._viewport.smuggler.dragdiff.y;
+				control.drawable.x =	this.states.pointer.current.x - this.states.pointer.dragdiff.x;
+				control.drawable.y =	this.states.pointer.current.y - this.states.pointer.dragdiff.y;
 
-				control.drawable.matrix.e /= (window.devicePixelRatio * this.scale);
-				control.drawable.matrix.f /= (window.devicePixelRatio * this.scale);
+				control.drawable.x /= window.devicePixelRatio * this.scale;
+				control.drawable.y /= window.devicePixelRatio * this.scale;
 			}
 			else if(control.restrict == Restrict.horizontal)
-				control.drawable.matrix.e = this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x;
+			{
+				control.drawable.x =	this.states.pointer.current.x - this.states.pointer.dragdiff.x;
+				control.drawable.x /= window.devicePixelRatio * this.scale;
+			}
 			else if(control.restrict == Restrict.vertical)
-				control.drawable.matrix.f = this.states.pointer.current.y - this._viewport.smuggler.dragdiff.y;
+			{
+				control.drawable.y =	this.states.pointer.current.y - this.states.pointer.dragdiff.y;
+				control.drawable.y /= window.devicePixelRatio * this.scale;
+			}
 
 			if(!this.features.nosnapping && this.dragging.restrict == Restrict.ondrag)
 			{
-				control.drawable.matrix.e = Math.round((this.states.pointer.current.x - this._viewport.smuggler.dragdiff.x) / (this.dragging.grid.x || 1)) * (this.dragging.grid.x || 1);
-				control.drawable.matrix.f = Math.round((this.states.pointer.current.y - this._viewport.smuggler.dragdiff.y) / (this.dragging.grid.y || 1)) * (this.dragging.grid.y || 1);
+				control.drawable.x =	Math.round((this.states.pointer.current.x - this.states.pointer.dragdiff.x) /	(this.dragging.grid.x || 1)) * (this.dragging.grid.x || 1);
+				control.drawable.y =	Math.round((this.states.pointer.current.y - this.states.pointer.dragdiff.y) /	(this.dragging.grid.y || 1)) * (this.dragging.grid.y || 1);
+				control.drawable.x /= window.devicePixelRatio * this.scale;
+				control.drawable.y /= window.devicePixelRatio * this.scale;
 			}
 
 			if(control.drawable.group)
 			{
 				let group: Group = this.get(control.drawable.group);
 
-				[...group.map, ...group.enrolled].forEach((entry: any) => {
-					entry[1].object.matrix.e = control.drawable.matrix.e - entry[1].object.points['origin'].x;
-					entry[1].object.matrix.f = control.drawable.matrix.f - entry[1].object.points['origin'].y;
+				[...group.grouped, ...group.enrolled].forEach((drawable: Drawable) => {
+					drawable.x = control.drawable.x - (<any>drawable.points)['origin'].x;
+					drawable.y = control.drawable.y - (<any>drawable.points)['origin'].y;
 				});
 			}
-
-			this.draw(control);
-			window.requestAnimationFrame(() => this.drag(control));
 		}
+
+		this._viewport.id.dragging = window.requestAnimationFrame((timestamp?: number) => {
+			this.draw(timestamp);
+			this.drag();
+		});
 	}
 
-	public draw(control?: Control): void
-	{
+	public draw(timestamp?: number): void {
+		this.states.refresh.delta = timestamp - this.states.refresh.elapsed;
+		this.states.refresh.elapsed = timestamp;
+		//console.log(this.states.refresh.delta)
+
 		if(!this.states.sorted)
 		{
 			//this._drawActions.sort();
@@ -414,6 +428,8 @@ export class Context
 			this._controls.reverse();
 			this.states.sorted = true;
 		}
+
+		//this.context2D.filter = 'brightness(125%)';
 
 		if(!this._attributes.features.nodefault)
 		{
@@ -426,51 +442,47 @@ export class Context
 		}
 		this.context2D.imageSmoothingEnabled = false;
 
-		this._drawActions.map.forEach((entry: any) => {
-			if(entry.object.onDrawBefore)
-				entry.object.onDrawBefore(this.context2D);
+		this._drawActions.forEach((drawaction: DrawAction) => {
+			drawaction.onDrawBefore(this.context2D);
 		});
 
-		let length: number = this._drawables.sorted.length;
-		let stickies: Array<{guid: string, map: Map<string, any>}> = this._drawables.sorted.filter(([guid, map]: any) =>
-			map.object.sticky && map.object.visible
-		);
+		const stickies: Drawable[] = this._drawables.sorted.filter((drawable: Drawable) => drawable.sticky && drawable.visible);
 
-		for(let i: number = 0; i < length; i++)
-		{
-			let drawable: Drawable = (<any>this._drawables.sorted[i])[1].object;
-
-			if(control && this.states.drag && drawable.guid == control.drawable.guid)
+		this._drawables.sorted.forEach((drawable: Drawable) => {
+			if(this.states.drag)
 			{
+				const control: Control = this.get(this.states.pointer.control);
+
 				this.context2D.save();
 				control.onDrag();
 				drawable.draw(this.context2D);
 				this.context2D.restore();
 			}
-
-			else if(drawable.visible && !drawable.sticky &&
-				drawable.matrix.e > -drawable.size.width && 
-				drawable.matrix.e < this._viewport.canvas.buffer.width + drawable.size.width &&
-				drawable.matrix.f > -drawable.size.height &&
-				drawable.matrix.f < this._viewport.canvas.buffer.height + drawable.size.height)
+			else if(
+				drawable.visible &&
+				!drawable.sticky &&
+				drawable.x > -drawable.size.width &&
+				drawable.x < this._viewport.canvas.buffer.width + drawable.size.width &&
+				drawable.y > -drawable.size.height &&
+				drawable.y < this._viewport.canvas.buffer.height + drawable.size.height
+			)
 			{
-				drawable.draw(this.context2D);	
+				drawable.draw(this.context2D);
 			}
-		}
-
-		for(let entry of stickies)
-			(<any>entry)[1].object.draw(this.context2D);
-
-		this._drawActions.map.forEach((entry: any) => {
-			if(entry.object.onDrawAfter)
-				entry.object.onDrawAfter(this.context2D);
 		});
 
-		let bitmap: ImageBitmap = this._viewport.canvas.buffer.transferToImageBitmap();
+		for(let entry of stickies)
+			entry.draw(this.context2D);
+
+		this._drawActions.forEach((drawaction: DrawAction) => {
+			drawaction.onDrawAfter(this.context2D);
+		});
+
+		const bitmap: ImageBitmap = this._viewport.canvas.buffer.transferToImageBitmap();
 		this._viewport.context.main.transferFromImageBitmap(bitmap);
 	}
-	
-	public setFocus(guid: string): void 
+
+	public setFocus(guid: string): void
 	{
 		let focusControl: Control = this.get(guid);
 
@@ -483,13 +495,13 @@ export class Context
 				if(unfocusControl instanceof Control)
 					unfocusControl.onLostFocus();
 			}
-			
+
 			focusControl.onFocus();
 			this.states.focussed = guid;
 		}
 	}
 
-	public removeFocus(): void 
+	public removeFocus(): void
 	{
 		if(this.states.focussed != undefined)
 		{
@@ -537,22 +549,23 @@ export class Context
 		return this._mouseActions;
 	}
 
-	public static near(map: Foundation.ExtendedMap, point: Point, radius: number, list: Array<string>)
+	// move to drawable
+	public static near(map: Foundation.ExtendedMap,	point: Point, radius: number,	list: Array<string>)
 	{
-		let near: any = [...map.filter(([name, entry]: any) =>
-			entry.object.x >= point.x - radius &&
-			entry.object.y >= point.y - radius &&
-			entry.object.x <= point.x + radius &&
-			entry.object.y <= point.y + radius &&
-			entry.object.visible != false &&
-			!list.includes(entry.object.guid)
-		)];
+		let near: any = [...map.filter((drawable: Drawable) =>
+			drawable.x >= point.x - radius &&
+			drawable.y >= point.y - radius &&
+			drawable.x <= point.x + radius &&
+			drawable.y <= point.y + radius &&
+			drawable.visible != false &&
+			!list.includes(drawable.guid))
+		];
 
-		for(let entry of near)
-			list.push(entry[0]);
+		for(let drawable of near)
+			list.push(drawable.guid);
 
-		for(let entry of near)
-			this.near(map, new Point(entry[1].object.x, entry[1].object.y), radius, list);
+		for(let drawable of near)
+			this.near(map, new Point(drawable.x, drawable.y), radius, list);
 	}
 
 
@@ -581,7 +594,7 @@ export class Context
 	 */
 	public get fx(): Fx
 	{
-		 return this._fx;
+		return this._fx;
 	}
 
 	/**
@@ -592,7 +605,7 @@ export class Context
 		return new Size(this.canvas.width, this.canvas.height);
 	}
 	/**
-	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are setted with new width and height values. 
+	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are setted with new width and height values.
 	 * A call to [[refresh]] is also made to update the Context.
 	 */
 	public set size(size: Size)
@@ -604,7 +617,7 @@ export class Context
 		this.canvas.height = size.height * ratio;
 		this._viewport.canvas.buffer.width = size.width * ratio;
 		this._viewport.canvas.buffer.height = size.height * ratio;
-		
+
 		//this._viewport.canvas.main.style.width = (this._viewport.canvas.main.width ) * ratio + 'px';
 		//this._viewport.canvas.main.style.height = (this._viewport.canvas.main.height ) * ratio + 'px';
 
@@ -706,9 +719,13 @@ export class Context
 		return this._viewport.states;
 	}
 
-	public get smuggler(): any
+	public get id(): any
 	{
-		return this._viewport.smuggler;
+		return this._viewport.id;
+	}
+
+	public get points(): any
+	{
+		return this._viewport.points;
 	}
 }
-

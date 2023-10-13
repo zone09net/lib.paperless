@@ -3,111 +3,177 @@
 import * as Paperless from './lib.paperless.js';
 
 
+const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
+const step: number = 100
+let count: number = 100;
 
-let context: Paperless.Context = new Paperless.Context({
+const context: Paperless.Context = new Paperless.Context({
 	strokecolor: '#151515',
 	autosize: true, 
 	dragging: {
 		delay: 0, 
-		grid: {x: 100, y:0}, 
+		grid: {x: 20, y: 20}, 
 		restrict: Paperless.Enums.Restrict.onrelease
 	}, 
 	features: {
-		nosnapping: false}
+		nosnapping: false
+	},
 });
-context.attach(document.body);
 
-let step: number = 250
-let count: number = 250;
-let colors: Array<string> = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
-let triangle1: Paperless.Drawables.Triangle = context.attach(new Paperless.Drawables.Triangle(new Paperless.Point(50, 50), 30, {nostroke: false, linewidth: 2, strokecolor: '#151515', fillcolor: '#ffffff', sticky: true, angle: 180}));
-let triangle2: Paperless.Drawables.Triangle = context.attach(new Paperless.Drawables.Triangle(new Paperless.Point(250, 50), 30, {nostroke: false, linewidth: 2, strokecolor: '#151515', fillcolor: '#ffffff', sticky: true, angle: 0}));
-let triangle3: Paperless.Drawables.Triangle = context.attach(new Paperless.Drawables.Triangle(new Paperless.Point(250, 110), 30, {nostroke: false, linewidth: 2, strokecolor: '#151515', fillcolor: '#ffffff', sticky: true, angle: 0}));
-let triangle4: Paperless.Drawables.Triangle = context.attach(new Paperless.Drawables.Triangle(new Paperless.Point(250, 170), 30, {nostroke: false, linewidth: 2, strokecolor: '#151515', fillcolor: '#ffffff', sticky: true, angle: 0}));
-let label1: Paperless.Drawables.Label = context.attach(new Paperless.Drawables.Label(new Paperless.Point(150, 55), new Paperless.Size(0, 0), {autosize: true, content: '250', font: '60px bold system-ui', fillcolor: '#ffffff', sticky: true}));
-let label2: Paperless.Drawables.Label = context.attach(new Paperless.Drawables.Label(new Paperless.Point(150, 115), new Paperless.Size(0, 0), {autosize: true, content: 'line', font: '60px bold system-ui', fillcolor: '#ffffff', sticky: true}));
-let label3: Paperless.Drawables.Label = context.attach(new Paperless.Drawables.Label(new Paperless.Point(150, 175), new Paperless.Size(0, 0), {autosize: true, content: 'fx', font: '60px bold system-ui', fillcolor: '#ffffff', sticky: true}));
-let control: Paperless.Control;
+const label: Paperless.Drawables.Label = new Paperless.Drawables.Label({
+	autosize: true, 
+	content: count.toString(), 
+	font: '60px bold system-ui', 
+	fillcolor: '#ffffff', 
+	sticky: true
+});
 
-control = context.attach(new Paperless.Controls.Button(() => {
-	if(count < 2000)
-	{
-		polygons();
-		count += step;
-		label1.content = count.toString();
-		label1.generate();
-	}
-}));
-control.onInside = () => { context.dragging.delay = 180; triangle2.fillcolor = '#c8af55'; };
-control.onOutside = () => { context.dragging.delay = 0; triangle2.fillcolor = '#ffffff'; };
-control.attach(triangle2);
-control.movable = false;
+const triangle: Paperless.Drawables.Triangle = new Paperless.Drawables.Triangle({
+	radius: 30, 
+	nostroke: false, 
+	linewidth: 2, 
+	strokecolor: '#151515', 
+	fillcolor: '#ffffff', 
+	sticky: true, 
+	angle: 0
+});
 
-control = context.attach(new Paperless.Controls.Button(() => {
-	if(count > 0)
-	{
-		let filtered: Array<{guid: string, map: Map<string, any>}> = context.getControls().filter(([guid, map]: any) =>
-			map.object.constructor.name == 'Blank'
-		);
+const labelCount: Paperless.Drawables.Label = label.clone({
+	context: context,
+	content: count.toString(), 
+	point: {x: 150, y: 55},
+});
 
-		for(let i: number = 0; i < step; i++)
+const labelLine: Paperless.Drawables.Label = label.clone({
+	context: context,
+	content: 'line', 
+	point: {x: 150, y: 115},
+});
+
+const labelFx: Paperless.Drawables.Label = label.clone({
+	context: context,
+	content: 'fx', 
+	point: {x: 150, y: 175},
+});
+
+const less: Paperless.Drawables.Triangle = triangle.clone({
+	context: context,
+	point: {x: 50, y: 50}, 
+	angle: 180
+});
+
+const more: Paperless.Drawables.Triangle = triangle.clone({
+	context: context,
+	point: {x: 250, y: 50}, 
+	angle: 0
+});
+
+const line: Paperless.Drawables.Triangle = triangle.clone({
+	context: context,
+	point: {x: 250, y: 110}, 
+});
+
+const fx: Paperless.Drawables.Triangle = triangle.clone({
+	context: context,
+	point: {x: 250, y: 170}, 
+});
+
+// more
+new Paperless.Controls.Button({
+	movable: false,
+	context: context,
+	drawable: more,
+	callbackLeftClick: () => {
+		if(count < 2000)
 		{
-			let control: Paperless.Control = (<any>filtered[i])[1].object;
-			context.detach([control.drawable.guid, control.guid]);
+			count += step;
+			labelCount.content = count.toString();
+			labelCount.generate();
+			polygons();
+		}
+	},
+	onInside: () => { more.fillcolor = '#c8af55'; },
+	onOutside: () => { more.fillcolor = '#ffffff'; }
+});
+
+// less
+new Paperless.Controls.Button({
+	movable: false,
+	context: context,
+	drawable: less,
+	callbackLeftClick: () => {
+		if(count > 0)
+		{
+			const controls: Paperless.Control[] = context.getControls().filter((control: Paperless.Control) =>
+				control.drawable.constructor.name != 'Label' && control.drawable.constructor.name != 'Triangle'
+			);
+	
+			for(let i: number = 0; i < step; i++)
+				context.detach([controls[i].drawable.guid, controls[i].guid]);
+	
+			count -= step;
+			labelCount.content = count.toString();
+			labelCount.generate();
+		}
+	},
+	onInside: () => { less.fillcolor = '#c8af55'; },
+	onOutside: () => { less.fillcolor = '#ffffff'; }
+});
+
+
+// line
+new Paperless.Controls.Button({
+	movable: false,
+	context: context,
+	drawable: line,
+	callbackLeftClick: () => {
+		const drawables: Paperless.Drawable[] = context.getDrawables().filter((drawable: Paperless.Drawable) =>
+			drawable.constructor.name == 'Blade' ||
+			drawable.constructor.name == 'Hexagon' ||
+			drawable.constructor.name == 'Rectangle' ||
+			drawable.constructor.name == 'Cross'
+		);
+		const length: number = drawables.length
+
+		if(labelLine.content == 'line')
+		{
+			for(let i: number = 0; i < length; i++)
+				drawables[i].nostroke = true;
+
+			labelLine.content = 'noline';
+		}
+		else
+		{
+			for(let i: number = 0; i < length; i++)
+				drawables[i].nostroke = false;
+
+			labelLine.content = 'line';
 		}
 
-		count -= step;
-		label1.content = count.toString();
-		label1.generate();
-	}
-}));
-control.onInside = () => { context.dragging.delay = 180; triangle1.fillcolor = '#c8af55'; };
-control.onOutside = () => { context.dragging.delay = 0; triangle1.fillcolor = '#ffffff'; };
-control.attach(triangle1);
-control.movable = false;
+		labelLine.generate();
+	},
+	onInside: () => { line.fillcolor = '#c8af55'; },
+	onOutside: () => { line.fillcolor = '#ffffff'; }
+});
 
-control = context.attach(new Paperless.Controls.Button(() => {
-	let filtered: Array<{guid: string, map: Map<string, any>}> = context.getDrawables().filter(([guid, map]: any) =>
-		map.object.constructor.name == 'Triangle' ||
-		map.object.constructor.name == 'Hexagon' ||
-		map.object.constructor.name == 'Rectangle' ||
-		map.object.constructor.name == 'Cross'
-	);
+// fx
+new Paperless.Controls.Button({
+	movable: false,
+	context: context,
+	drawable: fx,
+	callbackLeftClick: () => {
+		if(labelFx.content == 'fx')
+			labelFx.content = 'nofx';
+		else
+			labelFx.content = 'fx';
+		labelFx.generate();
+	},
+	onInside: () => { fx.fillcolor = '#c8af55'; },
+	onOutside: () => { fx.fillcolor = '#ffffff'; }
+});
 
-	if(label2.content == 'line')
-	{
-		for(let i: number = 0; i < filtered.length; i++)
-			(<any>filtered[i])[1].object.nostroke = true;
 
-		label2.content = 'noline';
-	}
-	else
-	{
-		for(let i: number = 0; i < filtered.length; i++)
-		(<any>filtered[i])[1].object.nostroke = false;
-
-		label2.content = 'line';
-	}
-
-	label2.generate();
-}));
-control.onInside = () => { context.dragging.delay = 180; triangle3.fillcolor = '#c8af55'; };
-control.onOutside = () => { context.dragging.delay = 0; triangle3.fillcolor = '#ffffff'; };
-control.attach(triangle3);
-control.movable = false;
-
-control = context.attach(new Paperless.Controls.Button(() => {
-	if(label3.content == 'fx')
-		label3.content = 'nofx';
-	else
-		label3.content = 'fx';
-	label3.generate();
-}));
-control.onInside = () => { context.dragging.delay = 180; triangle4.fillcolor = '#c8af55'; };
-control.onOutside = () => { context.dragging.delay = 0; triangle4.fillcolor = '#ffffff'; };
-control.attach(triangle4);
-control.movable = false;
-
+context.attach(document.body);
 polygons();
 
 
@@ -115,39 +181,91 @@ function polygons(): void
 {
 	for(let i: number = 0; i < step; i++)
 	{
-		let random: number = Math.floor((Math.random() * (label2.content == 'line' ? 4 : 3)));
-		let color: string = '#' + Math.floor(16777215 - (Math.random() * 15000000)).toString(16);
-		let linewidth: number = Math.floor(Math.random() * 20 + 5);
-		let radius1: number = Math.floor(Math.random() * 30 + 20);
-		let radius2: number = Math.floor(Math.random() * 30 + 5);
-		let width: number = Math.floor(Math.random() * 60 + 20);
-		let height: number = Math.floor(Math.random() * 60 + 20);
-		let x: number = (Math.random() * (window.innerWidth - width)) + (width / 2);
-		let y: number = (Math.random() * (window.innerHeight - height)) + (height / 2);
-		let rx: number = (Math.random() * (window.innerWidth - (radius1 * 2))) + radius1;
-		let ry: number = (Math.random() * (window.innerHeight - (radius1 * 2))) + radius1;
+		const random: number = Math.floor((Math.random() * (labelLine.content == 'line' ? 4 : 3)));
+		const linewidth: number = Math.floor(Math.random() * 20 + 5);
+		const radius: number = Math.floor(Math.random() * 30 + 20);
+		const width: number = Math.floor(Math.random() * 60 + 20);
+		const height: number = Math.floor(Math.random() * 60 + 20);
+		const x: number = (Math.random() * (context.canvas.width - width)) + (width / 2);
+		const y: number = (Math.random() * (context.canvas.height - height)) + (height / 2);
+		const rx: number = (Math.random() * (context.canvas.width - (radius * 2))) + radius;
+		const ry: number = (Math.random() * (context.canvas.height - (radius * 2))) + radius;
 		let drawable: Paperless.Drawable;
-		let control: Paperless.Control;
 
 		switch(random)
 		{
 			case 0:
-				drawable = context.attach(new Paperless.Drawables.Triangle(new Paperless.Point(rx, ry), radius1, {nostroke: (label2.content == 'line' ? false : true), linewidth: 2, strokecolor: '#151515', fillcolor: colors[3]}));
-				break;
-			case 1:
-				drawable = context.attach(new Paperless.Drawables.Hexagon(new Paperless.Point(rx, ry), radius1, {nostroke: (label2.content == 'line' ? false : true), linewidth: 2, strokecolor: '#151515', fillcolor: colors[1]}));
-				break;
-			case 2:
-				drawable = context.attach(new Paperless.Drawables.Rectangle(new Paperless.Point(x, y), new Paperless.Size(width, height), {nostroke: (label2.content == 'line' ? false : true), linewidth: 2, strokecolor: '#151515', fillcolor: colors[2]}));
-				break;
-			case 3:
-				drawable = context.attach(new Paperless.Drawables.Cross(new Paperless.Point(x, y), new Paperless.Size(width, height), {nostroke: false, linewidth: linewidth, strokecolor: colors[0], fillcolor: colors[0]}));
-				if(label3.content == 'fx')
+				drawable = new Paperless.Drawables.Blade({
+					context: context,
+					point: {x: rx, y: ry},
+					outerRadius: radius,
+					spikes: Math.round(((Math.random() * 8) + 6) / 2) * 2,
+					nostroke: (labelLine.content == 'line' ? false : true), 
+					linewidth: 2, 
+					strokecolor: '#151515', 
+					fillcolor: colors[3],
+					hoverable: true
+				});
+
+				if(labelFx.content == 'fx')
 				{
 					context.fx.add({
 						duration: 1500,
 						drawable: drawable, 
-						effect: context.fx.rotate,
+						effect: fullRotate,
+						loop: true,
+						smuggler: { 
+							ease: Paperless.Fx.easeLinear, 
+							angle: 360, 
+						},
+					});
+				}		
+				break;
+
+			case 1:
+				drawable = new Paperless.Drawables.Hexagon({
+					context: context,
+					point: {x: rx, y: ry},
+					radius: radius,
+					nostroke: (labelLine.content == 'line' ? false : true), 
+					linewidth: 2, 
+					strokecolor: '#151515', 
+					fillcolor: colors[1],
+					hoverable: true
+				});
+				break;
+
+			case 2:
+				drawable = new Paperless.Drawables.Rectangle({
+					context: context,
+					point: {x: x, y: y},
+					size: {width: width, height: height},
+					nostroke: (labelLine.content == 'line' ? false : true), 
+					linewidth: 2, 
+					strokecolor: '#151515', 
+					fillcolor: colors[2],
+					hoverable: true
+				});
+				break;
+
+			case 3:
+				drawable = new Paperless.Drawables.Cross({
+					context: context,
+					point: {x: x, y: y},
+					size: {width: width, height: height},
+					nostroke: false, 
+					linewidth: linewidth, 
+					strokecolor: colors[0], 
+					fillcolor: colors[0],
+					hoverable: true
+				});
+
+				if(labelFx.content == 'fx')
+				{
+					context.fx.add({
+						duration: 1500,
+						drawable: drawable, 
+						effect: fullRotate,
 						loop: true,
 						smuggler: { 
 							ease: Paperless.Fx.easeLinear, 
@@ -158,19 +276,24 @@ function polygons(): void
 				break;
 		}
 
-		control = context.attach(new Paperless.Controls.Blank());
-		control.attach(drawable);
-		control.onInside = () => {
-			drawable.strokecolor = '#ffffff';
-		}
-		control.onOutside = () => {
-			if(drawable.constructor.name == 'Cross')
-				drawable.strokecolor = colors[0];
-			else
-				drawable.strokecolor = '#151515';
-		}
+		new Paperless.Control({
+			context: context,
+			drawable: drawable,
+			onInside: () => {
+				drawable.strokecolor = '#ffffff';
+			},
+			onOutside: () => {
+				if(drawable.constructor.name == 'Cross')
+					drawable.strokecolor = colors[0];
+				else
+					drawable.strokecolor = '#151515';
+			}
+		});
 	}
 }
 
-
+function fullRotate(fx: Paperless.Interfaces.IFx)
+{
+	(<Paperless.Drawable>fx.drawable).rad = fx.smuggler.ease(fx.t) * 6.28 * Math.sign(fx.smuggler.angle | 1);
+}
 

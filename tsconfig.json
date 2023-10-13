@@ -9,27 +9,27 @@
 			"dom", 
 			"es2018"
 		],
-		
+
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
 		"noEmitOnError": false,
 		"allowJs": false,
-		"watch": true,
+		//"watch": true,
 		"declaration": true,
 		"declarationMap": true,
 		"outDir": "./.dist",
 		"baseUrl": "../",
 		"paths": {
-			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
+			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"]
 		},
 		"typeRoots": ["./types"],
-		"types": ["OffscreenCanvas"],
+		"types": ["OffscreenCanvas"]
 	},
 
 	"tsc-alias": {
 		"verbose": true,
-		"resolveFullPaths": true,
+		"resolveFullPaths": true
 	 },
 
 	"include": [
@@ -40,5 +40,22 @@
 		"./node_modules",
 		"./.dist",
 		"./.rollup"
-	]
+	],
+
+	"typedocOptions": {
+		"name": "zone09.net",
+		"entryPoints": [
+			"../lib.foundation/src/lib.foundation.ts",
+         "./src/lib.paperless.ts"
+         //"./dev/lib.hac.ts",
+      ],
+      "out": "../www.zone09.net/public/doc",
+      "excludePrivate": true,
+      //"excludeInternal": true,
+      "excludeProtected": true,
+		"excludeExternals": true,
+      "hideGenerator": true,
+      "disableSources": true,
+		"cleanOutputDir": false
+  }
 }

@@ -49,8 +49,14 @@ export interface IStates
 		last: Point,
 		clicked: Point,
 		control: string,
+		dragdiff: Point,
 	},
 
 	touch: {
+	},
+
+	refresh: {
+		delta: number,
+		elapsed: number
 	}
 }
