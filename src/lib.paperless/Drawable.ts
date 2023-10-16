@@ -5,17 +5,7 @@ import {Fx} from './Fx.js';
 import {Group} from './Group.js';
 import {Matrix} from './Matrix.js';
 import {IDrawableAttributes} from './interfaces/IDrawable.js';
-import {Vector} from './Vector.js';
 import {Control} from './Control.js';
-
-
-
-export interface IDrawablePhysic
-{
-	mass?: number;
-	velocity?: Vector; // pixel/ms
-	collided?: number;
-}
 
 
 
@@ -51,12 +41,6 @@ export class Drawable extends Matrix
 	private _points: Point[] = [];
 	private _path = new Path2D();
 	private _boundaries: { topleft: Point; bottomright: Point };
-
-	private _physic: IDrawablePhysic = {
-		mass: 100,
-		velocity: new Vector({ x: 0.05, y: 0.05 }),
-		collided: undefined,
-	};
 	//---
 
 	public constructor(attributes: IDrawableAttributes = {})
@@ -380,15 +364,6 @@ export class Drawable extends Matrix
 	public set path(path: Path2D)
 	{
 		this._path = path;
-	}
-
-	public get physic(): IDrawablePhysic
-	{
-		return this._physic;
-	}
-	public set physic(physic: IDrawablePhysic)
-	{
-		this._physic = physic;
 	}
 
 	// attributes

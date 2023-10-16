@@ -57,8 +57,6 @@ export {Context} from './lib.paperless/Context.js';
 export {Fx} from './lib.paperless/Fx.js';
 //export {Filter} from './lib.pazperless/Filter.js';
 export {Matrix} from './lib.paperless/Matrix.js';
-export {Vector} from './lib.paperless/Vector.js';
-export {Physic} from './lib.paperless/Physic.js';
 export * as Interfaces from './lib.paperless/interfaces/Interfaces.js' ;
 export * as Controls from './lib.paperless/controls/Controls.js' ;
 export * as Drawables from './lib.paperless/drawables/Drawables.js' ;
