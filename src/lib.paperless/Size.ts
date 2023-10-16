@@ -31,7 +31,7 @@ export class Size
 	 * 
 	 * @param 	size			Should be a string format 'width, height'
 	 */
-	public toSize(size: string): Size
+	public fromString(size: string): Size
 	{
 		const match = size.match(/([0-9]+),\s*([0-9]+)/);
 

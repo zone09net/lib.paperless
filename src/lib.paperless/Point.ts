@@ -33,7 +33,7 @@ export class Point
 	 * 
 	 * @param	point			Should be a string format 'x, y'
 	 */
-	public toPoint(point: string): Point
+	public fromString(point: string): Point
 	{
 		const match = point.match(/([0-9]+),\s*([0-9]+)/);
 
