@@ -173,50 +173,50 @@ export class Context
 		return object;
 	}
 
-	public attach<Type>(object: | Drawable | Control | Component | Group | DrawAction | MouseAction | HTMLElement): Type 
+	public attach<Type>(entity: | Drawable | Control | Component | Group | DrawAction | MouseAction | HTMLElement): Type 
 	{
 		let guid: string;
 		let entry: any;
 
-		if(object instanceof Drawable)
+		if(entity instanceof Drawable)
 		{
 			guid = this.getGuidGenerator().create('1', 'a');
-			entry = this._drawables.set(guid, object);
+			entry = this._drawables.set(guid, entity);
 
 			this.states.sorted = false;
 		}
-		else if(object instanceof Control)
+		else if(entity instanceof Control)
 		{
 			guid = this.getGuidGenerator().create('1', 'b');
-			entry = this._controls.set(guid, object);
+			entry = this._controls.set(guid, entity);
 
 			this.states.sorted = false;
 		} 
-		else if(object instanceof Component)
+		else if(entity instanceof Component)
 		{
 			guid = this.getGuidGenerator().create('1', '9');
-			entry = this._components.set(guid, object);
+			entry = this._components.set(guid, entity);
 
 			this.states.sorted = false;
 		}
-		else if(object instanceof Group)
+		else if(entity instanceof Group)
 		{
 			guid = this.getGuidGenerator().create('1', '8');
-			entry = this._groups.set(guid, object);
+			entry = this._groups.set(guid, entity);
 		}
-		else if(object instanceof DrawAction)
+		else if(entity instanceof DrawAction)
 		{
 			guid = this.getGuidGenerator().create('2', 'a');
-			entry = this._drawActions.set(guid, object);
+			entry = this._drawActions.set(guid, entity);
 		}
-		else if(object instanceof MouseAction)
+		else if(entity instanceof MouseAction)
 		{
 			guid = this.getGuidGenerator().create('2', 'b');
-			entry = this._mouseActions.set(guid, object);
+			entry = this._mouseActions.set(guid, entity);
 		}
-		else if(object instanceof HTMLElement)
+		else if(entity instanceof HTMLElement)
 		{
-			object.appendChild(this._viewport.canvas.main);
+			entity.appendChild(this._viewport.canvas.main);
 			return null;
 		}
 		else
@@ -230,9 +230,9 @@ export class Context
 		return entry;
 	}
 
-	public detach(guids: Array<string> | string,	restrict: Restrict.norefresh | Restrict.none = Restrict.norefresh): void
+	public detach(guids: string[] | string, restrict: Restrict.norefresh | Restrict.none = Restrict.norefresh): void
 	{
-		let guidlist: Array<string>;
+		let guidlist: string[];
 
 		if(guids instanceof Array)
 			guidlist = guids;
@@ -244,86 +244,86 @@ export class Context
 			if(typeof guid != 'string')
 				continue;
 
-			let version = guid.charAt(14);
-			let variant = guid.charAt(19);
+			const version: string = guid.charAt(14);
+			const variant: string = guid.charAt(19);
 
 			if(version == '1' && variant == 'a')
 			{
-				let drawable = this._drawables.get(guid);
+				const entity: Drawable = this._drawables.get(guid);
 
-				if(drawable && drawable.removable)
+				if(entity && entity.removable)
 				{
-					const group: Group = this.get(drawable.group);
+					const group: Group = this.get(entity.group);
 
 					if(group)
-						group.detach(drawable);
+						group.detach(entity);
 
-					drawable.onDetach();
-					drawable.context = undefined;
-					drawable.guid = undefined;
-					drawable.fx = undefined;
+					entity.onDetach();
+					entity.context = undefined;
+					entity.guid = undefined;
+					entity.fx = undefined;
 					this._drawables.delete(guid);
 				}
 			}
 			else if(version == '1' && variant == 'b')
 			{
-				let control = this._controls.get(guid);
+				const entity: Control = this._controls.get(guid);
 
-				if(control && control.removable)
+				if(entity && entity.removable)
 				{
-					control.onDetach();
-					control.context = undefined;
-					control.guid = undefined;
-					control.fx = undefined;
+					entity.onDetach();
+					entity.context = undefined;
+					entity.guid = undefined;
+					entity.fx = undefined;
 					this._controls.delete(guid);
 				}
 			}
 			else if(version == '1' && variant == '8')
 			{
-				let group = this._groups.get(guid);
+				const entity: Group = this._groups.get(guid);
 
-				if(group)
+				if(entity)
 				{
-					group.onDetach();
-					group.context = undefined;
-					group.guid = undefined;
+					entity.onDetach();
+					entity.context = undefined;
+					entity.guid = undefined;
 					this._groups.delete(guid);
 				}
 			}
 			else if(version == '1' && variant == '9')
 			{
-				let component = this._components.get(guid);
+				const entity: Component = this._components.get(guid);
 
-				if(component)
+				if(entity)
 				{
-					component.onDetach();
-					component.context = undefined;
-					component.guid = undefined;
-					component.fx = undefined;
+					entity.onDetach();
+					entity.context = undefined;
+					entity.guid = undefined;
+					entity.fx = undefined;
 					this._components.delete(guid);
 				}
 			}
 			else if(version == '2' && variant == 'a')
 			{
-				let drawaction = this._drawActions.get(guid);
+				const entity: DrawAction = this._drawActions.get(guid);
 
-				if(drawaction)
+				if(entity)
 				{
-					drawaction.onDetach();
-					drawaction.context = undefined;
-					drawaction.guid = undefined;
+					entity.onDetach();
+					entity.context = undefined;
+					entity.guid = undefined;
 					this._drawActions.delete(guid);
 				}
 			}
 			else if(version == '2' && variant == 'b')
 			{
-				let mouseaction = this._mouseActions.get(guid);
+				const entity: MouseAction = this._mouseActions.get(guid);
 
-				if(mouseaction)
+				if(entity)
 				{
-					mouseaction.onDetach();
-					mouseaction.context = undefined;
-					mouseaction.guid = undefined;
+					entity.onDetach();
+					entity.context = undefined;
+					entity.guid = undefined;
 					this._mouseActions.delete(guid);
 				}
 			}
@@ -339,8 +339,8 @@ export class Context
 	{
 		if(guid)
 		{
-			let version = guid.charAt(14);
-			let variant = guid.charAt(19);
+			const version = guid.charAt(14);
+			const variant = guid.charAt(19);
 
 			if(version == '1' && variant == 'a')
 				return this._drawables.get(guid);
@@ -398,7 +398,7 @@ export class Context
 
 			if(control.drawable.group)
 			{
-				let group: Group = this.get(control.drawable.group);
+				const group: Group = this.get(control.drawable.group);
 
 				[...group.grouped, ...group.enrolled].forEach((drawable: Drawable) => {
 					drawable.x = control.drawable.x - (<any>drawable.points)['origin'].x;
@@ -484,13 +484,13 @@ export class Context
 
 	public setFocus(guid: string): void
 	{
-		let focusControl: Control = this.get(guid);
+		const focusControl: Control = this.get(guid);
 
 		if(focusControl instanceof Control && guid != this.states.focussed)
 		{
 			if(this.states.focussed != undefined)
 			{
-				let unfocusControl: Control = this.get(this.states.focussed);
+				const unfocusControl: Control = this.get(this.states.focussed);
 
 				if(unfocusControl instanceof Control)
 					unfocusControl.onLostFocus();
@@ -505,7 +505,7 @@ export class Context
 	{
 		if(this.states.focussed != undefined)
 		{
-			let unfocusControl: Control = this.get(this.states.focussed);
+			const unfocusControl: Control = this.get(this.states.focussed);
 
 			if(unfocusControl instanceof Control)
 				unfocusControl.onLostFocus();
