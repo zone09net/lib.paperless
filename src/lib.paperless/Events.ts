@@ -217,9 +217,9 @@ export class Events
       event.preventDefault();
 
       //const touches = _event.changedTouches || _event.touches || [];
-      let touches: any = event.touches || [];
-		let ratio: number = window.devicePixelRatio;
-		let point: Point = new Point(touches[0].pageX / ratio, touches[0].pageY / ratio);
+      const touches: any = event.touches || [];
+		const ratio: number = window.devicePixelRatio;
+		const point: Point = new Point(touches[0].pageX / ratio, touches[0].pageY / ratio);
 
 		context.canvas.dispatchEvent(new MouseEvent("mousemove", {
 			view: event.view,
@@ -272,7 +272,7 @@ export class Events
 		event.preventDefault();
 
       //const touches = _event.changedTouches || _event.touches || [];
-      let touches: any = event.touches || [];
+      const touches: any = event.touches || [];
 
       context.states.pinch = false;
 
@@ -290,8 +290,8 @@ export class Events
          {
             //console.log("[touch 1]")
 
-				let ratio: number = window.devicePixelRatio;
-				let point: Point = new Point(touches[0].pageX / ratio, touches[0].pageY / ratio);
+				const ratio: number = window.devicePixelRatio;
+				const point: Point = new Point(touches[0].pageX / ratio, touches[0].pageY / ratio);
 				
 				context.canvas.dispatchEvent(new MouseEvent("mousedown", {
 					view: event.view,
@@ -307,7 +307,7 @@ export class Events
    public static handleTouchEnd(context: Context, event: HTMLElementEventMap['touchend'])
    {
       //const touches = _event.changedTouches || _event.touches || [];
-      let touches: any = event.touches || [];
+      const touches: any = event.touches || [];
 
 		context.states.pinch = false;
       //_zsys._stage.states.pinch.pointCurrent0 = null;
@@ -336,7 +336,7 @@ export class Events
 
 	public static handleWindowTouchMove(context: Context, event: HTMLElementEventMap['touchmove'])
    {
-      // This will remove the scrolling while we are zoomed and dragging tile
+      // This will remove the scrolling while we are zoomed and dragging
       if(context.states.drag || context.states.pinch)
       {
          event.preventDefault();
