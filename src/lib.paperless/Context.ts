@@ -49,13 +49,6 @@ export class Context
 	public constructor(attributes: IContextAttributes = {})
 	{
 		const {
-			fillcolor = '#000000',
-			strokecolor = '#a0a0a0',
-			font = '16px system-ui',
-			linewidth = 2,
-			shadow = 0,
-			shadowcolor = '#ffffff',
-			alpha = 1,
 			scale = 1,
 			size = new Size(window.innerWidth, window.innerHeight),
 			autosize = false,
@@ -64,13 +57,6 @@ export class Context
 		} = attributes;
 
 		this._attributes = {
-			strokecolor: strokecolor,
-			fillcolor: fillcolor,
-			font: font,
-			linewidth: linewidth,
-			shadow: shadow,
-			shadowcolor: shadowcolor,
-			alpha: alpha,
 			scale: scale,
 			autosize: autosize,
 			features: {
@@ -429,19 +415,6 @@ export class Context
 			this.states.sorted = true;
 		}
 
-		//this.context2D.filter = 'brightness(125%)';
-
-		if(!this._attributes.features.nodefault)
-		{
-			this.context2D.font = this._attributes.font;
-			this.context2D.strokeStyle = this._attributes.strokecolor;
-			this.context2D.shadowBlur = this._attributes.shadow;
-			this.context2D.shadowColor = this._attributes.shadowcolor;
-			this.context2D.globalAlpha = this._attributes.alpha;
-			this.context2D.lineWidth = this._attributes.linewidth;
-		}
-		this.context2D.imageSmoothingEnabled = false;
-
 		this._drawActions.forEach((drawaction: DrawAction) => {
 			drawaction.onDrawBefore(this.context2D);
 		});
@@ -622,60 +595,6 @@ export class Context
 		//this._viewport.canvas.main.style.height = (this._viewport.canvas.main.height ) * ratio + 'px';
 
 		this.refresh();
-	}
-
-	public get fillcolor(): string
-	{
-		return this._attributes.fillcolor;
-	}
-	public set fillcolor(fillcolor: string)
-	{
-		this._attributes.fillcolor = fillcolor;
-	}
-
-	public get strokecolor(): string
-	{
-		return this._attributes.strokecolor;
-	}
-	public set strokecolor(strokecolor: string)
-	{
-		this._attributes.strokecolor = strokecolor;
-	}
-
-	public get linewidth(): number
-	{
-		return this._attributes.linewidth;
-	}
-	public set linewidth(linewidth: number)
-	{
-		this._attributes.linewidth = linewidth;
-	}
-
-	public get alpha(): number
-	{
-		return this._attributes.alpha;
-	}
-	public set alpha(alpha: number)
-	{
-		this._attributes.alpha = alpha;
-	}
-
-	public get shadow(): number
-	{
-		return this._attributes.shadow;
-	}
-	public set shadow(shadow: number)
-	{
-		this._attributes.shadow = shadow;
-	}
-
-	public get shadowcolor(): string
-	{
-		return this._attributes.shadowcolor;
-	}
-	public set shadowcolor(shadowcolor: string)
-	{
-		this._attributes.shadowcolor = shadowcolor;
 	}
 
 	public get scale(): number

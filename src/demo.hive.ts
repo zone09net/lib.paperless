@@ -145,7 +145,6 @@ class Hive extends Paperless.Component
 }
 
 const context: Paperless.Context = new Paperless.Context({
-	strokecolor: "#151515",
 	autosize: true,
 	dragging: {
 		delay: 0,
