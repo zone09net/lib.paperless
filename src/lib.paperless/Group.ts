@@ -56,6 +56,12 @@ export class Group
 	 */
 	public constructor(attributes: IGroupAttributes = {}) 
 	{
+		const {
+			context = null,
+
+		} = attributes;
+
+		context ? context.attach(this) : null;	
 	}
 
 	public enroll(entity: Drawable | Array<Drawable>): void
