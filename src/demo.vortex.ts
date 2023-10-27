@@ -1,5 +1,3 @@
-
-
 import * as Paperless from './lib.paperless.js';
 
 

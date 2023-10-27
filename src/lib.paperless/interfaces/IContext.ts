@@ -47,7 +47,7 @@ export interface IStates
 	touch: {
 	},
 
-	refresh: {
+	timestamp: {
 		delta: number,
 		elapsed: number
 	}

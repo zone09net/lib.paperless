@@ -72,7 +72,10 @@ export class Context
 				...{
 					delay: 180,
 					restrict: Restrict.none,
-					grid: { ...{ x: 1, y: 1 }, ...dragging.grid },
+					grid: { 
+						...{x: 1, y: 1}, 
+						...dragging.grid 
+					},
 				},
 				...dragging,
 			},
@@ -115,7 +118,7 @@ export class Context
 
 				touch: {},
 
-				refresh: {
+				timestamp: {
 					delta: 0,
 					elapsed: 0,
 				}
@@ -206,7 +209,7 @@ export class Context
 			return null;
 		}
 		else
-			throw new Error('Context.attach need either a Drawable/Control/Component/Group/DrawActions/MouseActions/HTMLElement type');
+			throw new Error('Context.attach need either a Drawable|Control|Component|Group|DrawActions|MouseActions|HTMLElement type');
 
 		entry.context = this;
 		entry.guid = guid;
@@ -400,9 +403,8 @@ export class Context
 	}
 
 	public draw(timestamp?: number): void {
-		this.states.refresh.delta = timestamp - this.states.refresh.elapsed;
-		this.states.refresh.elapsed = timestamp;
-		//console.log(this.states.refresh.delta)
+		this.states.timestamp.delta = timestamp - this.states.timestamp.elapsed;
+		this.states.timestamp.elapsed = timestamp;
 
 		if(!this.states.sorted)
 		{
@@ -578,7 +580,7 @@ export class Context
 		return new Size(this.canvas.width, this.canvas.height);
 	}
 	/**
-	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are setted with new width and height values.
+	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are given the same new width and height values.
 	 * A call to [[refresh]] is also made to update the Context.
 	 */
 	public set size(size: Size)
