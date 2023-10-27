@@ -2,7 +2,7 @@
 	"compileOnSave": true,
 
 	"compilerOptions": {
-		"target": "es2017",
+		"target": "es2018",
 		"module": "es6",
 		"moduleResolution": "node",
 		"lib": [
@@ -14,15 +14,13 @@
 		"removeComments": true,
 		"preserveConstEnums": true,
 		"noEmitOnError": false,
-		"allowJs": false,
-		//"watch": true,
+		"allowJs": true,
 		"declaration": true,
 		"declarationMap": true,
-		"outDir": "../www.zone09.net/public/js/dev",
+		"outDir": "./.dist",
 		"baseUrl": "../",
 		"paths": {
-			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
-			"@zone09.net/paperless": ["lib.paperless/src/lib.paperless.ts"]
+			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"]
 		},
 		"typeRoots": ["./types"],
 		"types": ["OffscreenCanvas"]
@@ -33,15 +31,15 @@
 		"resolveFullPaths": true
 	 },
 
-	 /*
 	"include": [
-		"./src/demo.paperless.ts",
+		"./src/lib.paperless.ts"
 	],
-	*/
-	
+
 	"exclude": [
 		"./node_modules",
 		"./.dist",
-		"./.rollup"
+		"./.rollup",
+		"./.obfuscator",
+		"./.minify"
 	]
 }

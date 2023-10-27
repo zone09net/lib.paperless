@@ -13,12 +13,13 @@
 		"clean:minify": "if exist .minify rmdir /s /q .minify",
 		"clean": "concurrently --kill-others \"npm run clean:dist\" \"npm run clean:rollup\" \"npm run clean:obfuscator\" \"npm run clean:minify\"",
 		
-   	"build": "tsc --build && tsc-alias",
-		"build:watch": "concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc -w\" \"tsc-alias -w\"",
-		"build:demo": "tsc --build tsconfig.demo.json && tsc-alias -p tsconfig.demo.json",
-		"build:demo:watch": "concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc --build tsconfig.demo.json -w\" \"tsc-alias -p tsconfig.demo.json -w\"",
-		"rollup": "tsc --build --force && rollup -c rollup.config.js",
+		"build": "type tsconfig.main.json > tsconfig.json && tsc --build --force",
+		"rollup": "rollup -c rollup.config.js",
 		"obfuscator": "javascript-obfuscator ./.rollup --output ./.obfuscator --compact true --exclude ./.rollup/extlib/**/**",
-		"minify": "if not exist .minify mkdir .minify && minify ./.rollup/lib.paperless.js > ./.minify/lib.paperless.js"
+		"minify": "if not exist .minify mkdir .minify && minify ./.rollup/lib.hac.js > ./.minify/lib.hac.js",
+		"dist": "npm run -s clean && npm run -s rollup && npm run -s obfuscator && npm run -s minify",
+
+		"dev": "type tsconfig.dev.json > tsconfig.json && tsc --build --force && tsc-alias",
+		"watch": "type tsconfig.dev.json > tsconfig.json && concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc --build -w\" \"tsc-alias -w\""
   	}
 }
