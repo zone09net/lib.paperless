@@ -6,6 +6,7 @@ import {Group} from './Group.js';
 import {Matrix} from './Matrix.js';
 import {IDrawableAttributes} from './interfaces/IDrawable.js';
 import {Control} from './Control.js';
+import {Restrict} from './enums/Restrict.js';
 
 
 
@@ -201,7 +202,7 @@ export class Drawable extends Matrix
 		return hover;
 	}
 
-	public toFront(): void
+	public toFront(restrict: Restrict.none | Restrict.norefresh = Restrict.none): void
 	{
 		const drawables: any = this.context.getDrawables();
 		const controls: any = this.context.getControls();
@@ -218,9 +219,12 @@ export class Drawable extends Matrix
 				this.context.link(drawable, controlIndex[0]);
 		});
 
-		drawables.sort();
-		controls.reverse();
-		this.context.states.sorted = true;
+		if(restrict == Restrict.none)
+		{
+			drawables.sort();
+			controls.reverse();
+			this.context.states.sorted = true;
+		}
 	}
 
 	public near(radius: number): Drawable[]
