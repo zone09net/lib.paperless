@@ -48,25 +48,25 @@ const orange: Paperless.Drawables.Circle = new Paperless.Drawables.Circle({
 
 const blue: Paperless.Drawables.Circle = orange.clone({
 	context: context,
-	offset: {x: 100, y: 100},
+	offset1: {x: 100, y: 100},
 	fillcolor: colors[1]
 });
 
 const pink1: Paperless.Drawables.Circle = orange.clone({
 	context: context,
-	offset: {x: -100, y: -100},
+	offset1: {x: -100, y: -100},
 	fillcolor: colors[0]
 });
 
 const pink2: Paperless.Drawables.Circle = pink1.clone({
 	context: context,
-	offset: {x:-100, y: 100}, 
+	offset1: {x:-100, y: 100}, 
 	matrix: pink1.matrix
 })
 
 const pink3: Paperless.Drawables.Circle = pink1.clone({
 	context: context,
-	offset: {x: 100, y: -100}, 
+	offset1: {x: 100, y: -100}, 
 	matrix: pink1.matrix	
 })
 

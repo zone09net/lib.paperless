@@ -67,7 +67,9 @@ export interface IDrawableAttributes
 	 */
 	generate?: boolean,
 
-	offset?: {x?: number, y?: number},
+	offset1?: {x?: number, y?: number},
+
+	offset2?: {x?: number, y?: number},
 
 	point?: {x?: number, y?: number},
 

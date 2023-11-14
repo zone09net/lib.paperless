@@ -35,7 +35,8 @@ export class Drawable extends Matrix
 	private _sticky: boolean;
 	private _removable: boolean;
 	private _hoverable: boolean;
-	private _offset: { x?: number; y?: number };
+	private _offset1: { x?: number; y?: number };
+	private _offset2: { x?: number; y?: number };
 	private _size: { width?: number; height?: number };
 
 	private _hover: boolean = false;
@@ -64,7 +65,8 @@ export class Drawable extends Matrix
 			hoverable = true,
 			point = {x: window.innerWidth / 2, y: window.innerHeight / 2},
 			scale = {x: 1, y: 1},
-			offset = {x: 0, y: 0},
+			offset1 = {x: 0, y: 0},
+			offset2 = {x: 0, y: 0},
 			size = {width: 50, height: 50},
 			matrix = null,
 			context = null,
@@ -87,7 +89,8 @@ export class Drawable extends Matrix
 		this._sticky = sticky;
 		this._removable = removable;
 		this._hoverable = hoverable;
-		this._offset = offset;
+		this._offset1 = offset1;
+		this._offset2 = offset2;
 		this._size = size;
 
 		context ? context.attach(this) : null;
@@ -113,7 +116,11 @@ export class Drawable extends Matrix
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
-		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x,	this.matrix.f + this.offset.y);
+		context2D.setTransform(
+			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
+			this.matrix.e + this.offset1.x + this.offset2.x,	
+			this.matrix.f + this.offset1.y + this.offset2.y
+		);
 
 		context2D.strokeStyle = this.strokecolor;
 		context2D.fillStyle = this.fillcolor;
@@ -194,7 +201,11 @@ export class Drawable extends Matrix
 		let hover: boolean;
 
 		context2D.save();
-		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x,	this.matrix.f + this.offset.y);
+		context2D.setTransform(
+			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
+			this.matrix.e + this.offset1.x + this.offset2.x, 
+			this.matrix.f + this.offset1.y + this.offset2.y
+		);
 		context2D.lineWidth = this.linewidth;
 		hover = context2D.isPointInPath(this.path, x, y) || context2D.isPointInStroke(this.path, x, y);
 		context2D.restore();
@@ -320,13 +331,22 @@ export class Drawable extends Matrix
 		this._points = points;
 	}
 
-	public get offset(): { x?: number; y?: number }
+	public get offset1(): { x?: number; y?: number }
 	{
-		return this._offset;
+		return this._offset1;
 	}
-	public set offset(offset: { x?: number; y?: number })
+	public set offset1(offset1: { x?: number; y?: number })
 	{
-		this._offset = offset;
+		this._offset1 = offset1;
+	}
+
+	public get offset2(): { x?: number; y?: number }
+	{
+		return this._offset2;
+	}
+	public set offset2(offset2: { x?: number; y?: number })
+	{
+		this._offset2 = offset2;
 	}
 
 	public get width(): number
@@ -506,7 +526,8 @@ export class Drawable extends Matrix
 			sticky: this.sticky,
 			removable: this.removable,
 			hoverable: this.hoverable,
-			offset: this.offset,
+			offset1: this.offset1,
+			offset2: this.offset2,
 			size: { width: this.width, height: this.height },
 		};
 	}
