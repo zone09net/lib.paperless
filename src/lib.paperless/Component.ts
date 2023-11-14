@@ -1,5 +1,3 @@
-import * as Foundation from '@zone09.net/foundation';
-import {Drawable} from './Drawable.js';
 import {Point} from './Point.js';
 import {Size} from './Size.js';
 import {Context} from './Context.js';
@@ -14,8 +12,8 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  */
 export class Component 
 {
-	private _point: {x?: number, y?: number};
-	private _size: {width?: number, height?: number};
+	private _point: Point;
+	private _size: Size;
 	private _guid: string = undefined;
 	private _context: Context = undefined;
 	private _fx: Fx = undefined;
@@ -38,8 +36,8 @@ export class Component
 			onResize = null,
 		} = attributes;
 
-		this._point = point;
-		this._size = size;
+		this._point = new Point(point.x, point.y);
+		this._size = new Size(size.width, size.height);
 		this._sticky = sticky;
 
 		context ? context.attach(this) : null;	
@@ -161,28 +159,12 @@ export class Component
 
 	public get size(): Size
 	{
-		return new Size(this._size.width, this._size.height);
-	}
-
-	/**
-	 * Gets the width and height of this Component. 
-	 */
-	/*
-	public get size(): Size
-	{
 		return this._size;
 	}
-	*/
-	/**
-	 * Sets the width and height of this Component. When setting size, it is the duty of the user to resize the childs entities
-	 * that this Component may have.
-	 */
-	/*
 	public set size(size: Size)
 	{
 		this._size = size;
 	}
-	*/
 
 	public get x(): number
 	{
@@ -204,29 +186,12 @@ export class Component
 
 	public get point(): Point
 	{
-		return new Point(this._point.x, this._point.y);
-	}
-
-
-	/**
-	 * Gets the x and y position in [[Context]] of this Component.
-	 */
-	/*
-	public get point(): Point
-	{
 		return this._point;
 	}
-	*/
-	/**
-	 * Sets the x and y coordinate in the [[Context]] of this Component. When setting point, it is the duty of the user to translate the position
-	 * of the entities that this Component may have.
-	 */
-	/*
 	public set point(point: Point)
 	{
 		this._point = point;
 	}
-	*/
 
 	/**
 	 * Gets the current status of the sticky, default is false.
