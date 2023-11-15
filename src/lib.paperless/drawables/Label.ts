@@ -321,10 +321,13 @@ export class Label extends Drawable
 		context2D.shadowBlur = this.shadow;
 		context2D.shadowColor = this.shadowcolor;
 
-		if(this._corner)
-			context2D.drawImage(this._canvas, this._padding.left, this._padding.top);
-		else
-			context2D.drawImage(this._canvas, (-this._canvas.width / 2) + this._padding.left, (-this._canvas.height / 2) + this._padding.top);
+		if(this._canvas.width > 0 && this._canvas.height > 0)
+		{
+			if(this._corner)
+				context2D.drawImage(this._canvas, this._padding.left, this._padding.top);
+			else
+				context2D.drawImage(this._canvas, (-this._canvas.width / 2) + this._padding.left, (-this._canvas.height / 2) + this._padding.top);
+		}
 
 		context2D.restore();
 	}
