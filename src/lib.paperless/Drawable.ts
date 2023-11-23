@@ -220,14 +220,19 @@ export class Drawable extends Matrix
 		const group: Group = this.context.get(this.group);
 
 		(group ? [...group.grouped, ...group.enrolled] : [this]).forEach((drawable: Drawable) => {
-			const drawableIndex: number = drawables.map.get(drawable.guid).index;
-			const controlIndex: any = controls.filter((control: Control, index: number) => index == drawableIndex);
-			const newIndex: number = drawables.index();
+			const drawableMap: any = drawables.map.get(drawable.guid);
 
-			drawables.index(drawable.guid, newIndex);
+			if(drawableMap)
+			{
+				const drawableIndex: number = drawableMap.index;
+				const controlIndex: any = controls.filter((control: Control, index: number) => index == drawableIndex);
+				const newIndex: number = drawables.index();
 
-			if(controlIndex.length == 1)
-				this.context.link(drawable, controlIndex[0]);
+				drawables.index(drawable.guid, newIndex);
+
+				if(controlIndex.length == 1)
+					this.context.link(drawable, controlIndex[0]);
+			}
 		});
 
 		if(restrict == Restrict.none)
