@@ -402,7 +402,8 @@ export class Context
 		});
 	}
 
-	public draw(timestamp?: number): void {
+	public draw(timestamp?: number): void 
+	{
 		this.states.timestamp.delta = timestamp - this.states.timestamp.elapsed;
 		this.states.timestamp.elapsed = timestamp;
 
