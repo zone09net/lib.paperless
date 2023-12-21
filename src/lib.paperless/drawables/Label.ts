@@ -299,7 +299,11 @@ export class Label extends Drawable
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
-		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
+		context2D.setTransform(
+			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
+			this.matrix.e + this.offset1.x + this.offset2.x, 
+			this.matrix.f + this.offset1.y + this.offset2.y
+		);
 
 		context2D.globalAlpha = this.alpha;
 		context2D.imageSmoothingEnabled = false;
@@ -317,10 +321,13 @@ export class Label extends Drawable
 		context2D.shadowBlur = this.shadow;
 		context2D.shadowColor = this.shadowcolor;
 
-		if(this._corner)
-			context2D.drawImage(this._canvas, this._padding.left, this._padding.top);
-		else
-			context2D.drawImage(this._canvas, (-this._canvas.width / 2) + this._padding.left, (-this._canvas.height / 2) + this._padding.top);
+		if(this._canvas.width > 0 && this._canvas.height > 0)
+		{
+			if(this._corner)
+				context2D.drawImage(this._canvas, this._padding.left, this._padding.top);
+			else
+				context2D.drawImage(this._canvas, (-this._canvas.width / 2) + this._padding.left, (-this._canvas.height / 2) + this._padding.top);
+		}
 
 		context2D.restore();
 	}

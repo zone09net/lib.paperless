@@ -108,7 +108,11 @@ export class Artwork extends Rectangle
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
 		context2D.save();
-		context2D.setTransform(this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, this.matrix.e + this.offset.x, this.matrix.f + this.offset.y);
+		context2D.setTransform(
+			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
+			this.matrix.e + this.offset1.x + this.offset2.x, 
+			this.matrix.f + this.offset1.y + this.offset2.y
+		);
 
 		context2D.lineWidth = this.linewidth;
 		context2D.strokeStyle = this.strokecolor;

@@ -56,6 +56,11 @@ export class Group
 	 */
 	public constructor(attributes: IGroupAttributes = {}) 
 	{
+		const {
+			context = null,
+		} = attributes;
+
+		context ? context.attach(this) : null;	
 	}
 
 	public enroll(entity: Drawable | Array<Drawable>): void
@@ -126,6 +131,21 @@ export class Group
 			this._grouped.delete(entity.guid);
 			entity.group = undefined;
 		}
+	}
+
+	public getDrawables(): Drawable[]
+	{
+		return this._grouped.filter((entity: Drawable | Control | Component | Group) => entity instanceof Drawable);
+	}
+
+	public getControls(): Control[]
+	{
+		return this._grouped.filter((entity: Drawable | Control | Component | Group) => entity instanceof Control);
+	}
+
+	public getComponents(): Component[]
+	{
+		return this._grouped.filter((entity: Drawable | Control | Component | Group) => entity instanceof Component);
 	}
 
 	/**

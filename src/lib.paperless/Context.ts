@@ -49,13 +49,6 @@ export class Context
 	public constructor(attributes: IContextAttributes = {})
 	{
 		const {
-			fillcolor = '#000000',
-			strokecolor = '#a0a0a0',
-			font = '16px system-ui',
-			linewidth = 2,
-			shadow = 0,
-			shadowcolor = '#ffffff',
-			alpha = 1,
 			scale = 1,
 			size = new Size(window.innerWidth, window.innerHeight),
 			autosize = false,
@@ -64,13 +57,6 @@ export class Context
 		} = attributes;
 
 		this._attributes = {
-			strokecolor: strokecolor,
-			fillcolor: fillcolor,
-			font: font,
-			linewidth: linewidth,
-			shadow: shadow,
-			shadowcolor: shadowcolor,
-			alpha: alpha,
 			scale: scale,
 			autosize: autosize,
 			features: {
@@ -86,7 +72,10 @@ export class Context
 				...{
 					delay: 180,
 					restrict: Restrict.none,
-					grid: { ...{ x: 1, y: 1 }, ...dragging.grid },
+					grid: { 
+						...{x: 1, y: 1}, 
+						...dragging.grid 
+					},
 				},
 				...dragging,
 			},
@@ -129,7 +118,7 @@ export class Context
 
 				touch: {},
 
-				refresh: {
+				timestamp: {
 					delta: 0,
 					elapsed: 0,
 				}
@@ -220,7 +209,7 @@ export class Context
 			return null;
 		}
 		else
-			throw new Error('Context.attach need either a Drawable/Control/Component/Group/DrawActions/MouseActions/HTMLElement type');
+			throw new Error('Context.attach need either a Drawable|Control|Component|Group|DrawActions|MouseActions|HTMLElement type');
 
 		entry.context = this;
 		entry.guid = guid;
@@ -331,7 +320,7 @@ export class Context
 
 		this.states.sorted = false;
 
-		if(restrict == Restrict.none && !this.fx.id && this.states.drag)
+		if(restrict == Restrict.none && !this.fx.id && !this.states.drag)
 			this.refresh();
 	}
 
@@ -413,10 +402,10 @@ export class Context
 		});
 	}
 
-	public draw(timestamp?: number): void {
-		this.states.refresh.delta = timestamp - this.states.refresh.elapsed;
-		this.states.refresh.elapsed = timestamp;
-		//console.log(this.states.refresh.delta)
+	public draw(timestamp?: number): void 
+	{
+		this.states.timestamp.delta = timestamp - this.states.timestamp.elapsed;
+		this.states.timestamp.elapsed = timestamp;
 
 		if(!this.states.sorted)
 		{
@@ -428,19 +417,6 @@ export class Context
 			this._controls.reverse();
 			this.states.sorted = true;
 		}
-
-		//this.context2D.filter = 'brightness(125%)';
-
-		if(!this._attributes.features.nodefault)
-		{
-			this.context2D.font = this._attributes.font;
-			this.context2D.strokeStyle = this._attributes.strokecolor;
-			this.context2D.shadowBlur = this._attributes.shadow;
-			this.context2D.shadowColor = this._attributes.shadowcolor;
-			this.context2D.globalAlpha = this._attributes.alpha;
-			this.context2D.lineWidth = this._attributes.linewidth;
-		}
-		this.context2D.imageSmoothingEnabled = false;
 
 		this._drawActions.forEach((drawaction: DrawAction) => {
 			drawaction.onDrawBefore(this.context2D);
@@ -460,19 +436,22 @@ export class Context
 			}
 			else if(
 				drawable.visible &&
-				!drawable.sticky &&
+				!drawable.sticky/* &&
 				drawable.x > -drawable.size.width &&
 				drawable.x < this._viewport.canvas.buffer.width + drawable.size.width &&
 				drawable.y > -drawable.size.height &&
-				drawable.y < this._viewport.canvas.buffer.height + drawable.size.height
+				drawable.y < this._viewport.canvas.buffer.height + drawable.size.height*/
 			)
 			{
 				drawable.draw(this.context2D);
 			}
 		});
 
-		for(let entry of stickies)
-			entry.draw(this.context2D);
+		if(!this.states.drag)
+		{
+			for(let entry of stickies)
+				entry.draw(this.context2D);
+		}
 
 		this._drawActions.forEach((drawaction: DrawAction) => {
 			drawaction.onDrawAfter(this.context2D);
@@ -605,7 +584,7 @@ export class Context
 		return new Size(this.canvas.width, this.canvas.height);
 	}
 	/**
-	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are setted with new width and height values.
+	 * Sets the [[Size]] of the Context instance. When setted, both main and buffer canvas are given the same new width and height values.
 	 * A call to [[refresh]] is also made to update the Context.
 	 */
 	public set size(size: Size)
@@ -622,60 +601,6 @@ export class Context
 		//this._viewport.canvas.main.style.height = (this._viewport.canvas.main.height ) * ratio + 'px';
 
 		this.refresh();
-	}
-
-	public get fillcolor(): string
-	{
-		return this._attributes.fillcolor;
-	}
-	public set fillcolor(fillcolor: string)
-	{
-		this._attributes.fillcolor = fillcolor;
-	}
-
-	public get strokecolor(): string
-	{
-		return this._attributes.strokecolor;
-	}
-	public set strokecolor(strokecolor: string)
-	{
-		this._attributes.strokecolor = strokecolor;
-	}
-
-	public get linewidth(): number
-	{
-		return this._attributes.linewidth;
-	}
-	public set linewidth(linewidth: number)
-	{
-		this._attributes.linewidth = linewidth;
-	}
-
-	public get alpha(): number
-	{
-		return this._attributes.alpha;
-	}
-	public set alpha(alpha: number)
-	{
-		this._attributes.alpha = alpha;
-	}
-
-	public get shadow(): number
-	{
-		return this._attributes.shadow;
-	}
-	public set shadow(shadow: number)
-	{
-		this._attributes.shadow = shadow;
-	}
-
-	public get shadowcolor(): string
-	{
-		return this._attributes.shadowcolor;
-	}
-	public set shadowcolor(shadowcolor: string)
-	{
-		this._attributes.shadowcolor = shadowcolor;
 	}
 
 	public get scale(): number

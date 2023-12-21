@@ -52,7 +52,13 @@ export class Fx
 			loop = false,
 			effect,
 			nogroup = false,
-			smuggler = { ease: Fx.easeLinear, angle: 0, distance: 0, scale: {x: 1, y: 1}, data: {} },
+			smuggler = { 
+				ease: Fx.easeLinear, 
+				angle: 0, 
+				distance: 0, 
+				scale: {x: 1, y: 1}, 
+				data: {} 
+			},
 			complete = null,
 			t0 = new Date().getTime(),
 			tdelta = 0,
@@ -70,7 +76,13 @@ export class Fx
 					duration: duration,
 					loop: loop,
 					effect: effect,
-					smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: smuggler.data },
+					smuggler: { 
+						ease: smuggler.ease, 
+						angle: smuggler.angle, 
+						distance: smuggler.distance, 
+						scale: smuggler.scale, 
+						data: smuggler.data 
+					},
 					complete: (i == 0 ? complete : null),
 					t0: t0,
 					tdelta: tdelta,
@@ -99,7 +111,13 @@ export class Fx
 						duration: duration,
 						loop: loop,
 						effect: effect,
-						smuggler: { ease: smuggler.ease, angle: smuggler.angle, distance: smuggler.distance, scale: smuggler.scale, data: smuggler.data },
+						smuggler: {
+							ease: smuggler.ease, 
+							angle: smuggler.angle, 
+							distance: smuggler.distance, 
+							scale: smuggler.scale, 
+							data: smuggler.data 
+						},
 						complete: (drawable == first ? complete : null),
 						t0: t0,
 						tdelta: tdelta,
@@ -148,6 +166,7 @@ export class Fx
 				if(this._stack.length === 0)
 				{
 					window.cancelAnimationFrame(this._id);
+					this.context.draw();
 					this._id = undefined;
 					break;
 				}
@@ -189,6 +208,7 @@ export class Fx
 				if(this._stack.length === 0)
 				{
 					window.cancelAnimationFrame(this._id);
+					this.context.draw();
 					this._id = undefined;
 				}
 			}

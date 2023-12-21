@@ -8,7 +8,6 @@ const step: number = 100
 let count: number = 100;
 
 const context: Paperless.Context = new Paperless.Context({
-	strokecolor: '#151515',
 	autosize: true, 
 	dragging: {
 		delay: 0, 

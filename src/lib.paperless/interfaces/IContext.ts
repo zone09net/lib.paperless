@@ -9,7 +9,6 @@ export interface IFeatures
 	nohover?: boolean,
 	nodragging?: boolean,
 	nosnapping?: boolean,
-	nodefault?: boolean,
 }
 
 export interface IDragging 
@@ -20,13 +19,6 @@ export interface IDragging
 }
 
 export interface IContextAttributes {
-	strokecolor?: string,
-	fillcolor?: string,
-	font?: string,
-	linewidth?: number,
-	shadow?: number,
-	shadowcolor?: string,
-	alpha?: number,
 	scale?: number,
 	size?: Size,
 	autosize?: boolean,
@@ -55,7 +47,7 @@ export interface IStates
 	touch: {
 	},
 
-	refresh: {
+	timestamp: {
 		delta: number,
 		elapsed: number
 	}

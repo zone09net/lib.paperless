@@ -7,6 +7,7 @@ const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"]
 const vertical: Paperless.Group = context.attach(new Paperless.Group());
 const horizontal: Paperless.Group = context.attach(new Paperless.Group());
 const everyone: Paperless.Group = context.attach(new Paperless.Group());
+const enrolled: Paperless.Group = context.attach(new Paperless.Group());
 
 const left: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
 	context: context,
@@ -48,25 +49,25 @@ const orange: Paperless.Drawables.Circle = new Paperless.Drawables.Circle({
 
 const blue: Paperless.Drawables.Circle = orange.clone({
 	context: context,
-	offset: {x: 100, y: 100},
+	offset1: {x: 100, y: 100},
 	fillcolor: colors[1]
 });
 
 const pink1: Paperless.Drawables.Circle = orange.clone({
 	context: context,
-	offset: {x: -100, y: -100},
+	offset1: {x: -100, y: -100},
 	fillcolor: colors[0]
 });
 
 const pink2: Paperless.Drawables.Circle = pink1.clone({
 	context: context,
-	offset: {x:-100, y: 100}, 
+	offset1: {x:-100, y: 100}, 
 	matrix: pink1.matrix
 })
 
 const pink3: Paperless.Drawables.Circle = pink1.clone({
 	context: context,
-	offset: {x: 100, y: -100}, 
+	offset1: {x: 100, y: -100}, 
 	matrix: pink1.matrix	
 })
 
@@ -125,4 +126,4 @@ horizontal.attach([left, right]);
 vertical.attach([top, bottom]);
 
 everyone.attach(orange);
-everyone.enroll([left, right, top, bottom, pink1, pink2, pink3, blue])
+everyone.enroll([left, right, top, bottom, pink1, pink2, pink3, blue]);

@@ -6,5 +6,5 @@ export enum Restrict
 	ondrag = 3,
 	onrelease = 4,
 	norefresh = 5
- }
- 
+}
+
