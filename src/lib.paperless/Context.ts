@@ -436,11 +436,11 @@ export class Context
 			}
 			else if(
 				drawable.visible &&
-				!drawable.sticky &&
+				!drawable.sticky/* &&
 				drawable.x > -drawable.size.width &&
 				drawable.x < this._viewport.canvas.buffer.width + drawable.size.width &&
 				drawable.y > -drawable.size.height &&
-				drawable.y < this._viewport.canvas.buffer.height + drawable.size.height
+				drawable.y < this._viewport.canvas.buffer.height + drawable.size.height*/
 			)
 			{
 				drawable.draw(this.context2D);
