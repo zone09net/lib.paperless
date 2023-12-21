@@ -166,6 +166,7 @@ export class Fx
 				if(this._stack.length === 0)
 				{
 					window.cancelAnimationFrame(this._id);
+					this.context.draw();
 					this._id = undefined;
 					break;
 				}
@@ -207,6 +208,7 @@ export class Fx
 				if(this._stack.length === 0)
 				{
 					window.cancelAnimationFrame(this._id);
+					this.context.draw();
 					this._id = undefined;
 				}
 			}
