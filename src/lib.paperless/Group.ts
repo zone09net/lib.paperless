@@ -58,7 +58,6 @@ export class Group
 	{
 		const {
 			context = null,
-
 		} = attributes;
 
 		context ? context.attach(this) : null;	
@@ -132,6 +131,21 @@ export class Group
 			this._grouped.delete(entity.guid);
 			entity.group = undefined;
 		}
+	}
+
+	public getDrawables(): Drawable[]
+	{
+		return this._grouped.filter((entity: Drawable | Control | Component | Group) => entity instanceof Drawable);
+	}
+
+	public getControls(): Control[]
+	{
+		return this._grouped.filter((entity: Drawable | Control | Component | Group) => entity instanceof Control);
+	}
+
+	public getComponents(): Component[]
+	{
+		return this._grouped.filter((entity: Drawable | Control | Component | Group) => entity instanceof Component);
 	}
 
 	/**
