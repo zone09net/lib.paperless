@@ -320,7 +320,7 @@ export class Context
 
 		this.states.sorted = false;
 
-		if(restrict == Restrict.none && !this.fx.id && this.states.drag)
+		if(restrict == Restrict.none && !this.fx.id && !this.states.drag)
 			this.refresh();
 	}
 
@@ -446,8 +446,11 @@ export class Context
 			}
 		});
 
-		for(let entry of stickies)
-			entry.draw(this.context2D);
+		if(!this.states.drag)
+		{
+			for(let entry of stickies)
+				entry.draw(this.context2D);
+		}
 
 		this._drawActions.forEach((drawaction: DrawAction) => {
 			drawaction.onDrawAfter(this.context2D);
