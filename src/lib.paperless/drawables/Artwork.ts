@@ -25,6 +25,7 @@ export class Artwork extends Rectangle
 	private _padding: number;
 	private _autosize: boolean;
 	private _autoload: boolean;
+	private _loaded: boolean = false;
 	//---
 
 	/**
@@ -67,6 +68,7 @@ export class Artwork extends Rectangle
 
 			if(this._autoload)
 			{
+				this._loaded = true;
 				this.generate();
 				this.context.refresh();
 			}
@@ -107,28 +109,31 @@ export class Artwork extends Rectangle
 	 */
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
 	{
-		context2D.save();
-		context2D.setTransform(
-			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
-			this.matrix.e + this.offset1.x + this.offset2.x, 
-			this.matrix.f + this.offset1.y + this.offset2.y
-		);
+		if(this._loaded)
+		{
+			context2D.save();
+			context2D.setTransform(
+				this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
+				this.matrix.e + this.offset1.x + this.offset2.x, 
+				this.matrix.f + this.offset1.y + this.offset2.y
+			);
 
-		context2D.lineWidth = this.linewidth;
-		context2D.strokeStyle = this.strokecolor;
-		context2D.fillStyle = this.fillcolor;
-		context2D.globalAlpha = this.alpha;
-		context2D.shadowBlur = this.shadow;
-		context2D.shadowColor = this.shadowcolor;
-		context2D.imageSmoothingEnabled = false;
+			context2D.lineWidth = this.linewidth;
+			context2D.strokeStyle = this.strokecolor;
+			context2D.fillStyle = this.fillcolor;
+			context2D.globalAlpha = this.alpha;
+			context2D.shadowBlur = this.shadow;
+			context2D.shadowColor = this.shadowcolor;
+			context2D.imageSmoothingEnabled = false;
 
-		if(!this.nostroke)
-			context2D.stroke(this.path);
-		if(!this.nofill)
-			context2D.fill(this.path);
+			if(!this.nostroke)
+				context2D.stroke(this.path);
+			if(!this.nofill)
+				context2D.fill(this.path);
 
-		context2D.drawImage(this._image, 0, 0, this._image.width, this._image.height, -this.width / 2 + this._padding, -this.height / 2 + this._padding, this._image.width, this._image.height);
-		context2D.restore();
+			context2D.drawImage(this._image, 0, 0, this._image.width, this._image.height, -this.width / 2 + this._padding, -this.height / 2 + this._padding, this._image.width, this._image.height);
+			context2D.restore();
+		}
 	}
 
 	/**
