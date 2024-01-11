@@ -15,9 +15,9 @@
 		
 		"build": "type tsconfig.main.json > tsconfig.json && tsc --build --force",
 		"rollup": "rollup -c rollup.config.js",
-		"obfuscator": "javascript-obfuscator ./.rollup --output ./.obfuscator --compact true --exclude ./.rollup/extlib/**/**",
-		"minify": "if not exist .minify mkdir .minify && minify ./.rollup/lib.hac.js > ./.minify/lib.hac.js",
-		"dist": "npm run -s clean && npm run -s rollup && npm run -s obfuscator && npm run -s minify",
+		"obfuscator": "javascript-obfuscator ./.rollup --output ./.obfuscator --compact true --string-array false --identifier-names-generator mangled --simplify true --exclude ./.rollup/extlib/**/**",
+		"minify": "if not exist .minify mkdir .minify && minify ./.rollup/lib.paperless.js > ./.minify/lib.paperless.js",
+		"dist": "npm run -s clean && npm run build && npm run -s rollup && npm run -s obfuscator && npm run -s minify",
 
 		"dev": "type tsconfig.dev.json > tsconfig.json && tsc --build --force && tsc-alias",
 		"watch": "type tsconfig.dev.json > tsconfig.json && concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc --build -w\" \"tsc-alias -w\""
