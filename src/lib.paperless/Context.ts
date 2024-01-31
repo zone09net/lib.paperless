@@ -214,7 +214,7 @@ export class Context
 		entry.context = this;
 		entry.guid = guid;
 		entry.fx = this._fx;
-		entry.onAttach();
+		entry.onAttach(entry);
 
 		return entry;
 	}
@@ -247,7 +247,7 @@ export class Context
 					if(group)
 						group.detach(entity);
 
-					entity.onDetach();
+					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
 					entity.fx = undefined;
@@ -260,7 +260,7 @@ export class Context
 
 				if(entity && entity.removable)
 				{
-					entity.onDetach();
+					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
 					entity.fx = undefined;
@@ -273,7 +273,7 @@ export class Context
 
 				if(entity)
 				{
-					entity.onDetach();
+					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
 					this._groups.delete(guid);
@@ -285,7 +285,7 @@ export class Context
 
 				if(entity)
 				{
-					entity.onDetach();
+					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
 					entity.fx = undefined;
@@ -298,7 +298,7 @@ export class Context
 
 				if(entity)
 				{
-					entity.onDetach();
+					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
 					this._drawActions.delete(guid);
@@ -310,7 +310,7 @@ export class Context
 
 				if(entity)
 				{
-					entity.onDetach();
+					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
 					this._mouseActions.delete(guid);
@@ -430,7 +430,7 @@ export class Context
 				const control: Control = this.get(this.states.pointer.control);
 
 				this.context2D.save();
-				control.onDrag();
+				control.onDrag(control);
 				drawable.draw(this.context2D);
 				this.context2D.restore();
 			}
@@ -472,10 +472,10 @@ export class Context
 				const unfocusControl: Control = this.get(this.states.focussed);
 
 				if(unfocusControl instanceof Control)
-					unfocusControl.onLostFocus();
+					unfocusControl.onLostFocus(unfocusControl);
 			}
 
-			focusControl.onFocus();
+			focusControl.onFocus(focusControl);
 			this.states.focussed = guid;
 		}
 	}
@@ -487,7 +487,7 @@ export class Context
 			const unfocusControl: Control = this.get(this.states.focussed);
 
 			if(unfocusControl instanceof Control)
-				unfocusControl.onLostFocus();
+				unfocusControl.onLostFocus(unfocusControl);
 
 			this.states.focussed = undefined;
 		}

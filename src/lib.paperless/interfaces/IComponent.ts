@@ -1,4 +1,5 @@
 import {Context} from "../Context";
+import {Component} from '../Component.js';
 
 
 
@@ -23,7 +24,7 @@ export interface IComponentAttributes
 
 	context?: Context,
 
-	onAttach?: () => void,
-	onDetach?: () => void,
-	onResize?: () => void,
+	onAttach?: (self?: Component) => void,
+	onDetach?: (self?: Component) => void,
+	onResize?: (self?: Component) => void,
 }

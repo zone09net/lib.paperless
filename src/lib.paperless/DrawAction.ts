@@ -12,8 +12,8 @@ export class DrawAction
 
 	public onDrawBefore(context2D: OffscreenCanvasRenderingContext2D): void {}
 	public onDrawAfter(context2D: OffscreenCanvasRenderingContext2D): void {}
-	public onAttach(): void {}
-	public onDetach(): void {}
+	public onAttach(self?: DrawAction): void {}
+	public onDetach(self?: DrawAction): void {}
 
 
 

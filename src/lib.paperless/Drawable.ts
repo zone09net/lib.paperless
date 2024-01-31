@@ -255,9 +255,9 @@ export class Drawable extends Matrix
 		);
 	}
 
-	public onAttach(): void {}
-	public onDetach(): void {}
-	public onResize(): void {}
+	public onAttach(self?: Drawable): void {}
+	public onDetach(self?: Drawable): void {}
+	public onResize(self?: Drawable): void {}
 
 
 

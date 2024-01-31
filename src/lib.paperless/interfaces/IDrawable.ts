@@ -1,4 +1,5 @@
 import {Context} from "../Context";
+import {Drawable} from '../Drawable';
 
 
 
@@ -79,9 +80,9 @@ export interface IDrawableAttributes
 
 	context?: Context,
 
-	onAttach?: () => void,
-	onDetach?: () => void,
-	onResize?: () => void,
+	onAttach?: (self?: Drawable) => void,
+	onDetach?: (self?: Drawable) => void,
+	onResize?: (self?: Drawable) => void,
 }
 
 export interface IDrawableArrowAttributes extends IDrawableAttributes

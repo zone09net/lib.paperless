@@ -50,13 +50,13 @@ export class Component
 	/**
 	 * Callback method that gets called when this Component is attached to a [[Context]].
 	 */
-	public onAttach(): void {}
+	public onAttach(self?: Component): void {}
 
 	/**
 	 * Callback method that gets called when this Component is detached from a [[Context]]. Since a Component used [[Drawable]] and
 	 * [[Control]], the developer needs to make sure to detach every entities created on the life time of that Component.
 	 */
-	public onDetach(): void {}
+	public onDetach(self?: Component): void {}
 
 	/**
 	 * Callback method that gets called when this Component (position + size) touches the outside limits of the [[Context]] size. This is called 
@@ -64,7 +64,7 @@ export class Component
 	 * 
 	 * @fixme						onResize is never called by the Context resize event. 
 	 */
-	public onResize(): void {}
+	public onResize(self?: Component): void {}
 
 
 

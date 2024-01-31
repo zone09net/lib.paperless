@@ -1,6 +1,7 @@
 import {Restrict} from "../enums/Restrict";
 import {Drawable} from "../Drawable";
 import {Context} from "../Context";
+import {Control} from "../Control.js";
 
 
 
@@ -35,18 +36,18 @@ export interface IControlAttributes
 
 	drawable?: Drawable,
 
-	onLeftClick?: () => void,
-	onRightClick?: () => void,
-	onDragBegin?: () => void,
-	onDrag?: () => void,
-	onDragEnd?: () => void,
-	onInside?: () => void,
-	onOutside?: () => void,
-	onFocus?: () => void,
-	onLostFocus?: () => void,
-	onAttach?: () => void,
-	onDetach?: () => void,
-	onDrawable?: () => void,
+	onLeftClick?: (self?: Control) => void,
+	onRightClick?: (self?: Control) => void,
+	onDragBegin?: (self?: Control) => void,
+	onDrag?: (self?: Control) => void,
+	onDragEnd?: (self?: Control) => void,
+	onInside?: (self?: Control) => void,
+	onOutside?: (self?: Control) => void,
+	onFocus?: (self?: Control) => void,
+	onLostFocus?: (self?: Control) => void,
+	onAttach?: (self?: Control) => void,
+	onDetach?: (self?: Control) => void,
+	onDrawable?: (self?: Control) => void,
 }
 
 export interface IControlButtonAttributes extends IControlAttributes

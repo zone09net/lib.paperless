@@ -46,12 +46,12 @@ export class Events
 							if(unhover)
 							{
 								unhover.drawable.hover = false;
-								unhover.onOutside();
+								unhover.onOutside(unhover);
 							}
 							
 							context.states.pointer.control = control.guid;
 							control.drawable.hover = true;
-							control.onInside();
+							control.onInside(control);
 						}
 
 						refresh = true;
@@ -64,7 +64,7 @@ export class Events
 							refresh = true;
 							context.states.pointer.control = undefined;
 							control.drawable.hover = false;
-							control.onOutside();
+							control.onOutside(control);
 						}
 					}
 				}
@@ -125,7 +125,7 @@ export class Events
 							context.states.drag = true;
 							control.drawable.toFront();
 							context.setFocus(control.guid);
-							control.onDragBegin();
+							control.onDragBegin(control);
 							context.drag();
 						}
 					}, context.dragging.delay);
@@ -154,10 +154,10 @@ export class Events
 					if(control.focusable)
 						context.setFocus(control.guid);
 					
-					control.onLeftClick();
+					control.onLeftClick(control);
 				}
 				else if(event.button == 2 && control.enabled && control.drawable.visible)
-					control.onRightClick();
+					control.onRightClick(control);
 			}
 			else if(context.states.drag)
 			{
@@ -169,7 +169,7 @@ export class Events
 					control.drawable.y /= (window.devicePixelRatio * context.scale);
 				}
 
-				control.onDragEnd();
+				control.onDragEnd(control);
 			}
 		}
 
@@ -191,11 +191,11 @@ export class Events
 				context.size = new Size(window.innerWidth, window.innerHeight);
 				
 				context.getDrawables().filter((drawable: Drawable) => {
-					drawable.onResize();
+					drawable.onResize(drawable);
 				});
 
 				context.getComponents().filter((component: Component) => {
-					component.onResize();
+					component.onResize(component);
 				});
 			}, 250);
 		}

@@ -151,7 +151,7 @@ export class Group
 	/**
 	 * Callback method that gets called when this Group is attached to a [[Context]]. At this point, [[context]] and [[guid]] are available.
 	 */
-	public onAttach(): void {}
+	public onAttach(self?: Group): void {}
 
 	/**
 	 * Callback method that gets called when the this Group detached from a [[Context]]. When this Group is detached,
@@ -168,7 +168,7 @@ export class Group
 	 * ```
 	 * @internal
 	 */
-	public onDetach(): void 
+	public onDetach(self?: Group): void 
 	{
 		this._grouped.map.forEach((entry: any) => {
 			entry.object.group = undefined;

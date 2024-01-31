@@ -115,21 +115,21 @@ export class Control
 		this.context.link(drawable, this);
 
 		if(this.drawable)
-			this.onDrawable();
+			this.onDrawable(this);
 	}
 
-	public onLeftClick(): void {}
-	public onRightClick(): void {}
-	public onDragBegin(): void {}
-	public onDrag(): void {}
-	public onDragEnd(): void {}
-	public onInside(): void {}
-	public onOutside(): void {}
-	public onFocus(): void {}
-	public onLostFocus(): void {}
-	public onAttach(): void {}
-	public onDetach(): void {}
-	public onDrawable(): void {}
+	public onLeftClick(self?: Control): void {}
+	public onRightClick(self?: Control): void {}
+	public onDragBegin(self?: Control): void {}
+	public onDrag(self?: Control): void {}
+	public onDragEnd(self?: Control): void {}
+	public onInside(self?: Control): void {}
+	public onOutside(self?: Control): void {}
+	public onFocus(self?: Control): void {}
+	public onLostFocus(self?: Control): void {}
+	public onAttach(self?: Control): void {}
+	public onDetach(self?: Control): void {}
+	public onDrawable(self?: Control): void {}
 
 
 

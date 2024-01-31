@@ -28,7 +28,7 @@ export class Button extends Control
 		this._smugglerRightClick = smugglerRightClick;
 	}
 
-	public onLeftClick(): boolean
+	public onLeftClick(self?: Button): boolean
 	{
 		if(this.drawable.hover && typeof this._callbackLeftClick === 'function')
 		{
@@ -39,7 +39,7 @@ export class Button extends Control
 		return false;
 	}
 
-	public onRightClick(): boolean
+	public onRightClick(self?: Button): boolean
 	{
 		if(this.drawable.hover && typeof this._callbackRightClick === 'function')
 		{

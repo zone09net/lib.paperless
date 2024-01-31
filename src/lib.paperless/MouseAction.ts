@@ -13,8 +13,8 @@ export class MouseAction
 	public onMouseMove(context: Context): void {}
 	public onMouseDown(context: Context): void {}
 	public onMouseUp(context: Context): void {}
-	public onAttach(): void {}
-	public onDetach(): void {}
+	public onAttach(self?: MouseAction): void {}
+	public onDetach(self?: MouseAction): void {}
 	
 
 
