@@ -144,7 +144,7 @@ export class Line extends Drawable
 	 */
 	public get point0(): Point
 	{
-		return this.point0;
+		return this._point0;
 	}
 	/**
 	 * Sets the first point of the line.
