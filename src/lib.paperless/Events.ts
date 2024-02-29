@@ -201,6 +201,12 @@ export class Events
 		}
 	}
 
+	public static handleVisibilityChange(context: Context, event: HTMLElementEventMap['resize']): void
+	{
+		if(document.visibilityState === 'visible')
+			context.refresh();
+	}
+
 	public static handleRightMouseClick(context: Context, event: HTMLElementEventMap['mousedown']): void
 	{
 		event.preventDefault();

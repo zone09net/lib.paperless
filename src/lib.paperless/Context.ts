@@ -142,6 +142,7 @@ export class Context
 		this._viewport.canvas.main.addEventListener('dragstart', Events.handleDragStart.bind(null, this), false);
 		this._viewport.canvas.main.addEventListener('dragover', Events.handleMouseMove.bind(null, this), {passive: false});
 		window.addEventListener('resize', Events.handleResize.bind(null, this), false);
+		window.addEventListener('visibilitychange', Events.handleVisibilityChange.bind(null, this), false);
 
 		this._fx.context = this;
 	}
