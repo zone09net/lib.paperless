@@ -424,34 +424,28 @@ export class Context
 		});
 
 		const stickies: Drawable[] = this._drawables.sorted.filter((drawable: Drawable) => drawable.sticky && drawable.visible);
+		const nostickies: Drawable[] = this._drawables.sorted.filter((drawable: Drawable) => !drawable.sticky && drawable.visible);
+		const control: Control = this.get(this.states.pointer.control);
 
-		this._drawables.sorted.forEach((drawable: Drawable) => {
-			if(this.states.drag)
-			{
-				const control: Control = this.get(this.states.pointer.control);
-
-				this.context2D.save();
-				control.onDrag(control);
-				drawable.draw(this.context2D);
-				this.context2D.restore();
-			}
-			else if(
-				drawable.visible &&
-				!drawable.sticky/* &&
-				drawable.x > -drawable.size.width &&
-				drawable.x < this._viewport.canvas.buffer.width + drawable.size.width &&
-				drawable.y > -drawable.size.height &&
-				drawable.y < this._viewport.canvas.buffer.height + drawable.size.height*/
-			)
-			{
-				drawable.draw(this.context2D);
-			}
-		});
-
-		if(!this.states.drag)
+		if(this.states.drag)
 		{
-			for(let entry of stickies)
-				entry.draw(this.context2D);
+			for(let drawable of [...nostickies, ...stickies])
+			{
+				if(drawable.guid == control.drawable.guid)
+				{
+					this.context2D.save();
+					control.onDrag(control);
+					drawable.draw(this.context2D);
+					this.context2D.restore();
+				}
+				else
+					drawable.draw(this.context2D);
+			}
+		}
+		else
+		{
+			for(let drawable of [...nostickies, ...stickies])
+				drawable.draw(this.context2D);
 		}
 
 		this._drawActions.forEach((drawaction: DrawAction) => {
