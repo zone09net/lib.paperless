@@ -4,19 +4,20 @@ import * as Paperless from './lib.paperless.js';
 
 
 const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
-const step: number = 100
+const step: number = 100;
 let count: number = 100;
 
 const context: Paperless.Context = new Paperless.Context({
 	autosize: true, 
 	dragging: {
 		delay: 0, 
-		grid: {x: 20, y: 20}, 
+		//grid: {x: 20, y: 20}, 
 		restrict: Paperless.Enums.Restrict.onrelease
 	}, 
 	features: {
 		nosnapping: false
 	},
+	layer: 5
 });
 
 const label: Paperless.Drawables.Label = new Paperless.Drawables.Label({
@@ -103,7 +104,7 @@ new Paperless.Controls.Button({
 	callbackLeftClick: () => {
 		if(count > 0)
 		{
-			const controls: Paperless.Control[] = context.getControls().filter((control: Paperless.Control) =>
+			const controls: Paperless.Control[] = context.getAllControls().filter((control: Paperless.Control) =>
 				control.drawable.constructor.name != 'Label' && control.drawable.constructor.name != 'Triangle'
 			);
 	
@@ -126,7 +127,7 @@ new Paperless.Controls.Button({
 	context: context,
 	drawable: line,
 	callbackLeftClick: () => {
-		const drawables: Paperless.Drawable[] = context.getDrawables().filter((drawable: Paperless.Drawable) =>
+		const drawables: Paperless.Drawable[] = context.getAllDrawables().filter((drawable: Paperless.Drawable) =>
 			drawable.constructor.name == 'Blade' ||
 			drawable.constructor.name == 'Hexagon' ||
 			drawable.constructor.name == 'Rectangle' ||
@@ -171,9 +172,31 @@ new Paperless.Controls.Button({
 	onOutside: () => { fx.fillcolor = '#ffffff'; }
 });
 
+new Paperless.Layer({
+	context: context,
+	index: 0
+});
+
+new Paperless.Layer({
+	context: context,
+	index: 1
+});
+
+new Paperless.Layer({
+	context: context,
+	index: 2
+});
+
+new Paperless.Layer({
+	context: context,
+	index: 3
+});
+
+
 
 context.attach(document.body);
 polygons();
+
 
 
 function polygons(): void
@@ -190,6 +213,8 @@ function polygons(): void
 		const rx: number = (Math.random() * (context.canvas.width - (radius * 2))) + radius;
 		const ry: number = (Math.random() * (context.canvas.height - (radius * 2))) + radius;
 		let drawable: Paperless.Drawable;
+
+		context.layer = random;
 
 		switch(random)
 		{
@@ -295,4 +320,5 @@ function fullRotate(fx: Paperless.Interfaces.IFx)
 {
 	(<Paperless.Drawable>fx.drawable).rad = fx.smuggler.ease(fx.t) * 6.28 * Math.sign(fx.smuggler.angle | 1);
 }
+
 

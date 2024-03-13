@@ -79,6 +79,7 @@ export interface IDrawableAttributes
 	matrix?: DOMMatrix,
 
 	context?: Context,
+	layer?: number,
 
 	onAttach?: (self?: Drawable) => void,
 	onDetach?: (self?: Drawable) => void,

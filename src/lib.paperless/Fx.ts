@@ -331,7 +331,7 @@ export class Fx
 		let sin: number = Math.sin(rad);
 		let cos: number = Math.cos(rad);
 
-		(<Drawable>fx.drawable).matrix = new DOMMatrix([cos * (1 + adjust.x) || 0, sin * (1 + adjust.x) || 0, -sin * (1 + adjust.y) || 0, cos * (1 + adjust.y) || 0, (<Drawable>fx.drawable).matrix.e, (<Drawable>fx.drawable).matrix.f]);
+		(<Drawable>fx.drawable).matrix = new DOMMatrix([cos * (1 + adjust.x) || 0, sin * (1 + adjust.x) || 0, -sin * (1 + adjust.y) || 0, cos * (1 + adjust.y) || 0, (<Drawable>fx.drawable).x, (<Drawable>fx.drawable).y]);
 	}
 
 	/**

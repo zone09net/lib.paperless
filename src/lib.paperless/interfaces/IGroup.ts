@@ -4,5 +4,6 @@ import {Context} from "../Context.js";
 
 export interface IGroupAttributes 
 {
-	context?: Context
+	context?: Context,
+	layer?: number,
 }

@@ -20,6 +20,7 @@ export interface IDragging
 
 export interface IContextAttributes {
 	scale?: number,
+	layer?: number
 	size?: Size,
 	autosize?: boolean,
 	features?: IFeatures,
@@ -44,6 +45,8 @@ export interface IStates
 		dragdiff: Point,
 	},
 
+	layer?: number
+
 	touch: {
 	},
 
@@ -52,3 +55,4 @@ export interface IStates
 		elapsed: number
 	}
 }
+

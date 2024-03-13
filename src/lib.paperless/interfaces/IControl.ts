@@ -33,6 +33,7 @@ export interface IControlAttributes
 	restrict?: Restrict,
 
 	context?: Context,
+	layer?: number,
 
 	drawable?: Drawable,
 

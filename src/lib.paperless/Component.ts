@@ -30,6 +30,7 @@ export class Component
 			point = {x: window.innerWidth / 2, y: window.innerHeight / 2},
 			size = {width: 50, height: 50},
 			context = null,
+			layer = null,
 
 			onAttach = null,
 			onDetach = null,
@@ -40,7 +41,7 @@ export class Component
 		this._size = new Size(size.width, size.height);
 		this._sticky = sticky;
 
-		context ? context.attach(this) : null;	
+		context ? context.attach(this, layer) : null;	
 
 		onAttach ? this.onAttach = onAttach : null;
 		onDetach ? this.onDetach = onDetach : null;

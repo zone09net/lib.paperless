@@ -23,6 +23,7 @@ export interface IComponentAttributes
 	removable?: boolean,
 
 	context?: Context,
+	layer?: number,
 
 	onAttach?: (self?: Component) => void,
 	onDetach?: (self?: Component) => void,

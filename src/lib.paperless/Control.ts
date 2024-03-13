@@ -70,6 +70,7 @@ export class Control
 			focusable = true,
 			restrict = Restrict.none,
 			context = null,
+			layer = null,
 			drawable = null,
 			
 			onLeftClick = null,
@@ -92,7 +93,7 @@ export class Control
 		this._focusable = focusable;
 		this._restrict = restrict;
 
-		context ? context.attach(this) : null;
+		context ? context.attach(this, layer) : null;
 		drawable ? this.attach(drawable) : null;
 
 		onLeftClick ? this.onLeftClick = onLeftClick : null;

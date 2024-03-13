@@ -1,5 +1,6 @@
 import {Context} from './Context.js';
 import {Fx} from './Fx.js';
+import {IMouseActionAttributes} from './interfaces/IMouseAction.js';
 
 
 
@@ -10,12 +11,34 @@ export class MouseAction
 	private _fx: Fx = undefined;
 	//---
 	
-	public onMouseMove(context: Context): void {}
-	public onMouseDown(context: Context): void {}
-	public onMouseUp(context: Context): void {}
+	public constructor(attributes: IMouseActionAttributes = {})
+	{
+		const {
+			context = null,
+			layer = null,
+
+			onAttach = null,
+			onDetach = null,
+			onMouseMove = null,
+			onMouseDown = null,
+			onMouseUp = null,
+		} = attributes;
+
+		context ? context.attach(this, layer) : null;	
+
+		onAttach ? this.onAttach = onAttach : null;
+		onDetach ? this.onDetach = onDetach : null;
+		onMouseMove ? this.onMouseMove = onMouseMove : null;
+		onMouseDown ? this.onMouseDown = onMouseDown : null;
+		onMouseUp ? this.onMouseUp = onMouseUp : null;
+	}
+	
 	public onAttach(self?: MouseAction): void {}
 	public onDetach(self?: MouseAction): void {}
-	
+	public onMouseMove(context: Context, self?: MouseAction): void {}
+	public onMouseDown(context: Context, self?: MouseAction): void {}
+	public onMouseUp(context: Context, self?: MouseAction): void {}
+
 
 
 	// Accessors

@@ -1,3 +1,4 @@
+import * as Foundation from '@zone09.net/foundation';
 import {Point} from './Point.js';
 import {Control} from './Control.js';
 import {Group} from './Group.js';
@@ -7,6 +8,7 @@ import {Size} from './Size.js';
 import {Restrict} from './enums/Restrict.js';
 import {Component} from './Component.js';
 import {MouseAction} from './MouseAction.js';
+import {Layer} from './Layer.js';
 
 
 
@@ -16,62 +18,64 @@ export class Events
 	{
 		event.preventDefault();
 
+		const layers: Layer[] = context.getLayers()
 		const pointer: Point = new Point(event.clientX, event.clientY, { scale: window.devicePixelRatio * context.scale });
 		let refresh: boolean = false;
 
 		context.states.pointer.last = context.states.pointer.current;
 		context.states.pointer.current = pointer.toRealPosition(<HTMLElement>event.currentTarget);
 
-		context.getExtendedMouseActions().forEach((mouseaction: MouseAction) => {
-			mouseaction.onMouseMove(context);
-		});
+		layers.forEach((layer: Layer) => {
+			layer.mouseactions.forEach((mouseaction: MouseAction) => {
+				mouseaction.onMouseMove(context);
+			});
 
-		if(!context.states.drag && !context.features.nohover)
-		{
-			const stickies: Control[] = context.getControls().sorted.filter((control: Control) =>
-				control.drawable.sticky
-			);
+			if(!context.states.drag && !context.features.nohover)
+			{
+				const stickies: Control[] = layer.controls.sorted.filter((control: Control) => control.drawable.sticky && control.drawable.visible);
+				const nostickies: Control[] = layer.controls.sorted.filter((control: Control) => !control.drawable.sticky && control.drawable.visible);
 
-			[...stickies, ...context.getControls().sorted].every((control: Control) => {
-				if(control.drawable && control.drawable.hoverable)
-				{
-					if(control.drawable.isHover(context.states.pointer.current))
+				[...stickies, ...nostickies].every((control: Control) => {
+					if(control.drawable && control.drawable.hoverable)
 					{
-						if(context.states.pointer.control == control.guid)
+						if(control.drawable.isHover(context.states.pointer.current))
+						{
+							if(context.states.pointer.control == control.guid)
+								return false;
+							else
+							{
+								const unhover: Control = context.get(context.states.pointer.control);
+
+								if(unhover)
+								{
+									unhover.drawable.hover = false;
+									unhover.onOutside(unhover);
+								}
+								
+								context.states.pointer.control = control.guid;
+								control.drawable.hover = true;
+								control.onInside(control);
+							}
+
+							refresh = true;
 							return false;
+						}
 						else
 						{
-							const unhover: Control = context.get(context.states.pointer.control);
-
-							if(unhover)
+							if(context.states.pointer.control == control.guid)
 							{
-								unhover.drawable.hover = false;
-								unhover.onOutside(unhover);
+								refresh = true;
+								context.states.pointer.control = undefined;
+								control.drawable.hover = false;
+								control.onOutside(control);
 							}
-							
-							context.states.pointer.control = control.guid;
-							control.drawable.hover = true;
-							control.onInside(control);
-						}
-
-						refresh = true;
-						return false;
-					}
-					else
-					{
-						if(context.states.pointer.control == control.guid)
-						{
-							refresh = true;
-							context.states.pointer.control = undefined;
-							control.drawable.hover = false;
-							control.onOutside(control);
 						}
 					}
-				}
 
-				return true;
-			});
-		}
+					return true;
+				});
+			}
+		});
 
 		if(refresh && !context.fx.id && !context.states.drag)
 			context.refresh();
@@ -92,8 +96,10 @@ export class Events
 		context.states.pointer.clicked = new Point(context.states.pointer.current.x, context.states.pointer.current.y, { scale: 1 });
 		context.states.mousedown = true;
 
-		context.getExtendedMouseActions().forEach((mouseaction: MouseAction) => {
-			mouseaction.onMouseDown(context);
+		context.getLayers().forEach((layer: Layer) => {
+			layer.mouseactions.forEach((mouseaction: MouseAction) => {
+				mouseaction.onMouseDown(context);
+			});
 		});
 
 		if(event.button == 0 && context.states.pointer.control && !context.states.drag)
@@ -124,7 +130,10 @@ export class Events
 
 							context.states.drag = true;
 							control.drawable.toFront();
-							context.setFocus(control.guid);
+
+							if(control.focusable)
+								context.setFocus(control.guid);
+
 							control.onDragBegin(control);
 							context.drag();
 						}
@@ -139,10 +148,12 @@ export class Events
 		event.preventDefault();
 		window.clearTimeout(context.id.dragging);
 
-		const control: Control = context.getControls().get(context.states.pointer.control);
+		const control: Control = context.get(context.states.pointer.control);
 
-		context.getExtendedMouseActions().forEach((mouseaction: MouseAction) => {
-			mouseaction.onMouseUp(context);
+		context.getLayers().forEach((layer: Layer) => {
+			layer.mouseactions.forEach((mouseaction: MouseAction) => {
+				mouseaction.onMouseUp(context);
+			});
 		});
 
 		if(control instanceof Control)
@@ -187,15 +198,17 @@ export class Events
 		{
 			clearTimeout(context.id.resizing);
 
-			context.id.resizing = setTimeout(() => { 
+			context.id.resizing = setTimeout(() => {
 				context.size = new Size(window.innerWidth, window.innerHeight);
 				
-				context.getDrawables().filter((drawable: Drawable) => {
-					drawable.onResize(drawable);
-				});
+				context.getLayers().forEach((layer: Layer) => {
+					layer.drawables.forEach((drawable: Drawable) => {
+						drawable.onResize(drawable);
+					});
 
-				context.getComponents().filter((component: Component) => {
-					component.onResize(component);
+					layer.components.forEach((component: Component) => {
+						component.onResize(component);
+					});
 				});
 			}, 250);
 		}

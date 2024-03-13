@@ -4,6 +4,7 @@ import {Context} from './Context.js';
 import {Fx} from './Fx.js';
 import {Group} from './Group.js';
 import {Matrix} from './Matrix.js';
+import {Layer} from './Layer.js';
 import {IDrawableAttributes} from './interfaces/IDrawable.js';
 import {Control} from './Control.js';
 import {Restrict} from './enums/Restrict.js';
@@ -41,7 +42,7 @@ export class Drawable extends Matrix
 
 	private _hover: boolean = false;
 	private _points: Point[] = [];
-	private _path = new Path2D();
+	private _path: Path2D = new Path2D();
 	private _boundaries: { topleft: Point; bottomright: Point };
 	//---
 
@@ -70,6 +71,7 @@ export class Drawable extends Matrix
 			size = {width: 50, height: 50},
 			matrix = null,
 			context = null,
+			layer = null,
 
 			onAttach = null,
 			onDetach = null,
@@ -93,7 +95,7 @@ export class Drawable extends Matrix
 		this._offset2 = offset2;
 		this._size = size;
 
-		context ? context.attach(this) : null;
+		context ? context.attach(this, layer) : null;
 
 		onAttach ? this.onAttach = onAttach : null;
 		onDetach ? this.onDetach = onDetach : null;
@@ -215,8 +217,9 @@ export class Drawable extends Matrix
 
 	public toFront(restrict: Restrict.none | Restrict.norefresh = Restrict.none): void
 	{
-		const drawables: any = this.context.getDrawables();
-		const controls: any = this.context.getControls();
+		const layer: number = Layer.decode(this.guid);
+		const drawables: any = this.context.getDrawables(layer);
+		const controls: any = this.context.getControls(layer);
 		const group: Group = this.context.get(this.group);
 
 		(group ? [...group.grouped, ...group.enrolled] : [this]).forEach((drawable: Drawable) => {
@@ -254,6 +257,27 @@ export class Drawable extends Matrix
 			//drawable.guid != this.guid
 		);
 	}
+
+	/*
+	public static chain(map: Foundation.ExtendedMap, point: Point, radius: number, list: Array<string>)
+	{
+		let near: any = [...map.filter((drawable: Drawable) =>
+			drawable.x >= point.x - radius &&
+			drawable.y >= point.y - radius &&
+			drawable.x <= point.x + radius &&
+			drawable.y <= point.y + radius &&
+			drawable.visible != false &&
+			!list.includes(drawable.guid))
+		];
+
+		for(let drawable of near)
+			list.push(drawable.guid);
+
+		for(let drawable of near)
+			this.near(map, new Point(drawable.x, drawable.y), radius, list);
+	}
+	*/
+
 
 	public onAttach(self?: Drawable): void {}
 	public onDetach(self?: Drawable): void {}

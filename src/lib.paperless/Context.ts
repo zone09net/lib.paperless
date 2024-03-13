@@ -8,6 +8,7 @@ import {Component} from './Component.js';
 import {Group} from './Group.js';
 import {DrawAction} from './DrawAction.js';
 import {MouseAction} from './MouseAction.js';
+import {Layer} from './Layer.js';
 import {Fx} from './Fx.js';
 import {Restrict} from './enums/Restrict.js';
 import {IContextAttributes} from './interfaces/IContext.js';
@@ -19,14 +20,9 @@ import {IStates} from './interfaces/IContext.js';
 
 export class Context
 {
-	private _guid: Foundation.Guid = new Foundation.Guid();
-	private _drawables: Foundation.ExtendedMap = new Foundation.ExtendedMap();
-	private _controls: Foundation.ExtendedMap = new Foundation.ExtendedMap();
-	private _components: Foundation.ExtendedMap = new Foundation.ExtendedMap();
-	private _groups: Foundation.ExtendedMap = new Foundation.ExtendedMap();
-	private _drawActions: Foundation.ExtendedMap = new Foundation.ExtendedMap();
-	private _mouseActions: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _fx: Fx = new Fx();
+	private _guid: Foundation.Guid = new Foundation.Guid();
+	private _layers: Layer[] = [];
 	private _attributes: IContextAttributes;
 	private _viewport: {
 		canvas: {
@@ -41,6 +37,7 @@ export class Context
 			resizing: number,
 			dragging: number
 		},
+		layer: number,
 		points: Point[],
 		states: IStates,
 	};
@@ -50,6 +47,7 @@ export class Context
 	{
 		const {
 			scale = 1,
+			layer = 0,
 			size = new Size(window.innerWidth, window.innerHeight),
 			autosize = false,
 			features = {},
@@ -99,6 +97,8 @@ export class Context
 
 			points: [],
 
+			layer: layer,
+
 			states: {
 				mobile: Foundation.Mobile.isMobile(),
 				mousedown: false,
@@ -125,6 +125,11 @@ export class Context
 			},
 		};
 
+		new Layer({
+			context: this,
+			index: layer
+		});
+
 		this._viewport.context.main = this._viewport.canvas.main.getContext('bitmaprenderer', {alpha: false});
 		this._viewport.context.buffer = this._viewport.canvas.buffer.getContext('2d', {alpha: false});
 		this.size = size;
@@ -149,60 +154,92 @@ export class Context
 
 	public link(drawable: Drawable, control: Control): void 
 	{
-		const d: any = this._drawables.map.get(drawable.guid);
-		const c: any = this._controls.map.get(control.guid);
+		const layerDrawable: number = Layer.decode(drawable.guid);
+		const layerControl: number = Layer.decode(control.guid);
+
+		if(layerDrawable != layerControl)
+			throw new Error('Context.link() - both drawable and control need to be in the same layer');
+
+		const d: any = this._layers[layerDrawable].drawables.map.get(drawable.guid);
+		const c: any = this._layers[layerDrawable].controls.map.get(control.guid);
 
 		c.index = d.index;
 		this.states.sorted = false;
 	}
 
-	public enroll(object: Drawable | Control | Component): Drawable | Control | Component
+	public enroll(entity: Drawable | Control | Component | Group | DrawAction | MouseAction | Layer): Drawable | Control | Component | Group | DrawAction | MouseAction | Layer
 	{
-		object.context = this;
+		entity.context = this;
 
-		return object;
+		return entity;
 	}
 
-	public attach<Type>(entity: | Drawable | Control | Component | Group | DrawAction | MouseAction | HTMLElement): Type 
+	public attach<Type>(entity: Drawable | Control | Component | Group | DrawAction | MouseAction | Layer | HTMLElement, layerOverride?: number): Type 
 	{
 		let guid: string;
 		let entry: any;
+		let layer: number;
+
+		if(layerOverride)
+		{
+			if(!this._layers[layerOverride])
+			{
+				new Layer({
+					context: this,
+					index: layerOverride
+				});
+
+				console.log('Layer ' + layerOverride + ' was created as it was missing');
+			}
+
+			layer = layerOverride;
+		}
+		else
+			layer = this._viewport.layer;
+
+		const layerString: string = Layer.encode(layer);
 
 		if(entity instanceof Drawable)
 		{
-			guid = this.getGuidGenerator().create('1', 'a');
-			entry = this._drawables.set(guid, entity);
+			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-draw-000000xxxxxx');
+			entry = this._layers[layer].drawables.set(guid, entity);
 
 			this.states.sorted = false;
 		}
 		else if(entity instanceof Control)
 		{
-			guid = this.getGuidGenerator().create('1', 'b');
-			entry = this._controls.set(guid, entity);
+			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-ctrl-000000xxxxxx');
+			entry = this._layers[layer].controls.set(guid, entity);
 
 			this.states.sorted = false;
 		} 
 		else if(entity instanceof Component)
 		{
-			guid = this.getGuidGenerator().create('1', '9');
-			entry = this._components.set(guid, entity);
+			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-comp-000000xxxxxx');
+			entry = this._layers[layer].components.set(guid, entity);
 
 			this.states.sorted = false;
 		}
 		else if(entity instanceof Group)
 		{
-			guid = this.getGuidGenerator().create('1', '8');
-			entry = this._groups.set(guid, entity);
+			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-grup-000000xxxxxx');
+			entry = this._layers[layer].groups.set(guid, entity);
 		}
 		else if(entity instanceof DrawAction)
 		{
-			guid = this.getGuidGenerator().create('2', 'a');
-			entry = this._drawActions.set(guid, entity);
+			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-dact-000000xxxxxx');
+			entry = this._layers[layer].drawactions.set(guid, entity);
 		}
 		else if(entity instanceof MouseAction)
 		{
-			guid = this.getGuidGenerator().create('2', 'b');
-			entry = this._mouseActions.set(guid, entity);
+			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-mact-000000xxxxxx');
+			entry = this._layers[layer].mouseactions.set(guid, entity);
+		}
+		else if(entity instanceof Layer)
+		{
+			guid = this.getGuidGenerator().create('00000000-' + String(entity.index).padStart(4, '0') + '-0000-layr-000000xxxxxx');
+			this._layers[entity.index] = entity;
+			entry = this._layers[entity.index];
 		}
 		else if(entity instanceof HTMLElement)
 		{
@@ -215,7 +252,6 @@ export class Context
 		entry.context = this;
 		entry.guid = guid;
 		entry.fx = this._fx;
-		entry.onAttach(entry);
 
 		return entry;
 	}
@@ -234,12 +270,12 @@ export class Context
 			if(typeof guid != 'string')
 				continue;
 
-			const version: string = guid.charAt(14);
-			const variant: string = guid.charAt(19);
+			const layer: number = Layer.decode(guid);
+			const type: string = guid.substring(19, 23);
 
-			if(version == '1' && variant == 'a')
+			if(type == 'draw')
 			{
-				const entity: Drawable = this._drawables.get(guid);
+				const entity: Drawable = this._layers[layer].drawables.get(guid);
 
 				if(entity && entity.removable)
 				{
@@ -252,12 +288,12 @@ export class Context
 					entity.context = undefined;
 					entity.guid = undefined;
 					entity.fx = undefined;
-					this._drawables.delete(guid);
+					this._layers[layer].drawables.delete(guid);
 				}
 			}
-			else if(version == '1' && variant == 'b')
+			else if(type == 'ctrl')
 			{
-				const entity: Control = this._controls.get(guid);
+				const entity: Control = this._layers[layer].controls.get(guid);
 
 				if(entity && entity.removable)
 				{
@@ -265,24 +301,24 @@ export class Context
 					entity.context = undefined;
 					entity.guid = undefined;
 					entity.fx = undefined;
-					this._controls.delete(guid);
+					this._layers[layer].controls.delete(guid);
 				}
 			}
-			else if(version == '1' && variant == '8')
+			else if(type == 'grup')
 			{
-				const entity: Group = this._groups.get(guid);
+				const entity: Group = this._layers[layer].groups.get(guid);
 
 				if(entity)
 				{
 					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
-					this._groups.delete(guid);
+					this._layers[layer].groups.delete(guid);
 				}
 			}
-			else if(version == '1' && variant == '9')
+			else if(type == 'comp')
 			{
-				const entity: Component = this._components.get(guid);
+				const entity: Component = this._layers[layer].components.get(guid);
 
 				if(entity)
 				{
@@ -290,31 +326,43 @@ export class Context
 					entity.context = undefined;
 					entity.guid = undefined;
 					entity.fx = undefined;
-					this._components.delete(guid);
+					this._layers[layer].components.delete(guid);
 				}
 			}
-			else if(version == '2' && variant == 'a')
+			else if(type == 'dact')
 			{
-				const entity: DrawAction = this._drawActions.get(guid);
+				const entity: DrawAction = this._layers[layer].drawactions.get(guid);
 
 				if(entity)
 				{
 					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
-					this._drawActions.delete(guid);
+					this._layers[layer].drawactions.delete(guid);
 				}
 			}
-			else if(version == '2' && variant == 'b')
+			else if(type == 'mact')
 			{
-				const entity: MouseAction = this._mouseActions.get(guid);
+				const entity: MouseAction = this._layers[layer].mouseactions.get(guid);
 
 				if(entity)
 				{
 					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
-					this._mouseActions.delete(guid);
+					this._layers[layer].mouseactions.delete(guid);
+				}
+			}
+			else if(type == 'layr')
+			{
+				const entity: Layer = this._layers[layer];
+
+				if(entity)
+				{
+					entity.onDetach(entity);
+					entity.context = undefined;
+					entity.guid = undefined;
+					this._layers[layer] = undefined;
 				}
 			}
 		}
@@ -325,25 +373,27 @@ export class Context
 			this.refresh();
 	}
 
-	public get<Type extends	Drawable | Control | Component | Group	| DrawAction | MouseAction>(guid: string): Type
+	public get<Type extends Drawable | Control | Component | Group | DrawAction | MouseAction | Layer>(guid: string): Type
 	{
 		if(guid)
 		{
-			const version = guid.charAt(14);
-			const variant = guid.charAt(19);
+			const layer: number = Layer.decode(guid);
+			const type: string = guid.substring(19, 23);
 
-			if(version == '1' && variant == 'a')
-				return this._drawables.get(guid);
-			else if(version == '1' && variant == 'b')
-				return this._controls.get(guid);
-			else if(version == '1' && variant == '8')
-				return this._groups.get(guid);
-			else if(version == '1' && variant == '9')
-				return this._components.get(guid);
-			else if(version == '2' && variant == 'a')
-				return this._drawActions.get(guid);
-			else if(version == '2' && variant == 'b')
-				return this._mouseActions.get(guid);
+			if(type == 'draw')
+				return this._layers[layer].drawables.get(guid);
+			else if(type == 'ctrl')
+				return this._layers[layer].controls.get(guid);
+			else if(type == 'grup')
+				return this._layers[layer].groups.get(guid);
+			else if(type == 'comp')
+				return this._layers[layer].components.get(guid);
+			else if(type == 'dact')
+				return this._layers[layer].drawactions.get(guid);
+			else if(type == 'mact')
+				return this._layers[layer].mouseactions.get(guid);
+			else if(type == 'layr')
+				return <any>this._layers[layer];
 		}
 	}
 
@@ -405,51 +455,54 @@ export class Context
 
 	public draw(timestamp?: number): void 
 	{
+		const layers: Layer[] = this.getLayers();
+		const control: Control = this.get(this.states.pointer.control);
+
 		this.states.timestamp.delta = timestamp - this.states.timestamp.elapsed;
 		this.states.timestamp.elapsed = timestamp;
 
 		if(!this.states.sorted)
 		{
-			//this._drawActions.sort();
-			//this._mouseActions.sort();
-			this._components.sort();
-			//this._groups.sort();
-			this._drawables.sort();
-			this._controls.reverse();
+			layers.forEach((layer: Layer) => {
+				layer.drawables.sort();
+				layer.controls.reverse();
+			});
+
 			this.states.sorted = true;
 		}
 
-		this._drawActions.forEach((drawaction: DrawAction) => {
-			drawaction.onDrawBefore(this.context2D);
-		});
+		layers.forEach((layer: Layer) => {
+			layer.drawactions.forEach((drawaction: DrawAction) => {
+				drawaction.onDrawBefore(this.context2D);
+			});
 
-		const stickies: Drawable[] = this._drawables.sorted.filter((drawable: Drawable) => drawable.sticky && drawable.visible);
-		const nostickies: Drawable[] = this._drawables.sorted.filter((drawable: Drawable) => !drawable.sticky && drawable.visible);
-		const control: Control = this.get(this.states.pointer.control);
+			const stickies: Drawable[] = layer.drawables.sorted.filter((drawable: Drawable) => drawable.sticky && drawable.visible);
+			const nostickies: Drawable[] = layer.drawables.sorted.filter((drawable: Drawable) => !drawable.sticky && drawable.visible);
 
-		if(this.states.drag)
-		{
-			for(let drawable of [...nostickies, ...stickies])
+			if(this.states.drag)
 			{
-				if(drawable.guid == control.drawable.guid)
+				for(let drawable of [...nostickies, ...stickies])
 				{
-					this.context2D.save();
-					control.onDrag(control);
-					drawable.draw(this.context2D);
-					this.context2D.restore();
+					if(drawable.guid == control.drawable.guid)
+					{
+						this.context2D.save();
+						control.onDrag(control);
+						drawable.draw(this.context2D);
+						this.context2D.restore();
+					}
+					else
+						drawable.draw(this.context2D);
 				}
-				else
+			}
+			else
+			{
+				for(let drawable of [...nostickies, ...stickies])
 					drawable.draw(this.context2D);
 			}
-		}
-		else
-		{
-			for(let drawable of [...nostickies, ...stickies])
-				drawable.draw(this.context2D);
-		}
 
-		this._drawActions.forEach((drawaction: DrawAction) => {
-			drawaction.onDrawAfter(this.context2D);
+			layer.drawactions.forEach((drawaction: DrawAction) => {
+				drawaction.onDrawAfter(this.context2D);
+			});	
 		});
 
 		const bitmap: ImageBitmap = this._viewport.canvas.buffer.transferToImageBitmap();
@@ -493,53 +546,117 @@ export class Context
 		return this._guid;
 	}
 
-	public getDrawables(): Foundation.ExtendedMap
+	public getDrawables(layer?: number): Foundation.ExtendedMap
 	{
-		return this._drawables;
+		return layer >= 0 ? this._layers[layer].drawables : this._layers[this._viewport.layer].drawables;
 	}
 
-	public getControls(): Foundation.ExtendedMap
+	public getAllDrawables(): Foundation.ExtendedMap
 	{
-		return this._controls;
+		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+		
+		this.getLayers().forEach((layer: Layer) => {
+			layer.drawables.forEach((drawable: Drawable) => {
+				all.set(drawable.guid, drawable);
+			});
+		});
+
+		return all;
 	}
 
-	public getComponents(): Foundation.ExtendedMap
+	public getControls(layer?: number): Foundation.ExtendedMap
 	{
-		return this._components;
+		return layer >= 0 ? this._layers[layer].controls : this._layers[this._viewport.layer].controls;
 	}
 
-	public getGroups(): Foundation.ExtendedMap
+	public getAllControls(): Foundation.ExtendedMap
 	{
-		return this._groups;
+		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+				
+		this.getLayers().forEach((layer: Layer) => {
+			layer.controls.forEach((control: Control) => {
+				all.set(control.guid, control);
+			});
+		});
+
+		return all;
 	}
 
-	public getExtendedDrawActions(): Foundation.ExtendedMap
+	public getComponents(layer?: number): Foundation.ExtendedMap
 	{
-		return this._drawActions;
+		return layer >= 0 ? this._layers[layer].components : this._layers[this._viewport.layer].components;
 	}
 
-	public getExtendedMouseActions(): Foundation.ExtendedMap
+	public getAllComponents(): Foundation.ExtendedMap
 	{
-		return this._mouseActions;
+		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+				
+		this.getLayers().forEach((layer: Layer) => {
+			layer.components.forEach((component: Component) => {
+				all.set(component.guid, component);
+			});	
+		});
+
+		return all;
 	}
 
-	// move to drawable
-	public static near(map: Foundation.ExtendedMap,	point: Point, radius: number,	list: Array<string>)
+	public getGroups(layer?: number): Foundation.ExtendedMap
 	{
-		let near: any = [...map.filter((drawable: Drawable) =>
-			drawable.x >= point.x - radius &&
-			drawable.y >= point.y - radius &&
-			drawable.x <= point.x + radius &&
-			drawable.y <= point.y + radius &&
-			drawable.visible != false &&
-			!list.includes(drawable.guid))
-		];
+		return layer >= 0 ? this._layers[layer].groups : this._layers[this._viewport.layer].groups;
+	}
 
-		for(let drawable of near)
-			list.push(drawable.guid);
+	public getAllGroups(): Foundation.ExtendedMap
+	{
+		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+				
+		this.getLayers().forEach((layer: Layer) => {
+			layer.groups.forEach((group: Group) => {
+				all.set(group.guid, group);
+			});	
+		});
 
-		for(let drawable of near)
-			this.near(map, new Point(drawable.x, drawable.y), radius, list);
+		return all;
+	}
+
+	public getExtendedDrawActions(layer?: number): Foundation.ExtendedMap
+	{
+		return layer >= 0 ? this._layers[layer].drawactions : this._layers[this._viewport.layer].drawactions;
+	}
+
+	public getAllDrawActions(): Foundation.ExtendedMap
+	{
+		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+				
+		this.getLayers().forEach((layer: Layer) => {
+			layer.drawactions.forEach((drawaction: DrawAction) => {
+				all.set(drawaction.guid, drawaction);
+			});	
+		});
+
+		return all;
+	}
+
+	public getExtendedMouseActions(layer?: number): Foundation.ExtendedMap
+	{
+		return layer >= 0 ? this._layers[layer].mouseactions : this._layers[this._viewport.layer].mouseactions;
+	}
+
+	public getAllMouseActions(): Foundation.ExtendedMap
+	{
+		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+				
+		this.getLayers().forEach((layer: Layer) => {
+			layer.mouseactions.forEach((mouseaction: MouseAction) => {
+				all.set(mouseaction.guid, mouseaction);
+			});	
+		});
+
+		return all;
+	}
+
+	public getLayers(): Layer[]
+	{
+		return this._layers.filter((layer: Layer) => layer != undefined && layer != null);
 	}
 
 
@@ -587,8 +704,8 @@ export class Context
 		//let ratio: number = window.devicePixelRatio;
 		let ratio: number = 1;
 
-		this.canvas.width = size.width * ratio;
-		this.canvas.height = size.height * ratio;
+		this._viewport.canvas.main.width = size.width * ratio;
+		this._viewport.canvas.main.height = size.height * ratio;
 		this._viewport.canvas.buffer.width = size.width * ratio;
 		this._viewport.canvas.buffer.height = size.height * ratio;
 
@@ -634,6 +751,25 @@ export class Context
 		this._attributes.autosize = autosize;
 	}
 
+	public get layer(): number
+	{
+		return this._viewport.layer;
+	}
+	public set layer(layer: number)
+	{
+		this._viewport.layer = layer;
+
+		if(!this._layers[layer])
+		{
+			new Layer({
+				context: this,
+				index: layer
+			});
+
+			console.log('layer ' + layer + ' was created as it was missing');
+		}
+	}
+
 	public get states(): IStates
 	{
 		return this._viewport.states;
@@ -649,3 +785,4 @@ export class Context
 		return this._viewport.points;
 	}
 }
+

@@ -1,5 +1,3 @@
-
-
 import * as Paperless from './lib.paperless.js';
 
 
@@ -102,6 +100,8 @@ polygons();
 
 function polygons(): void
 {
+	context.states.norefresh = true;
+
 	for(let i: number = 0; i < step; i++)
 	{
 		const rad: number = Math.random() * 6.28;
@@ -111,7 +111,8 @@ function polygons(): void
 			point: {
 				x: (Math.random() * (limit.right - limit.left)) + limit.left,
 				y: (Math.random() * (limit.bottom - limit.top)) + limit.top,
-			}
+			},
+			hoverable: false
 		});
 
 		context.fx.add({
@@ -132,6 +133,9 @@ function polygons(): void
 			},
 		});
 	}
+
+	context.states.norefresh = true;
+	context.refresh();
 }
 
 

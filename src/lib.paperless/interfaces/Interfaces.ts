@@ -7,3 +7,7 @@ export {IPoint} from './IPoint.js';
 export {ISize} from './ISize.js';
 export {IPadding} from './IPadding.js';
 export {IFeatures, IDragging, IStates, IContextAttributes} from './IContext.js';
+export {IDrawActionAttributes} from './IDrawAction.js';
+export {IMouseActionAttributes} from './IMouseAction.js';
+
+

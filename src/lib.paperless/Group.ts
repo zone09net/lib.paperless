@@ -58,9 +58,10 @@ export class Group
 	{
 		const {
 			context = null,
+			layer = null,
 		} = attributes;
 
-		context ? context.attach(this) : null;	
+		context ? context.attach(this, layer) : null;	
 	}
 
 	public enroll(entity: Drawable | Array<Drawable>): void
@@ -215,7 +216,7 @@ export class Group
 	{
 		this._guid = guid;
 	}
-	
+
 	public get fx(): Fx
 	{
 		return this._fx;
