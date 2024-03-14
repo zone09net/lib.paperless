@@ -252,6 +252,7 @@ export class Context
 		entry.context = this;
 		entry.guid = guid;
 		entry.fx = this._fx;
+		entry.onAttach();
 
 		return entry;
 	}
