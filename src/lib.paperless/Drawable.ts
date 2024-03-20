@@ -124,16 +124,19 @@ export class Drawable extends Matrix
 			this.matrix.f + this.offset1.y + this.offset2.y
 		);
 
-		context2D.strokeStyle = this.strokecolor;
-		context2D.fillStyle = this.fillcolor;
-		context2D.lineWidth = this.linewidth;
 		context2D.globalAlpha = this.alpha;
-		context2D.shadowBlur = this.shadow;
-		context2D.shadowColor = this.shadowcolor;
 		context2D.imageSmoothingEnabled = false;
+
+		context2D.strokeStyle = this.strokecolor;
+		context2D.lineWidth = this.linewidth;
 
 		if(!this.nostroke)
 			context2D.stroke(this.path);
+
+		context2D.shadowBlur = this.shadow;
+		context2D.shadowColor = this.shadowcolor;
+		context2D.fillStyle = this.fillcolor;
+
 		if(!this.nofill)
 			context2D.fill(this.path);
 
@@ -208,8 +211,15 @@ export class Drawable extends Matrix
 			this.matrix.e + this.offset1.x + this.offset2.x, 
 			this.matrix.f + this.offset1.y + this.offset2.y
 		);
-		context2D.lineWidth = this.linewidth;
-		hover = context2D.isPointInPath(this.path, x, y) || context2D.isPointInStroke(this.path, x, y);
+
+		if(!this.context.features.nolinehover)
+		{
+			context2D.lineWidth = this.linewidth;
+			hover = context2D.isPointInPath(this.path, x, y) || context2D.isPointInStroke(this.path, x, y);
+		}
+		else
+			hover = context2D.isPointInPath(this.path, x, y)
+
 		context2D.restore();
 
 		return hover;

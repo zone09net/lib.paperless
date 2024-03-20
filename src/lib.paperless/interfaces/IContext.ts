@@ -7,7 +7,7 @@ import {Restrict} from '../enums/Restrict.js';
 export interface IFeatures 
 {
 	nohover?: boolean,
-	nodragging?: boolean,
+	nolinehover?: boolean,
 	nosnapping?: boolean,
 }
 

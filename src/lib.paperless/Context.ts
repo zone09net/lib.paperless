@@ -60,9 +60,8 @@ export class Context
 			features: {
 				...{
 					nohover: false,
-					nodragging: false,
+					nolinehover: true,
 					nosnapping: true,
-					nodefault: false,
 				},
 				...features,
 			},
@@ -247,7 +246,7 @@ export class Context
 			return null;
 		}
 		else
-			throw new Error('Context.attach need either a Drawable|Control|Component|Group|DrawActions|MouseActions|HTMLElement type');
+			throw new Error('Context.attach() wrong type');
 
 		entry.context = this;
 		entry.guid = guid;
@@ -503,7 +502,7 @@ export class Context
 
 			layer.drawactions.forEach((drawaction: DrawAction) => {
 				drawaction.onDrawAfter(this.context2D);
-			});	
+			});
 		});
 
 		const bitmap: ImageBitmap = this._viewport.canvas.buffer.transferToImageBitmap();
