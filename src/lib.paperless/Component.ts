@@ -17,6 +17,8 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  * Here's an example of 4 smileys in each of the browser corner.
  *
  * ```typescript
+ * import * as Paperless from './lib.paperless.js';
+ *
  * class Smileys extends Paperless.Component 
  * {
  * 	public onAttach(): void
@@ -81,6 +83,7 @@ export class Component
 	private _fx: Fx = undefined;
 	private _sticky: boolean;
 	private _group: string = undefined;
+	private _removable: boolean;
 	private _enrolled: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	//---
 
@@ -95,6 +98,7 @@ export class Component
 			size = {width: 50, height: 50},
 			context = null,
 			layer = null,
+			removable = true,
 
 			onAttach = null,
 			onDetach = null,
@@ -104,6 +108,7 @@ export class Component
 		this._point = new Point(point.x, point.y);
 		this._size = new Size(size.width, size.height);
 		this._sticky = sticky;
+		this._removable = removable;
 
 		context ? context.attach(this, layer) : null;	
 
@@ -136,6 +141,16 @@ export class Component
 	}
 
 	/**
+	 * Sets the sticky value of all drawables that has been enrolled in the Component to [[Component.sticky]] value.
+	 */
+	public setStickyDrawables(): void
+	{
+		this.getDrawables().forEach((drawable: Drawable) => {
+			drawable.sticky = this.sticky;
+		});	
+	}
+
+	/**
 	 * Gets the enrolled drawables from the Component
 	 *
 	 * @returns							Array of [[Drawable]]
@@ -158,22 +173,22 @@ export class Component
 	/**
 	 * Callback method when the Component is attached to a [[Context]].
 	 *
-	 * @param self				The component itself, automatically set by the [[Context]].
+	 * @param self				The component itself, automatically set by the Context.
 	 */
 	public onAttach(self?: Component): void {}
 
 	/**
-	 * Callback method when the Component is detached from a [[Context]]. Since a Component used [[Drawable]] and
-	 * [[Control]], the developer needs to make sure to detach every entities created on the life time of that Component.
+	 * Callback method when the Component is detached from a [[Context]]. Since a Component use [[Drawable]] and
+	 * [[Control]], the developer needs to make sure to detach every entities created on the life time of the Component.
 	 *
-	 * @param self				The component itself, automatically set by the [[Context]].
+	 * @param self				The component itself, automatically set by the Context.
 	 */
 	public onDetach(self?: Component): void {}
 
 	/**
-	 * Callback method when the browser window get resized.
+	 * Callback method when the browser window get resized. Only called when the feature [[Context.autosize]] is set to true.
 	 *
-	 * @param self				The component itself, automatically set by the [[Context]].
+	 * @param self				The component itself, automatically set by the Context.
 	 */
 	public onResize(self?: Component): void {}
 
@@ -327,8 +342,22 @@ export class Component
 	}
 
 	/**
+	 * Gets the removable status of the Control.
+	 */
+	public get removable(): boolean
+	{
+		return this._removable;
+	}
+	/**
+	 * Sets the removable status of the Control. When set to false, the Control cannot be removed with the [[Context.detach]] method.
+	 */
+	public set removable(removable: boolean)
+	{
+		this._removable = removable;
+	}
+	
+	/**
 	 * Gets the current status of the sticky.
-	 * @defaultvalue false
 	 */
 	public get sticky(): boolean
 	{
@@ -337,7 +366,7 @@ export class Component
 	/**
 	 * Sets the the sticky status of the Component, means that all drawables of the component should render on top of the others non sticky.
 	 * As a Component is a regroupment of [[Drawable]] and [[Control]], it is the responsibility of the developer to make sure that the sticky 
-	 * value is spawned in the child entities.
+	 * value is spawned in the child entities. This can be done with the [[Component.setStickyDrawables]] method.
 	 */
 	public set sticky(sticky: boolean)
 	{

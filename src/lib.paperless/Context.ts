@@ -320,7 +320,7 @@ export class Context
 			{
 				const entity: Component = this._layers[layer].components.get(guid);
 
-				if(entity)
+				if(entity && entity.removable)
 				{
 					entity.onDetach(entity);
 					entity.context = undefined;
