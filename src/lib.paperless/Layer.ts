@@ -17,6 +17,12 @@ export class Layer
 	private _context: Context = undefined;
 	private _fx: Fx = undefined;
 	private _index: number;
+	private _freezed: boolean;
+	private _populated: boolean = false;
+	private _visible: boolean;
+	private _canvas: OffscreenCanvas = new OffscreenCanvas(0, 0);
+	private _context2D: OffscreenCanvasRenderingContext2D = this._canvas.getContext('2d', {alpha: true});
+	private _bitmap: ImageBitmap;
 	private _drawables: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _controls: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _components: Foundation.ExtendedMap = new Foundation.ExtendedMap();
@@ -30,12 +36,16 @@ export class Layer
 		const {
 			context = null,
 			index = 0,
+			freezed = false,
+			visible = true,
 
 			onAttach = null,
 			onDetach = null,
 		} = attributes;
 
 		this._index = index;
+		this._freezed = freezed;
+		this._visible = visible;
 
 		context ? context.attach(this) : null;
 
@@ -53,6 +63,25 @@ export class Layer
 		return Number(guid.substring(9, 13));
 	}
 
+	public freeze(): void
+	{
+		this._freezed = true;
+
+		this._canvas.width = this.context.canvas.width;
+		this._canvas.height = this.context.canvas.height;
+	}
+
+	public unfreeze(): void
+	{
+		this._freezed = false;
+		this._bitmap = undefined;
+	}
+
+	public save(): void
+	{
+		this._bitmap = this._canvas.transferToImageBitmap();
+	}
+	
 	public onAttach(self?: Layer): void {}
 
 	public onDetach(self?: Layer): void 
@@ -100,6 +129,35 @@ export class Layer
 	public get index(): number
 	{
 		return this._index;
+	}
+
+	public get canvas(): OffscreenCanvas
+	{
+		return this._canvas;
+	}
+
+	public get context2D(): OffscreenCanvasRenderingContext2D
+	{
+		return this._context2D;
+	}
+
+	public get freezed(): boolean
+	{
+		return this._freezed;
+	}
+
+	public get bitmap(): ImageBitmap
+	{
+		return this._bitmap;
+	}
+
+	public get visible(): boolean
+	{
+		return this._visible;
+	}
+	public set visible(visible: boolean)
+	{
+		this._visible = visible;
 	}
 
 	public get drawables(): Foundation.ExtendedMap

@@ -82,7 +82,7 @@ export class Context
 			canvas: {
 				buffer: new OffscreenCanvas(0, 0),
 				main: document.createElement('canvas')
-			},
+	},
 
 			context: {
 				buffer: undefined,
@@ -179,7 +179,7 @@ export class Context
 		let entry: any;
 		let layer: number;
 
-		if(layerOverride)
+		if(layerOverride != undefined || layerOverride != null)
 		{
 			if(!this._layers[layerOverride])
 			{
@@ -472,37 +472,64 @@ export class Context
 		}
 
 		layers.forEach((layer: Layer) => {
-			layer.drawactions.forEach((drawaction: DrawAction) => {
-				drawaction.onDrawBefore(this.context2D);
-			});
-
-			const stickies: Drawable[] = layer.drawables.sorted.filter((drawable: Drawable) => drawable.sticky && drawable.visible);
-			const nostickies: Drawable[] = layer.drawables.sorted.filter((drawable: Drawable) => !drawable.sticky && drawable.visible);
-
-			if(this.states.drag)
+			if(layer.visible)
 			{
-				for(let drawable of [...nostickies, ...stickies])
+				let context2D = this.context2D;
+
+				if(layer.freezed && !layer.bitmap)
 				{
-					if(drawable.guid == control.drawable.guid)
+				//	console.log(1, 'freezed', this.getLayers()[2].freezed, 'populated', this.getLayers()[2].populated);
+					context2D = layer.context2D;
+				}
+
+				if(!layer.bitmap)
+				{
+					//console.log(2, 'freezed', this.getLayers()[2].freezed, 'populated', this.getLayers()[2].populated);
+					layer.drawactions.forEach((drawaction: DrawAction) => {
+						drawaction.onDrawBefore(context2D, drawaction);
+					});
+
+					const stickies: Drawable[] = layer.drawables.sorted.filter((drawable: Drawable) => drawable.sticky && drawable.visible);
+					const nostickies: Drawable[] = layer.drawables.sorted.filter((drawable: Drawable) => !drawable.sticky && drawable.visible);
+
+					if(this.states.drag)
 					{
-						this.context2D.save();
-						control.onDrag(control);
-						drawable.draw(this.context2D);
-						this.context2D.restore();
+						for(let drawable of [...nostickies, ...stickies])
+						{
+							if(drawable.guid == control.drawable.guid)
+							{
+								context2D.save();
+								control.onDrag(control);
+								drawable.draw(context2D);
+								context2D.restore();
+							}
+							else
+								drawable.draw(context2D);
+						}
 					}
 					else
-						drawable.draw(this.context2D);
+					{
+						for(let drawable of [...nostickies, ...stickies])
+							drawable.draw(context2D);
+					}
+
+					layer.drawactions.forEach((drawaction: DrawAction) => {
+						drawaction.onDrawAfter(context2D, drawaction);
+					});
+
+					if(layer.freezed)
+					{
+						//console.log(3, 'freezed', this.getLayers()[2].freezed);
+						layer.save();
+						this.context2D.drawImage(layer.bitmap, 0, 0);
+					}
+				}
+				else
+				{
+					//console.log(4, 'freezed', this.getLayers()[2].freezed, 'populated', this.getLayers()[2].populated);
+					this.context2D.drawImage(layer.bitmap, 0, 0);
 				}
 			}
-			else
-			{
-				for(let drawable of [...nostickies, ...stickies])
-					drawable.draw(this.context2D);
-			}
-
-			layer.drawactions.forEach((drawaction: DrawAction) => {
-				drawaction.onDrawAfter(this.context2D);
-			});
 		});
 
 		const bitmap: ImageBitmap = this._viewport.canvas.buffer.transferToImageBitmap();
@@ -656,7 +683,19 @@ export class Context
 
 	public getLayers(): Layer[]
 	{
-		return this._layers.filter((layer: Layer) => layer != undefined && layer != null);
+		return this._layers.filter((l: Layer) => 
+			l != undefined && 
+			l != null
+		);
+	}
+
+	public getLayer(layer: number): Layer
+	{
+		return this._layers.filter((l: Layer) => 
+			l != undefined && 
+			l != null &&
+			(layer >= 0 ? Layer.decode(l.guid) == layer : true)
+		)[0];
 	}
 
 
