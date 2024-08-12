@@ -57,7 +57,7 @@ export class Control
 	private _movable: boolean;
 	private _removable: boolean;
 	private _focusable: boolean;
-	private _restrict: Restrict;
+	private _restrict: Restrict.none | Restrict.horizontal | Restrict.vertical;
 	private _group: string = undefined;
 	//---
 
@@ -139,10 +139,13 @@ export class Control
 	 */
 	public attach(drawable: Drawable): void
 	{
-		this.drawable = this.context.get(drawable.guid);
+		if(!this.context || !drawable.context)
+			throw new Error('Drawable and Control need to be both attached prior to use Control.attach()');
+
+		this._drawable = this.context.get(drawable.guid);
 		this.context.link(drawable, this);
 
-		if(this.drawable)
+		if(this._drawable)
 			this.onDrawable(this);
 	}
 
