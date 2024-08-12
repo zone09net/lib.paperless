@@ -32,8 +32,8 @@ export class Events
 
 			if(!context.states.drag && !context.features.nohover)
 			{
-				const stickies: Control[] = layer.controls.sorted.filter((control: Control) => control.drawable.sticky && control.drawable.visible);
-				const nostickies: Control[] = layer.controls.sorted.filter((control: Control) => !control.drawable.sticky && control.drawable.visible);
+				const stickies: Control[] = layer.controls.sorted.filter((control: Control) => control.drawable && control.drawable.sticky && control.drawable.visible);
+				const nostickies: Control[] = layer.controls.sorted.filter((control: Control) => control.drawable && !control.drawable.sticky && control.drawable.visible);
 
 				[...stickies, ...nostickies].every((control: Control) => {
 					if(control.drawable && control.drawable.hoverable)
@@ -102,44 +102,41 @@ export class Events
 			});
 		});
 
-		if(event.button == 0 && context.states.pointer.control && !context.states.drag)
+		const control: Control = context.get(context.states.pointer.control);
+
+		if(event.button == 0 && control && control.enabled)
 		{
-			const control: Control = context.get(context.states.pointer.control);
+			if(control.focusable)
+				context.setFocus(control.guid);
 
-			if(control)
+			if(control.movable && !context.states.drag)
 			{
-				if(control.movable && control.enabled)
-				{
-					context.id.dragging = setTimeout(() => {
-						if(control.drawable.isHover(context.states.pointer.current))
+				context.id.dragging = window.setTimeout(() => {
+					if(control.drawable.isHover(context.states.pointer.current))
+					{
+						const group: Group = context.get(control.drawable.group);
+
+						if(group)
 						{
-							const group: Group = context.get(control.drawable.group);
-
-							if(group)
-							{
-								[...group.grouped, ...group.enrolled].forEach((drawable: Drawable) => {
-									(<any>drawable.points)['origin'] = new Point(control.drawable.x - drawable.x, control.drawable.y - drawable.y, { scale: 1 });
-								});
-							}
-
-							context.states.pointer.dragdiff = new Point(
-								(context.states.pointer.current.x / context.scale / window.devicePixelRatio) - control.drawable.x, 
-								(context.states.pointer.current.y / context.scale / window.devicePixelRatio) - control.drawable.y, 
-								{ scale: context.scale * window.devicePixelRatio }
-							);
-
-							context.states.drag = true;
-							control.drawable.toFront();
-
-							if(control.focusable)
-								context.setFocus(control.guid);
-
-							control.onDragBegin(control);
-							context.drag();
+							[...group.grouped, ...group.enrolled].forEach((drawable: Drawable) => {
+								(<any>drawable.points)['origin'] = new Point(control.drawable.x - drawable.x, control.drawable.y - drawable.y, { scale: 1 });
+							});
 						}
-					}, context.dragging.delay);
-				}
-			}
+
+						context.states.pointer.dragdiff = new Point(
+							(context.states.pointer.current.x / context.scale / window.devicePixelRatio) - control.drawable.x, 
+							(context.states.pointer.current.y / context.scale / window.devicePixelRatio) - control.drawable.y, 
+							{ scale: context.scale * window.devicePixelRatio }
+						);
+
+						context.states.drag = true;
+						control.drawable.toFront();
+
+						control.onDragBegin(control);			
+						context.drag();
+					}
+				}, context.dragging.delay);
+			}	
 		}
 	}
 
