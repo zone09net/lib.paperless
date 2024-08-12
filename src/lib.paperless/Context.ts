@@ -129,8 +129,8 @@ export class Context
 			index: layer
 		});
 
-		this._viewport.context.main = this._viewport.canvas.main.getContext('bitmaprenderer', {alpha: false});
-		this._viewport.context.buffer = this._viewport.canvas.buffer.getContext('2d', {alpha: false});
+		this._viewport.context.main = this._viewport.canvas.main.getContext('bitmaprenderer', {alpha: true});
+		this._viewport.context.buffer = this._viewport.canvas.buffer.getContext('2d', {alpha: true});
 		this.size = size;
 
 		this._viewport.canvas.main.addEventListener('touchmove',Events.handleTouchMove.bind(null, this), {passive: false});
@@ -727,6 +727,22 @@ export class Context
 	public get fx(): Fx
 	{
 		return this._fx;
+	}
+
+	/**
+	 * Gets the width of the Context.
+	 */
+	public get width(): number
+	{
+		return this.canvas.width;
+	}
+
+	/**
+	 * Gets the height of the Context.
+	 */
+	public get height(): number
+	{
+		return this.canvas.height;
 	}
 
 	/**
