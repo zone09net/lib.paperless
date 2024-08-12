@@ -82,6 +82,22 @@ export class Button extends Control
 		return false;
 	}
 
+	/**
+	 * Triggers the [[Button.onLeftClick]] event on the Button.
+	 */
+	public leftClick(): void
+	{
+		this._callbackLeftClick(this._smugglerLeftClick);
+	}
+
+	/**
+	 * Triggers the [[Button.onRightClick]] event on the Button.
+	 */
+	public rightClick(): void
+	{
+		this._callbackRightClick(this._smugglerRightClick);
+	}
+
 
 
 	// Accessors
