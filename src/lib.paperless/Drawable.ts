@@ -42,7 +42,7 @@ export class Drawable extends Matrix
 
 	private _hover: boolean = false;
 	private _points: Point[] = [];
-	private _path: Path2D = new Path2D();
+	private _path: Path2D;
 	private _boundaries: { topleft: Point; bottomright: Point };
 	//---
 
@@ -72,6 +72,7 @@ export class Drawable extends Matrix
 			matrix = null,
 			context = null,
 			layer = null,
+			path = new Path2D(),
 
 			onAttach = null,
 			onDetach = null,
@@ -94,6 +95,7 @@ export class Drawable extends Matrix
 		this._offset1 = offset1;
 		this._offset2 = offset2;
 		this._size = size;
+		this._path = path;
 
 		context ? context.attach(this, layer) : null;
 

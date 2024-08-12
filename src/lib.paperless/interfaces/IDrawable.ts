@@ -63,6 +63,8 @@ export interface IDrawableAttributes
 
 	hoverable?: boolean,
 
+	path?: Path2D,
+
 	/**
 	 * Tells if the Drawable will be generated or not.
 	 */
@@ -355,6 +357,8 @@ export interface IDrawableLabelFilter
 			fillcolor?: string,
 			mark?: boolean,
 			markcolor?: string,
+			yoffset?: number,
+			xoffset?: number
 		}
 	}
 }
