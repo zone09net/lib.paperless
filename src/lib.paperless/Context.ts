@@ -333,11 +333,12 @@ export class Context
 			{
 				const entity: DrawAction = this._layers[layer].drawactions.get(guid);
 
-				if(entity)
+				if(entity && entity.removable)
 				{
 					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
+					entity.fx = undefined;
 					this._layers[layer].drawactions.delete(guid);
 				}
 			}
