@@ -7,44 +7,44 @@ import {Restrict} from './enums/Restrict.js';
 
 
 /**
- * A Control is what give life to a [[Drawable]]. Since a Drawable is only static by itself on a [[Context]], the only way to give
- * it some events it to [[attach]] is to a Control.
+ * A Control is what gives life to a [[Drawable]], it give the oportinity to have some events on specific action done by the user
+ * and the [[Context]]. 
  * 
- * The most basic Control is the [[Blank]] one. As the name says, a blank Control is only there to activate the basic events to
- * a Drawable such as the dragging ability. Take a loog on this 500 triangles example:
- * 
+ * This example will generate 500 circles that will desapear when the mouse cursor touch them.
+ *
  * ```typescript
  * import * as Paperless from './lib.paperless.js';
  * 
- * let context: Paperless.Context = new Paperless.Context();
- * 
- * context.attach(document.body);
+ * const colors: string[] = ['#815556', '#436665', '#9a6c27', '#769050', '#c8af55'];
+ * const context: Paperless.Context = new Paperless.Context({
+ * 	autosize: true, 
+ * 	features: { 
+ * 		nolinehover: true 
+ * 	}
+ * });
  * 
  * for(let i: number = 0; i < 500; i++)
  * {
- * 	let drawable: Paperless.Drawable;
- * 	let control: Paperless.Control;
- * 	let color: string = '#' + Math.floor(16777215 - (Math.random() * 15000000)).toString(16);
- * 	let radius: number = Math.floor(Math.random() * 30 + 20);
- * 	let x: number = (Math.random() * (window.innerWidth - (radius * 2))) + radius;
- * 	let y: number = (Math.random() * (window.innerHeight - (radius * 2) )) + radius;
+ * 	const radius: number = Math.floor(Math.random() * 30 + 20);
+ * 	const x: number = (Math.random() * (window.innerWidth - (radius * 2))) + radius;
+ * 	const y: number = (Math.random() * (window.innerHeight - (radius * 2) )) + radius;
  * 
- * 	drawable = context.attach(new Paperless.Drawables.Hexagon(new Paperless.Point(x, y), radius, {sides: 3}));
- * 	control = context.attach(new Paperless.Controls.Blank())
- * 
- * 	control.attach(drawable);
- * 	drawable.fillcolor = color;
- * 	drawable.rotation = 30;
+ * 	new Paperless.Control({
+ * 		context: context,
+ * 		drawable: new Paperless.Drawables.Circle({
+ * 			context: context,
+ * 			point: {x: x, y: y}, 
+ * 			outerRadius: radius,
+ * 			fillcolor: colors[Math.floor(Math.random() * 5)],
+ * 			nostroke: true
+ * 		}),
+ * 		onInside: (self?: Paperless.Control) => {
+ * 			context.detach([self.drawable.guid, self.guid]);
+ * 		}
+ * 	});
  * }
- * ```
  * 
- * Lets make those triangles disappear by adding a [[onInside]] event on the Control just after the drawable.rotation line. Doing
- * this will detach the triangles when the mouse pointer will touch them.
- * 
- * ```typescript
- * control.onInside = () => {
- * 	context.detach([control.guid, drawable.guid]);
- * }
+ * context.attach(document.body);
  * ```
  */
 export class Control
@@ -61,6 +61,9 @@ export class Control
 	private _group: string = undefined;
 	//---
 
+	/**
+	 * Contructs a Control.
+	 */
 	public constructor(attributes: IControlAttributes = {}) 
 	{
 		const {
@@ -110,6 +113,30 @@ export class Control
 		onDrawable ? this.onDrawable = onDrawable : null;
 	}
 
+	/**
+	 * Attaches a [[Drawable]] to the Control. By doing this, The Drawable will be interactive in the [[Context]].
+	 * The Drawable and the Control need to be already attached to a Context for this to work.
+	 *
+	 * ```typescript
+	 * // both of these codes will have the same effect
+	 *
+	 * const control: Paperless.Control = new Paperless.Control();
+	 * const drawable: Paperless.Drawables.Rectangle = new Paperless.Drawables.Rectangle();
+	 * context.attach(Rectangle);
+	 * context.attach(control);
+	 * control.attach(drawable);
+	 *
+	 * //---
+	 *
+	 * new Paperless.Control({
+	 * 	context: context,
+	 * 	drawable: new Paperless.Drawables.Rectangle({
+	 * 		context: context
+	 * 	}),
+	 * });
+	 * ```
+	 * @param drawable				Drawable to be attached to the Control.
+	 */
 	public attach(drawable: Drawable): void
 	{
 		this.drawable = this.context.get(drawable.guid);
@@ -119,17 +146,90 @@ export class Control
 			this.onDrawable(this);
 	}
 
+	/**
+	 * Callback method when the Control is clicked with the left mouse event.
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onLeftClick(self?: Control): void {}
+
+	/**
+	 * Callback method when the Control is clicked with the right mouse event.
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onRightClick(self?: Control): void {}
+
+	/**
+	 * Callback method when the Control is clicked and beeing dragged. Will be called just before moving the attached [[Drawable]].
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onDragBegin(self?: Control): void {}
+
+	/**
+	 * Callback method when the Control is beeing dragged. Will be called at every redraw phase.
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onDrag(self?: Control): void {}
+
+	/**
+	 * Callback method when the dragging of the Control is stopped. Will be called just after moving the attached [[Drawable]].
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onDragEnd(self?: Control): void {}
+
+	/**
+	 * Callback method when the mouse cursor is touching the attached [[Drawable]] of the Control.
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onInside(self?: Control): void {}
+
+	/**
+	 * Callback method when the mouse cursor is exiting the attached [[Drawable]] of the Control.
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onOutside(self?: Control): void {}
+
+	/**
+	 * Callback method when the Control gain focus with the [[Context.setFocus]] method.
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
 	public onFocus(self?: Control): void {}
+
+
+	/**
+	 * Callback method when the Control lose focus either with the [[Context.removeFocus]] method or when another
+	 * Control is beeing focussed.
+	 *
+	 * @param self				The control itself, automatically set by the Context.
+	 */
 	public onLostFocus(self?: Control): void {}
+
+	/**
+	 * Callback method when the Control is attached to a [[Context]].
+	 *
+	 * @param self				The control itself, automatically set by the Context.
+	 */
 	public onAttach(self?: Control): void {}
+
+	/**
+	 * Callback method when the Control is detached from a [[Context]]. 
+	 *
+	 * @param self				The control itself, automatically set by the Context.
+	 */
 	public onDetach(self?: Control): void {}
+
+	/**
+	 * Callback method when a [[Drawable]] has just been attached on the Control. 
+	 *
+	 * @param self				The control itself, automatically set by the Context.
+	 */
 	public onDrawable(self?: Control): void {}
 
 
@@ -137,93 +237,155 @@ export class Control
 	// Accessors
 	// --------------------------------------------------------------------------
 	
+	/**
+	 * Gets the the current [[Context]] that the Control is attached to. This will be undefined if the Control has not been attached to a Context yet.
+	 */
 	public get context(): Context
 	{
 		return this._context;
 	}
+	/** 
+	 * Sets the current [[Context]] to the Control. This is called internaly when the Control is attached to a Context.
+	 * 
+	 * @internal 
+	 */
 	public set context(context: Context)
 	{
 		this._context = context;
 	}
 
+	/**
+	 * Gets the the current [[Group]] GUID that the Control is attached to.
+	 */
 	public get group(): string
 	{
 		return this._group;
 	}
+	/** 
+	 * Sets the current [[Group]] GUID of the Control. This is called internaly when the Control is attached to a Group. 
+	 * 
+	 * @internal 
+	 */
 	public set group(group: string)
 	{
 		this._group = group;
 	}
 	
+	/**
+	 * Gets the the [[Fx]] instance from the current [[Context]] that the Control is attached to. This will be undefined if the Control has not been attached yet.
+	 */
 	public get fx(): Fx
 	{
 		return this._fx;
 	}
+	/** 
+	 * Sets the [[Fx]] instance of the current [[Context]] to the Control. This is called internaly when the Control gets attached to a Context. 
+	 * 
+	 * @internal 
+	 */
 	public set fx(fx: Fx)
 	{
 		this._fx = fx;
 	}
 
-	public get drawable(): Drawable
-	{
-		return this._drawable;
-	}
-	public set drawable(drawable: Drawable)
-	{
-		this._drawable = drawable;
-	}
-
+	/**
+	 * Gets the unique GUID identifier of the Control. This will be undefined if the Control has not been attached to a [[Context]] yet.
+	 */
 	public get guid(): string
 	{
 		return this._guid;
 	}
+	/** 
+	 * Sets the unique GUID of the Control. This is called internaly when the Control is attached to a [[Context]]. 
+	 * 
+	 * @internal 
+	 */
 	public set guid(guid: string)
 	{
 		this._guid = guid;
+	}	
+
+	/**
+	 * Gets the current attached [[Drawable]] on the Control.
+	 */
+	public get drawable(): Drawable
+	{
+		return this._drawable;
 	}
 
+	/**
+	 * Gets the enabled status of the Control.
+	 */
 	public get enabled(): boolean
 	{
 		return this._enabled;
 	}
+	/**
+	 * Sets the enabled status of the Control. When set to false, the Control cannot be clicked or moved with the mouse events.
+	 */
 	public set enabled(enabled: boolean)
 	{
 		this._enabled = enabled;
 	}
 
+	/**
+	 * Gets the movable status of the Control.
+	 */
 	public get movable(): boolean
 	{
 		return this._movable;
 	}
+	/**
+	 * Sets the movable status of the Control. When set to false, the Control cannot be moved with the mouse events.
+	 */
 	public set movable(movable: boolean)
 	{
 		this._movable = movable;
 	}
 
+	/**
+	 * Gets the removable status of the Control.
+	 */
 	public get removable(): boolean
 	{
 		return this._removable;
 	}
+	/**
+	 * Sets the removable status of the Control. When set to false, the Control cannot be removed with the [[Context.detach]] method.
+	 */
 	public set removable(removable: boolean)
 	{
 		this._removable = removable;
 	}
 
+	/**
+	 * Gets the focusable status of the Control.
+	 */
 	public get focusable(): boolean
 	{
 		return this._focusable;
 	}
+	/**
+	 * Sets the focusable status of the Control. When set to false, the Control cannot be focussed with the [[Context.setFocus]] method.
+	 */
 	public set focusable(focusable: boolean)
 	{
 		this._focusable = focusable;
 	}
 
-	public get restrict(): Restrict
+	/**
+	 * Gets the restrict status of the Control.
+	 */
+	public get restrict(): Restrict.none | Restrict.horizontal | Restrict.vertical
 	{
 		return this._restrict;
 	}
-	public set restrict(restrict: Restrict)
+	/**
+	 * Sets the restrict status of the Control, meaning the movement restriction on this one.
+	 */
+	public set restrict(restrict: Restrict.none | Restrict.horizontal | Restrict.vertical)
 	{
 		this._restrict = restrict;
 	}
 }
+
