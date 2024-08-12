@@ -232,6 +232,10 @@ export class Label extends Drawable
 								context2D.fillStyle = columnvalue.fillcolor;
 							if(columnvalue.spacing)
 								this._spacing = columnvalue.spacing;		
+							if(columnvalue.yoffset)
+								y += columnvalue.yoffset;
+							if(columnvalue.xoffset)
+								x += columnvalue.xoffset;
 
 							context2D.fillText(string, x, y);
 							x += context2D.measureText(string).width;
