@@ -172,6 +172,7 @@ new Paperless.Controls.Button({
 	onOutside: () => { fx.fillcolor = '#ffffff'; }
 });
 
+/*
 new Paperless.Layer({
 	context: context,
 	index: 0
@@ -191,7 +192,7 @@ new Paperless.Layer({
 	context: context,
 	index: 3
 });
-
+*/
 
 
 context.attach(document.body);
@@ -214,7 +215,7 @@ function polygons(): void
 		const ry: number = (Math.random() * (context.canvas.height - (radius * 2))) + radius;
 		let drawable: Paperless.Drawable;
 
-		context.layer = random;
+		//context.layer = random;
 
 		switch(random)
 		{
