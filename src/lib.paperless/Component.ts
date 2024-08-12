@@ -44,9 +44,7 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  *
  * 	public onDetach(): void
  * 	{
- * 		this.getDrawables().forEach((drawable: Paperless.Drawable) => {
- * 			this.context.detach(drawable.guid);
- * 		});
+ * 		this.detachEnrolled();
  * 	}
  * 
  * 	public onResize(): void
@@ -123,7 +121,7 @@ export class Component
 	 *
 	 * @param entity				Drawable(s) and/or Control(s)
 	 */
-	public enroll(entity: Drawable | Drawable[] | Control | Control[]): void
+	public enroll(entity: Drawable | Drawable[] | Control | Control[] | Component | Component[]): void
 	{
 		if(entity instanceof Array)
 		{
@@ -157,7 +155,7 @@ export class Component
 	 */
 	public getDrawables(): Drawable[]
 	{
-		return this._enrolled.filter((entity: Drawable | Control) => entity instanceof Drawable);
+		return this._enrolled.filter((entity: Drawable | Control | Component) => entity instanceof Drawable);
 	}
 
 	/**
@@ -167,13 +165,41 @@ export class Component
 	 */
 	public getControls(): Control[]
 	{
-		return this._enrolled.filter((entity: Drawable | Control) => entity instanceof Control);
+		return this._enrolled.filter((entity: Drawable | Control | Component) => entity instanceof Control);
+	}
+
+	/**
+	 * Gets the enrolled components from the Component
+	 *
+	 * @returns							Array of [[Component]]
+	 */
+	public getComponents(): Component[]
+	{
+		return this._enrolled.filter((entity: Drawable | Control | Component) => entity instanceof Component);
+	}
+
+	/**
+	 * Detachs all [[Drawable]] and [[Control]] that as been previously enrolled with [[Component.enroll]].
+	 */
+	public detachEnrolled(): void
+	{
+  		this.getComponents().forEach((component: Component) => {
+  			this.context.detach(component.guid);
+  		});
+
+  		this.getDrawables().forEach((drawable: Drawable) => {
+  			this.context.detach(drawable.guid);
+  		});
+
+  		this.getControls().forEach((control: Control) => {
+  			this.context.detach(control.guid);
+  		});
 	}
 
 	/**
 	 * Callback method when the Component is attached to a [[Context]].
 	 *
-	 * @param self				The component itself, automatically set by the Context.
+	 * @param self				The Component itself, automatically set by the Context.
 	 */
 	public onAttach(self?: Component): void {}
 
@@ -181,14 +207,14 @@ export class Component
 	 * Callback method when the Component is detached from a [[Context]]. Since a Component use [[Drawable]] and
 	 * [[Control]], the developer needs to make sure to detach every entities created on the life time of the Component.
 	 *
-	 * @param self				The component itself, automatically set by the Context.
+	 * @param self				The Component itself, automatically set by the Context.
 	 */
 	public onDetach(self?: Component): void {}
 
 	/**
 	 * Callback method when the browser window get resized. Only called when the feature [[Context.autosize]] is set to true.
 	 *
-	 * @param self				The component itself, automatically set by the Context.
+	 * @param self				The Component itself, automatically set by the Context.
 	 */
 	public onResize(self?: Component): void {}
 
