@@ -27,7 +27,7 @@ export class Events
 
 		layers.forEach((layer: Layer) => {
 			layer.mouseactions.forEach((mouseaction: MouseAction) => {
-				mouseaction.onMouseMove(context);
+				mouseaction.onMouseMove(mouseaction);
 			});
 
 			if(!context.states.drag && !context.features.nohover)
@@ -98,7 +98,7 @@ export class Events
 
 		context.getLayers().forEach((layer: Layer) => {
 			layer.mouseactions.forEach((mouseaction: MouseAction) => {
-				mouseaction.onMouseDown(context);
+				mouseaction.onMouseDown(mouseaction);
 			});
 		});
 
@@ -152,7 +152,7 @@ export class Events
 
 		context.getLayers().forEach((layer: Layer) => {
 			layer.mouseactions.forEach((mouseaction: MouseAction) => {
-				mouseaction.onMouseUp(context);
+				mouseaction.onMouseUp(mouseaction);
 			});
 		});
 
@@ -162,8 +162,8 @@ export class Events
 			{
 				if(event.button == 0 && control.enabled && control.drawable.visible)
 				{
-					if(control.focusable)
-						context.setFocus(control.guid);
+					//if(control.focusable)
+					//	context.setFocus(control.guid);
 					
 					control.onLeftClick(control);
 				}
@@ -196,11 +196,11 @@ export class Events
 	{
 		if(context.autosize)
 		{
-			clearTimeout(context.id.resizing);
+			window.clearTimeout(context.id.resizing);
 
-			context.id.resizing = setTimeout(() => {
+			context.id.resizing = window.setTimeout(() => {
 				context.size = new Size(window.innerWidth, window.innerHeight);
-				
+
 				context.getLayers().forEach((layer: Layer) => {
 					layer.drawables.forEach((drawable: Drawable) => {
 						drawable.onResize(drawable);

@@ -345,11 +345,12 @@ export class Context
 			{
 				const entity: MouseAction = this._layers[layer].mouseactions.get(guid);
 
-				if(entity)
+				if(entity && entity.removable)
 				{
 					entity.onDetach(entity);
 					entity.context = undefined;
 					entity.guid = undefined;
+					entity.fx = undefined;
 					this._layers[layer].mouseactions.delete(guid);
 				}
 			}
