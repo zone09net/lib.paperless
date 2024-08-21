@@ -12,7 +12,10 @@
 		 }
 	},
 	"terminal.integrated.defaultProfile.windows": "Command Prompt",
-   
+
+	"editor.cursorStyle": "block",
+	"editor.cursorBlinking": "solid",
+
    "php.suggest.basic": false,
 	
    //"intelephense.files.exclude": [
