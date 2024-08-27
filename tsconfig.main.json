@@ -20,7 +20,8 @@
 		"outDir": "./.dist",
 		"baseUrl": "../",
 		"paths": {
-			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"]
+			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
+			"@extlib/matter": ["extlib/matter-0.20.0.js"]
 		},
 		"typeRoots": ["./types"],
 		"types": ["OffscreenCanvas"]
