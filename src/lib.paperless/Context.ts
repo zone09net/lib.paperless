@@ -405,6 +405,23 @@ export class Context
 			window.requestAnimationFrame((timestamp: number) => this.draw(timestamp));
 	}
 
+	public loop(callback: () => void): void
+	{
+		const _this: Context = this;
+
+		function infinite(timestamp: number)
+		{
+			callback();
+
+			if(!_this._viewport.states.norefresh)
+				_this.draw(timestamp);
+
+			window.requestAnimationFrame((timestamp: number) => infinite(timestamp));
+		}
+
+		window.requestAnimationFrame((timestamp: number) => infinite(timestamp));
+	}
+
 	public drag(): void
 	{
 		if(this.states.drag)

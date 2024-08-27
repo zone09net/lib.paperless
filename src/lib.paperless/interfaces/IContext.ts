@@ -18,7 +18,8 @@ export interface IDragging
 	restrict?: Restrict
 }
 
-export interface IContextAttributes {
+export interface IContextAttributes 
+{
 	scale?: number,
 	layer?: number
 	size?: Size,
