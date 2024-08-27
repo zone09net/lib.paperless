@@ -9,5 +9,5 @@ export {IPadding} from './IPadding.js';
 export {IFeatures, IDragging, IStates, IContextAttributes} from './IContext.js';
 export {IDrawActionAttributes} from './IDrawAction.js';
 export {IMouseActionAttributes} from './IMouseAction.js';
-
+export {IDragActionAttributes} from './IDragAction.js';
 

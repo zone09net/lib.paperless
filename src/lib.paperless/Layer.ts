@@ -8,7 +8,7 @@ import {Component} from './Component.js';
 import {Group} from './Group.js';
 import {DrawAction} from './DrawAction.js';
 import {MouseAction} from './MouseAction.js';
-
+import {DragAction} from './DragAction.js';
 
 
 export class Layer
@@ -29,6 +29,7 @@ export class Layer
 	private _groups: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _drawactions: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	private _mouseactions: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+	private _dragactions: Foundation.ExtendedMap = new Foundation.ExtendedMap();
 	//---
 
 	public constructor(attributes: ILayerAttributes = {}) 
@@ -92,6 +93,7 @@ export class Layer
 		this._groups.forEach((group: Group) => { this.context.detach(group.guid); });
 		this._drawactions.forEach((drawaction: DrawAction) => { this.context.detach(drawaction.guid); });
 		this._mouseactions.forEach((mouseaction: MouseAction) => { this.context.detach(mouseaction.guid); });
+		this._dragactions.forEach((dragaction: DragAction) => { this.context.detach(dragaction.guid); });
 	}
 
 
@@ -188,5 +190,10 @@ export class Layer
 	public get mouseactions(): Foundation.ExtendedMap
 	{
 		return this._mouseactions;
+	}
+
+	public get dragactions(): Foundation.ExtendedMap
+	{
+		return this._dragactions;
 	}
 }

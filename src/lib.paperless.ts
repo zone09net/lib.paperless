@@ -53,6 +53,7 @@ export {Component} from './lib.paperless/Component.js';
 export {Group} from './lib.paperless/Group.js';
 export {MouseAction} from './lib.paperless/MouseAction.js';
 export {DrawAction} from './lib.paperless/DrawAction.js';
+export {DragAction} from './lib.paperless/DragAction.js';
 export {Context} from './lib.paperless/Context.js';
 export {Fx} from './lib.paperless/Fx.js';
 //export {Filter} from './lib.pazperless/Filter.js';

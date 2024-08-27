@@ -8,6 +8,7 @@ import {Size} from './Size.js';
 import {Restrict} from './enums/Restrict.js';
 import {Component} from './Component.js';
 import {MouseAction} from './MouseAction.js';
+import {DragAction} from './DragAction.js';
 import {Layer} from './Layer.js';
 
 
@@ -18,7 +19,7 @@ export class Events
 	{
 		event.preventDefault();
 
-		const layers: Layer[] = context.getLayers()
+		const layers: Layer[] = context.getLayers();
 		const pointer: Point = new Point(event.clientX, event.clientY, { scale: window.devicePixelRatio * context.scale });
 		let refresh: boolean = false;
 
@@ -132,6 +133,12 @@ export class Events
 						context.states.drag = true;
 						control.drawable.toFront();
 
+						context.getLayers().forEach((layer: Layer) => {
+							layer.dragactions.forEach((dragaction: DragAction) => {
+								dragaction.onDragBegin(dragaction);
+							});
+						});
+
 						control.onDragBegin(control);			
 						context.drag();
 					}
@@ -177,6 +184,11 @@ export class Events
 					control.drawable.y /= (window.devicePixelRatio * context.scale);
 				}
 
+				context.getLayers().forEach((layer: Layer) => {
+					layer.dragactions.forEach((dragaction: DragAction) => {
+						dragaction.onDragEnd(dragaction);
+					});
+				});
 				control.onDragEnd(control);
 			}
 		}

@@ -8,6 +8,7 @@ import {Component} from './Component.js';
 import {Group} from './Group.js';
 import {DrawAction} from './DrawAction.js';
 import {MouseAction} from './MouseAction.js';
+import {DragAction} from './DragAction.js';
 import {Layer} from './Layer.js';
 import {Fx} from './Fx.js';
 import {Restrict} from './enums/Restrict.js';
@@ -166,14 +167,13 @@ export class Context
 		this.states.sorted = false;
 	}
 
-	public enroll(entity: Drawable | Control | Component | Group | DrawAction | MouseAction | Layer): Drawable | Control | Component | Group | DrawAction | MouseAction | Layer
 	{
 		entity.context = this;
 
 		return entity;
 	}
 
-	public attach<Type>(entity: Drawable | Control | Component | Group | DrawAction | MouseAction | Layer | HTMLElement, layerOverride?: number): Type 
+	public attach<Type>(entity: Drawable | Control | Component | Group | DrawAction | MouseAction | DragAction | Layer | HTMLElement, layerOverride?: number): Type 
 	{
 		let guid: string;
 		let entry: any;
@@ -233,6 +233,11 @@ export class Context
 		{
 			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-mact-000000xxxxxx');
 			entry = this._layers[layer].mouseactions.set(guid, entity);
+		}
+		else if(entity instanceof DragAction)
+		{
+			guid = this.getGuidGenerator().create('00000000-' + layerString + '-0000-drag-000000xxxxxx');
+			entry = this._layers[layer].dragactions.set(guid, entity);
 		}
 		else if(entity instanceof Layer)
 		{
@@ -355,6 +360,19 @@ export class Context
 					this._layers[layer].mouseactions.delete(guid);
 				}
 			}
+			else if(type == 'drag')
+			{
+				const entity: DragAction = this._layers[layer].dragactions.get(guid);
+
+				if(entity && entity.removable)
+				{
+					entity.onDetach(entity);
+					entity.context = undefined;
+					entity.guid = undefined;
+					entity.fx = undefined;
+					this._layers[layer].dragactions.delete(guid);
+				}
+			}
 			else if(type == 'layr')
 			{
 				const entity: Layer = this._layers[layer];
@@ -375,7 +393,7 @@ export class Context
 			this.refresh();
 	}
 
-	public get<Type extends Drawable | Control | Component | Group | DrawAction | MouseAction | Layer>(guid: string): Type
+	public get<Type extends Drawable | Control | Component | Group | DrawAction | MouseAction | MouseAction | Layer>(guid: string): Type
 	{
 		if(guid)
 		{
@@ -394,6 +412,8 @@ export class Context
 				return this._layers[layer].drawactions.get(guid);
 			else if(type == 'mact')
 				return this._layers[layer].mouseactions.get(guid);
+			else if(type == 'drag')
+				return this._layers[layer].dragactions.get(guid);
 			else if(type == 'layr')
 				return <any>this._layers[layer];
 		}
@@ -518,6 +538,13 @@ export class Context
 							if(drawable.guid == control.drawable.guid)
 							{
 								context2D.save();
+
+								this.getLayers().forEach((layer: Layer) => {
+									layer.dragactions.forEach((dragaction: DragAction) => {
+										dragaction.onDrag(dragaction);
+									});
+								});
+								
 								control.onDrag(control);
 								drawable.draw(context2D);
 								context2D.restore();
@@ -664,7 +691,7 @@ export class Context
 		return all;
 	}
 
-	public getExtendedDrawActions(layer?: number): Foundation.ExtendedMap
+	public getDrawActions(layer?: number): Foundation.ExtendedMap
 	{
 		return layer >= 0 ? this._layers[layer].drawactions : this._layers[this._viewport.layer].drawactions;
 	}
@@ -682,7 +709,7 @@ export class Context
 		return all;
 	}
 
-	public getExtendedMouseActions(layer?: number): Foundation.ExtendedMap
+	public getMouseActions(layer?: number): Foundation.ExtendedMap
 	{
 		return layer >= 0 ? this._layers[layer].mouseactions : this._layers[this._viewport.layer].mouseactions;
 	}
@@ -694,6 +721,24 @@ export class Context
 		this.getLayers().forEach((layer: Layer) => {
 			layer.mouseactions.forEach((mouseaction: MouseAction) => {
 				all.set(mouseaction.guid, mouseaction);
+			});	
+		});
+
+		return all;
+	}
+
+	public getDragActions(layer?: number): Foundation.ExtendedMap
+	{
+		return layer >= 0 ? this._layers[layer].dragactions : this._layers[this._viewport.layer].dragactions;
+	}
+
+	public getAllDragActions(): Foundation.ExtendedMap
+	{
+		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();
+				
+		this.getLayers().forEach((layer: Layer) => {
+			layer.dragactions.forEach((dragaction: MouseAction) => {
+				all.set(dragaction.guid, dragaction);
 			});	
 		});
 
