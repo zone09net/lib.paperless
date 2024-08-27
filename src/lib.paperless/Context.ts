@@ -167,6 +167,7 @@ export class Context
 		this.states.sorted = false;
 	}
 
+	public enroll(entity: Drawable | Control | Component | Group | DrawAction | MouseAction | DragAction | Layer): Drawable | Control | Component | Group | DrawAction | MouseAction | DragAction | Layer
 	{
 		entity.context = this;
 
