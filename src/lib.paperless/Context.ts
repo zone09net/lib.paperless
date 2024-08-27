@@ -425,13 +425,14 @@ export class Context
 			window.requestAnimationFrame((timestamp: number) => this.draw(timestamp));
 	}
 
-	public loop(callback: () => void): void
+	public loop(callback?: () => void): void
 	{
 		const _this: Context = this;
 
 		function infinite(timestamp: number)
 		{
-			callback();
+			if(callback)
+				callback();
 
 			if(!_this._viewport.states.norefresh)
 				_this.draw(timestamp);
