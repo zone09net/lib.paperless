@@ -20,6 +20,10 @@
 	"editor.hover.delay": 500,
 	"editor.matchBrackets": "near",
 	"editor.renderIndentGuides": false,
+	"editor.autoClosingBrackets": "never",
+	"editor.autoClosingDelete": "never",
+	"editor.autoClosingOvertype": "never",
+	"editor.autoClosingQuotes": "never",
 	
    "php.suggest.basic": false,
 	
