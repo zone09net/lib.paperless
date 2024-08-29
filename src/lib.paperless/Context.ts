@@ -19,6 +19,13 @@ import {IStates} from './interfaces/IContext.js';
 
 
 
+/**
+ * The Context is what controls everything in Paperless, from rendering to sending all the different events to all attached [[Drawable]],
+ * [[Control]], [[Component]], [[DrawAction]], [[MouseAction]], [[DragAction]], [[Group]] and [[Layer]]. Once those objects are behing attached to the
+ * Context, they begin to receive polled events from the library.
+ *
+ *
+ */
 export class Context
 {
 	private _fx: Fx = new Fx();
@@ -616,16 +623,33 @@ export class Context
 		}
 	}
 
+	/**
+	 * Every object that are [[attach]] to the Context received a unique GUID from the internal generator. You can get a reference for
+	 * that GUID generator using this method.
+	 *
+	 * @returns 						Reference to the internal GUID generator.
+	 */
 	public getGuidGenerator(): Foundation.Guid
 	{
 		return this._guid;
 	}
 
+	/**
+	 * The method returns all attached [[Drawable]] in the Context from the current [[layer]] or a deffined one entered as argument.
+	 *
+	 * @param layer					Layer number to get the attached drawables from.
+	 * @returns							A map list of drawables
+	 */
 	public getDrawables(layer?: number): Foundation.ExtendedMap
 	{
 		return layer >= 0 ? this._layers[layer].drawables : this._layers[this._viewport.layer].drawables;
 	}
 
+	/**
+	 * As opposed to the [[getDrawables]], this methos get every attached [[Drawable]] in the Context from all layers. 
+	 *
+	 * @returns							A map list of drawables
+	 */
 	public getAllDrawables(): Foundation.ExtendedMap
 	{
 		let all: Foundation.ExtendedMap = new Foundation.ExtendedMap();

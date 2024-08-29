@@ -79,7 +79,7 @@ export class Point
 	}
 
 	/**
-	 * Validates if this Point is inside a poligon.
+	 * Validates if this Point is inside a polygon.
 	 * 
 	 * @param 	points 		Should be a list of Points that start from a point and comes back to the same point.
 	 */

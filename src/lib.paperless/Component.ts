@@ -21,14 +21,21 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  *
  * class Smileys extends Paperless.Component 
  * {
- * 	public onAttach(): void
+ * 	public position(): Paperless.Point[]
  * 	{
- * 		const points: Paperless.Point[] = [
+ *         const points: Paperless.Point[] = [
  * 			new Paperless.Point(50, 50),
  * 			new Paperless.Point(this.context.width - 50, 50),
  * 			new Paperless.Point(this.context.width - 50, this.context.height - 50),
  * 			new Paperless.Point(50, this.context.height - 50),
  * 		];
+ * 
+ * 		return points;
+ * 	 }
+ * 
+ * 	public onAttach(): void
+ * 	{
+ * 		const points: Paperless.Point[] = this.position();
  * 
  * 		for(let i = 0; i < 4; i++)
  * 		{
@@ -41,7 +48,7 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  * 			);
  * 		}
  * 	}
- *
+ * 
  * 	public onDetach(): void
  * 	{
  * 		this.detachEnrolled();
@@ -49,12 +56,7 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  * 
  * 	public onResize(): void
  * 	{
- * 		const points: Paperless.Point[] = [
- * 			new Paperless.Point(50, 50),
- * 			new Paperless.Point(this.context.width - 50, 50),
- * 			new Paperless.Point(this.context.width - 50, this.context.height - 50),
- * 			new Paperless.Point(50, this.context.height - 50),
- * 		];
+ * 		const points: Paperless.Point[] = this.position();
  * 		let i: number = 0;
  * 
  * 		this.getDrawables().forEach((drawable: Paperless.Drawable) => {
@@ -66,10 +68,12 @@ import {IComponentAttributes} from './interfaces/IComponent.js';
  * }
  * 
  * const context: Paperless.Context = new Paperless.Context({autosize: true});
- *
+ * 
  * new Smileys({
  * 	context: context
  * });
+ * 
+ * context.attach(document.body);
  * ```
  */
 export class Component 

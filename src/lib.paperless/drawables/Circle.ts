@@ -7,19 +7,29 @@ import {IDrawableCircleAttributes} from '../interfaces/IDrawable.js';
 /**
  * The Circle class creates a new circle [[Drawable]] with the specified attributes.
  *
- * The following code creates a kind of elipse.
+ * The following code creates a kind of rotating elipse.
  * 
  * ```typescript
- * const context: Paperless.Context;
- * const circle: Paperless.Drawables.Circle;
- *
- * circle = new Paperless.Drawables.Circle({
- * 	innerRadius: 15,
- * 	angleStart: 90
+ * const context: Paperless.Context = new Paperless.Context({autosize: true});
+ * 
+ * context.fx.add({
+ * 	duration: 1000,
+ * 	drawable: new Paperless.Drawables.Circle({
+ * 		context: context,
+ * 		innerRadius: 15,
+ * 		angleStart: 90,
+ * 		angleEnd: 235,
+ * 	}),
+ * 	effect: (fx: Paperless.Interfaces.IFx) => {
+ * 		(<Paperless.Drawable>fx.drawable).rad = fx.smuggler.ease(fx.t) * 6.28 * Math.sign(fx.smuggler.angle | 1);
+ * 	},
+ * 	loop: true,
+ * 	smuggler: { 
+ * 		ease: Paperless.Fx.easeLinear, 
+ * 	}
  * });
  * 
  * context.attach(document.body);
- * context.attach(circle);
  * ```
  */
 export class Circle extends Drawable
@@ -174,7 +184,7 @@ export class Circle extends Drawable
 		return this._angleEnd;
 	}
 	/**
-	 * Sets the current end angle of the circle. Depending on the [[angleStart]] and [[angleEnd]] values, the class Circle will create a arc.
+	 * Sets the current end angle of the circle. Depending on the [[angleStart]] and [[angleEnd]] values, the class Circle will create an arc.
 	 */	
 	public set angleEnd(angleEnd: number)
 	{
