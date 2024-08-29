@@ -1,18 +1,14 @@
 import * as Paperless from './lib.paperless.js';
 
-
-
-
 const context: Paperless.Context = new Paperless.Context({autosize: true, dragging: {delay: 0}});
 const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
 
 context.attach(document.body);
 
 
-
 // --------------------------------------------------
 // drawables + boundaries
-
+/*
 const arrow: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
 	context: context,
 	point: {x: 50, y: 50},
@@ -110,7 +106,7 @@ const boundaries = new Paperless.Drawables.Rectangle({
 	nofill: true,
 	point: {x: polygon.x, y: polygon.y},
 });
-
+*/
 
 
 // --------------------------------------------------
@@ -160,8 +156,3 @@ new Paperless.Controls.Button({
 	},
 });
 */
-
-
-
-
-
