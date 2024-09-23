@@ -1,3 +1,4 @@
+export {Polygon} from './Polygon.js';
 export {Circle} from './Circle.js';
 export {Hexagon} from './Hexagon.js';
 export {Rectangle} from './Rectangle.js';

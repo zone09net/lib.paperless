@@ -29,7 +29,7 @@ const label: Paperless.Drawables.Label = new Paperless.Drawables.Label({
 });
 
 const triangle: Paperless.Drawables.Triangle = new Paperless.Drawables.Triangle({
-	radius: 30, 
+	outerRadius: 30, 
 	nostroke: false, 
 	linewidth: 2, 
 	strokecolor: '#151515', 
@@ -251,7 +251,7 @@ function polygons(): void
 				drawable = new Paperless.Drawables.Hexagon({
 					context: context,
 					point: {x: rx, y: ry},
-					radius: radius,
+					outerRadius: radius,
 					nostroke: (labelLine.content == 'line' ? false : true), 
 					linewidth: 2, 
 					strokecolor: '#151515', 

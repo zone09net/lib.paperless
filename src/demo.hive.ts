@@ -14,7 +14,7 @@ export interface IComponentHiveAttributes extends Paperless.Interfaces.IComponen
   origin?: {x: number; y: number};
 }
 
-export interface IDrawableCellAttributes extends Paperless.Interfaces.IDrawableHexagonAttributes 
+export interface IDrawableCellAttributes extends Paperless.Interfaces.IDrawablePolygonAttributes 
 {
   hive?: Hive;
   coord?: {x: number; y: number};
@@ -30,7 +30,7 @@ class Cell extends Paperless.Drawables.Hexagon
 		super({
 			...attributes,
 			...{
-				radius: hive.radius,
+				outerRadius: hive.radius,
 			},
 		});
 
@@ -38,7 +38,7 @@ class Cell extends Paperless.Drawables.Hexagon
 
 		this._hive = hive;
 		this._coord = coord;
-		this.radius = hive.radius;
+		this.outerRadius = hive.radius;
 
 		const point: Paperless.Point = hive.toPoint(coord);
 

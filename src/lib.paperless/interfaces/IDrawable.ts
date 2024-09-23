@@ -1,5 +1,6 @@
-import {Context} from "../Context";
-import {Drawable} from '../Drawable';
+import {Context} from '../Context.js';
+import {Drawable} from '../Drawable.js';
+import {Point} from '../Point.js'
 
 
 
@@ -75,6 +76,8 @@ export interface IDrawableAttributes
 	offset2?: {x?: number, y?: number},
 
 	point?: {x?: number, y?: number},
+
+	points?: Point[],
 
 	size?: {width?: number, height?: number},
 
@@ -188,19 +191,37 @@ export interface IDrawableCrossAttributes extends IDrawableAttributes
 	linewidth?: number,
 }
 
-export interface IDrawableHexagonAttributes extends IDrawableAttributes
+export interface IDrawablePolygonAttributes extends IDrawableAttributes
 {
 	/**
-	 * Tells the number of side the [[Hexagon]] should have. A normal hexagon have 6 sides but setting it to 3 by example, would give a triangle.
-	 * @defaultvalue 6
+	 * Tells the number of side the [[Polygon]] should have. 
+	 * @defaultvalue 8
 	 */
 	sides?: number,
 
 	/**
-	 * This sets the radius of the hexagon. As the [[Hexagon]] is created with sin and cos, we need a radius.
-	 * @defaultvalue 25
+	 * Will set the start angle of the [[Polygon]]. Value can be from 0 to 360.
+	 * @defaultvalue 0
 	 */
-	radius?: number,
+	 angleStart?: number,
+
+	 /**
+	 * Will set the end angle of the [[Polygon]]. Value can be from 0 to 360.
+	 * @defaultvalue 360
+	 */
+	 angleEnd?: number,
+ 
+	 /**
+	  * Will set the inner radius of the [[Polygon]]. If greater than 0, this will produce a ring.
+	  * @defaultvalue 0
+	  */
+	 innerRadius?: number,
+ 
+	 /**
+	  * Will set the outer radius of the [[Polygon]].
+	  * @defaultvalue 25
+	  */
+	 outerRadius?: number,
 }
 
 export interface IDrawableLineAttributes extends IDrawableAttributes
@@ -237,20 +258,6 @@ export interface IDrawableRectangleAttributes extends IDrawableAttributes
 	 * @defaultvalue {topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0}
 	 */
 	rounded?: {topLeft?: number, topRight?: number, bottomLeft?: number, bottomRight?: number}
-}
-
-export interface IDrawableTriangleAttributes extends IDrawableHexagonAttributes
-{
-	 /**
-	  * @ignore
-	  */
-	 sides?: number,
-
-	/**
-	 * Determines the rotation values of the [[Triangle]]. Can be from 0 to 360 degrees.
-	 * @defaultvalue 30
-	 */
-	angle?: number,
 }
 
 export interface IDrawableStarAttributes extends IDrawableAttributes

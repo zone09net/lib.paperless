@@ -1,6 +1,6 @@
 import {Point} from '../Point.js';
-import {Hexagon} from './Hexagon.js';
-import {IDrawableTriangleAttributes} from '../interfaces/IDrawable.js';
+import {Polygon} from './Polygon.js';
+import {IDrawablePolygonAttributes} from '../interfaces/IDrawable.js';
 
 
 
@@ -21,15 +21,15 @@ import {IDrawableTriangleAttributes} from '../interfaces/IDrawable.js';
  * context.attach(triangle);
  * ```
  */
-export class Triangle extends Hexagon
+export class Triangle extends Polygon
 {
 	/**
 	 * Contructs an Triangle drawable.
 	 */
-	public constructor(attributes: IDrawableTriangleAttributes = {})
+	public constructor(attributes: IDrawablePolygonAttributes = {})
 	{
 		super({
-			...{angle: 30}, 
+			...{angle: 30},
 			...attributes,
 			...{sides: 3}
 		});
@@ -41,13 +41,16 @@ export class Triangle extends Hexagon
 	 * @param 	attributes 			Attributes that you would like to override.
 	 * @returns 						A new clone of this Drawable.
 	 */
-	public clone(attributes: IDrawableTriangleAttributes = {}): Triangle
+	public clone(attributes: IDrawablePolygonAttributes = {}): Triangle
 	{
 		const cloned: Triangle = new Triangle({
 			...this.attributes,
 			...{
-				sides: 3,
-				radius: this.radius
+				outerRadius: this.outerRadius,
+				innerRadius: this.innerRadius,
+				angleStart: this.angleStart,
+				angleEnd: this.angleEnd,
+				sides: this.sides,
 			},
 			...attributes
 		});

@@ -27,7 +27,7 @@ const number: Paperless.Drawables.Label = new Paperless.Drawables.Label({
 const less: Paperless.Drawables.Triangle = new Paperless.Drawables.Triangle({
 	context: context,
 	point: {x: 50, y: 50}, 
-	radius: 30, 
+	outerRadius: 30, 
 	nostroke: false, 
 	linewidth: 2, 
 	strokecolor: '#151515', 

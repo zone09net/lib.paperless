@@ -8,7 +8,7 @@ context.attach(document.body);
 
 // --------------------------------------------------
 // drawables + boundaries
-/*
+
 const arrow: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
 	context: context,
 	point: {x: 50, y: 50},
@@ -87,7 +87,7 @@ const star = new Paperless.Drawables.Star({
 const triangle = new Paperless.Drawables.Triangle({
 	context: context,
 	point: {x: 725, y: 50},
-	angle: 75,
+	//angle: 75,
 });
 
 const blade = new Paperless.Drawables.Blade({
@@ -98,7 +98,7 @@ const blade = new Paperless.Drawables.Blade({
 });
 
 
-const polygon: Paperless.Drawable = blade;
+const polygon: Paperless.Drawable = triangle;
 const boundaries = new Paperless.Drawables.Rectangle({
 	context: context,
 	size: {width: polygon.boundaries.bottomright.x - polygon.boundaries.topleft.x, height: polygon.boundaries.bottomright.y - polygon.boundaries.topleft.y},
@@ -106,7 +106,7 @@ const boundaries = new Paperless.Drawables.Rectangle({
 	nofill: true,
 	point: {x: polygon.x, y: polygon.y},
 });
-*/
+
 
 
 // --------------------------------------------------
