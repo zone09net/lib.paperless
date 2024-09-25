@@ -6,6 +6,7 @@ const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"]
 context.attach(document.body);
 
 
+/*
 // --------------------------------------------------
 // drawables + boundaries
 
@@ -106,7 +107,7 @@ const boundaries = new Paperless.Drawables.Rectangle({
 	nofill: true,
 	point: {x: polygon.x, y: polygon.y},
 });
-
+*/
 
 
 // --------------------------------------------------

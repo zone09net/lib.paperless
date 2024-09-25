@@ -13,7 +13,7 @@ const number: Paperless.Drawables.Label = new Paperless.Drawables.Label({
 	point: {x: 150, y: 55}, 
 	autosize: true, 
 	content: max.toString(), 
-	font: '60px bold system-ui', 
+	font: '60px CPMono-v07-Bold', 
 	fillcolor: '#ffffff', 
 	sticky: true
 });

@@ -15,7 +15,8 @@ const context: Paperless.Context = new Paperless.Context({
 		restrict: Paperless.Enums.Restrict.onrelease
 	}, 
 	features: {
-		nosnapping: false
+		nosnapping: false,
+		nolinehover: false
 	},
 	layer: 5
 });
@@ -23,7 +24,7 @@ const context: Paperless.Context = new Paperless.Context({
 const label: Paperless.Drawables.Label = new Paperless.Drawables.Label({
 	autosize: true, 
 	content: count.toString(), 
-	font: '60px bold system-ui', 
+	font: '60px CPMono-v07-Bold', 
 	fillcolor: '#ffffff', 
 	sticky: true
 });
@@ -140,7 +141,7 @@ new Paperless.Controls.Button({
 			for(let i: number = 0; i < length; i++)
 				drawables[i].nostroke = true;
 
-			labelLine.content = 'noline';
+			labelLine.content = 'none';
 		}
 		else
 		{
