@@ -1,5 +1,6 @@
 import {Drawable} from '../Drawable.js';
 import {Context} from '../Context.js';
+import {Point} from '../Point.js';
 
 
 
@@ -52,6 +53,11 @@ export interface IMatterBodyPolygon extends IMatterBody
 	angleStart?: number,
 	angleEnd?: number,
 	sides?: number
+}
+
+export interface IMatterBodyVertices extends IMatterBody
+{
+	points?: Point[],
 }
 
 export interface IMatter

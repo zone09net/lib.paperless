@@ -5,6 +5,7 @@ import * as Drawables from './drawables/Drawables.js';
 import {default as MatterJS} from '@extlib/matter';
 import {Context} from './Context.js';
 import {Control} from './Control.js';
+import {Drawable} from './Drawable.js';
 import {DrawAction} from './DrawAction.js';
 import {DragAction} from './DragAction.js';
 import {Point} from './Point.js';
@@ -291,7 +292,7 @@ export class Matter
 		const d: Drawables.Rectangle = new Drawables.Rectangle({
 			...drawable,
 			...{
-				context: this._context,
+				//context: this._context,
 				point: {x: body.point.x, y: body.point.y},
 				size: {width: body.size.width, height: body.size.height},
 			}
@@ -408,7 +409,7 @@ export class Matter
 		const angleStart: number = body.angleStart || 0;
 		const angleEnd: number = body.angleEnd || 360;
 		let sides: number = body.sides || 8;
-		let vertices: Array<{x: number, y: number}> = [];
+		let vertices: {x: number, y: number}[] = [];
 		let x: number;
 		let y: number;
 
@@ -473,6 +474,44 @@ export class Matter
 		return {drawable: d,	body: b}
 	}
 
+	public Points(body: Interfaces.IMatterBodyVertices, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	{
+		const points: Point[] = body.points || [];
+
+		const b: any = MatterJS.Bodies.fromVertices(body.point.x, body.point.y, points, {
+			...body.options,
+			...{
+				render: {
+					visible: this._attributes.norender ? false : true
+				}
+			} 
+		}, undefined, undefined, undefined, false);
+		
+		let d: Drawable;
+
+		d = new (drawable.path ? Drawable : Drawables.Points)({
+			...drawable,
+			...{
+				context: this._context,
+				point: {x: body.point.x, y: body.point.y},
+				points: points
+			}
+		});
+
+		const center: {x: number, y: number} = MatterJS.Vertices.centre(points);
+		MatterJS.Body.setCentre(b, {x: body.point.x - center.x, y: body.point.y - center.y});
+		//MatterJS.Body.setCentre(b, {x: body.point.x, y: body.point.y });
+
+		MatterJS.Body.setPosition(b, {x: body.point.x , y: body.point.y});
+		MatterJS.World.add(this._engine.world, b);
+
+		this._entities.push({
+			drawable: d,
+			body: b,
+		});
+	
+		return {drawable: d,	body: b}
+	}
 
 
 	// Accessors
