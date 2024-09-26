@@ -8,6 +8,7 @@ import {Layer} from './Layer.js';
 import {IDrawableAttributes} from './interfaces/IDrawable.js';
 import {Control} from './Control.js';
 import {Restrict} from './enums/Restrict.js';
+import * as Drawables from './drawables/Drawables.js';
 
 
 
@@ -147,56 +148,6 @@ export class Drawable extends Matrix
 		context2D.restore();
 	}
 
-		const square: number = (this.x - drawable.x) * (this.x - drawable.x) + (this.y - drawable.y) * (this.y - drawable.y);
-		
-		return (square <=	((<any>this).outerRadius + (<any>drawable).outerRadius) * ((<any>this).outerRadius + (<any>drawable).outerRadius));
-	}
-
-	public intersectRectangle(drawable: Drawable): boolean
-	{
-		if(this.x > drawable.width + drawable.x	||
-			drawable.x > this.width + this.x			||
-			this.y > drawable.height + drawable.y	||
-			drawable.y > this.height + this.y
-		)
-			return false;
-
-		return true;
-	}
-
-	/*
-			// Function to check intercept of line seg and circle
-		// A,B end points of line segment
-		// C center of circle
-		// radius of circle
-		// returns true if touching or crossing else false   
-		function doesLineInterceptCircle(A, B, C, radius) {
-				var dist;
-				const v1x = B.x - A.x;
-				const v1y = B.y - A.y;
-				const v2x = C.x - A.x;
-				const v2y = C.y - A.y;
-				// get the unit distance along the line of the closest point to
-				// circle center
-				const u = (v2x * v1x + v2y * v1y) / (v1y * v1y + v1x * v1x);
-				
-				
-				// if the point is on the line segment get the distance squared
-				// from that point to the circle center
-				if(u >= 0 && u <= 1){
-						dist  = (A.x + v1x * u - C.x) ** 2 + (A.y + v1y * u - C.y) ** 2;
-				} else {
-						// if closest point not on the line segment
-						// use the unit distance to determine which end is closest
-						// and get dist square to circle
-						dist = u < 0 ?
-									(A.x - C.x) ** 2 + (A.y - C.y) ** 2 :
-									(B.x - C.x) ** 2 + (B.y - C.y) ** 2;
-				}
-				return dist < radius * radius;
-		 }
-	*/
-
 	public isHover(point: Point): boolean
 	{
 		if(!this.context)
@@ -289,7 +240,14 @@ export class Drawable extends Matrix
 	}
 	*/
 
+	public static isCircleInsideCircle(small: Drawables.Circle | Drawables.Smiley, big: Drawables.Circle | Drawables.Smiley): boolean
+	{
+		const distance: number = Point.distance(big.point, small.point);
 
+		return big.outerRadius > (distance + small.outerRadius);
+	}
+	
+	 
 	public onAttach(self?: Drawable): void {}
 	public onDetach(self?: Drawable): void {}
 	public onResize(self?: Drawable): void {}
