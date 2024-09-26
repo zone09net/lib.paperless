@@ -11,3 +11,4 @@ export {Triangle} from './Triangle.js';
 export {Smiley} from './Smiley.js';
 export {Arrow} from './Arrow.js';
 export {Blade} from './Blade.js';
+export {Points} from './Points.js';

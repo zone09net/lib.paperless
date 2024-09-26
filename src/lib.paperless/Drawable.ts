@@ -65,6 +65,7 @@ export class Drawable extends Matrix
 			removable = true,
 			hoverable = true,
 			point = {x: window.innerWidth / 2, y: window.innerHeight / 2},
+			points = [],
 			scale = {x: 1, y: 1},
 			offset1 = {x: 0, y: 0},
 			offset2 = {x: 0, y: 0},
@@ -96,6 +97,7 @@ export class Drawable extends Matrix
 		this._offset2 = offset2;
 		this._size = size;
 		this._path = path;
+		this._points = points;
 
 		context ? context.attach(this, layer) : null;
 
@@ -145,7 +147,6 @@ export class Drawable extends Matrix
 		context2D.restore();
 	}
 
-	public intersectCircle(drawable: Drawable): boolean
 	{
 		const square: number = (this.x - drawable.x) * (this.x - drawable.x) + (this.y - drawable.y) * (this.y - drawable.y);
 		
@@ -265,7 +266,6 @@ export class Drawable extends Matrix
 			drawable.y >= this.y - radius &&
 			drawable.x <= this.x + radius &&
 			drawable.y <= this.y + radius &&
-			drawable.visible != false
 			//drawable.guid != this.guid
 		);
 	}
