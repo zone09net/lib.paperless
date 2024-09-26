@@ -147,7 +147,6 @@ export class Drawable extends Matrix
 		context2D.restore();
 	}
 
-	{
 		const square: number = (this.x - drawable.x) * (this.x - drawable.x) + (this.y - drawable.y) * (this.y - drawable.y);
 		
 		return (square <=	((<any>this).outerRadius + (<any>drawable).outerRadius) * ((<any>this).outerRadius + (<any>drawable).outerRadius));
