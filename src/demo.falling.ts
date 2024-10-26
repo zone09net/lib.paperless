@@ -10,7 +10,7 @@ const proximity: Paperless.Drawables.Circle = new Paperless.Drawables.Circle({
 	context: context,
 	outerRadius: radius,
 	nostroke: true,
-	fillcolor: '#111111',
+	fillcolor: '#151515',
 	visible: false,
 });
 
@@ -31,9 +31,7 @@ new Paperless.Controls.Button({
 		context: context,
 		point: {x: 250, y: 50}, 
 		outerRadius: 30, 
-		nostroke: false, 
-		linewidth: 2, 
-		strokecolor: '#151515', 
+		nostroke: true, 
 		fillcolor: '#ffffff', 
 		sticky: true, 
 		angle: 0
@@ -58,9 +56,7 @@ new Paperless.Controls.Button({
 		context: context,
 		point: {x: 50, y: 50}, 
 		outerRadius: 30, 
-		nostroke: false, 
-		linewidth: 2, 
-		strokecolor: '#151515', 
+		nostroke: true, 
 		fillcolor: '#ffffff', 
 		sticky: true, 
 		angle: 180

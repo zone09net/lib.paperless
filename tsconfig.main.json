@@ -21,9 +21,9 @@
 		"baseUrl": "../",
 		"paths": {
 			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
-			"@extlib/matter": ["extlib/matter-0.20.0.js"],
-			"@extlib/path2d-inspector": ["extlib/path2d-inspector.js"],
-			"@extlib/poly-decomp": ["extlib/poly-decomp-0.2.1.js"]
+			"@extlib/matter": ["extlib/matter-0.20.0.min.js"],
+			"@extlib/poly-decomp": ["extlib/poly-decomp-0.2.1.min.js"],
+			"@extlib/intersects": ["extlib/intersects-2.7.1.min.js"]
 		},
 		"typeRoots": ["./types"],
 		"types": ["OffscreenCanvas"]

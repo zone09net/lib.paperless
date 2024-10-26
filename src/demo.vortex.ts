@@ -22,9 +22,7 @@ const less: Paperless.Drawables.Triangle = new Paperless.Drawables.Triangle({
 	context: context,
 	point: {x: 50, y: 50}, 
 	outerRadius: 30, 
-	nostroke: false, 
-	linewidth: 2, 
-	strokecolor: '#151515', 
+	nostroke: true, 
 	fillcolor: '#ffffff', 
 	sticky: true, 
 	angle: 180

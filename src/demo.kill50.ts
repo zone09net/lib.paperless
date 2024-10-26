@@ -29,9 +29,7 @@ new Paperless.Controls.Button({
 		context: context,
 		point: {x: 250, y: 50}, 
 		outerRadius: 30, 
-		nostroke: false, 
-		linewidth: 2, 
-		strokecolor: '#151515', 
+		nostroke: true, 
 		fillcolor: '#ffffff', 
 		sticky: true, 
 		angle: 0

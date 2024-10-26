@@ -118,6 +118,10 @@ export class Drawable extends Matrix
 		}
 	}
 
+	/**
+	 * Generates the [[Drawable]]. By default, this is called by the constructor but can be deactivated by passing 
+	 * the *generate: false* in the attributes. After the method is called, [[points]], [[path]] and [[boundaries]] are sets.
+	 */
 	public generate(): void {}
 
 	public draw(context2D: OffscreenCanvasRenderingContext2D): void
@@ -171,7 +175,7 @@ export class Drawable extends Matrix
 			hover = context2D.isPointInPath(this.path, x, y) || context2D.isPointInStroke(this.path, x, y);
 		}
 		else
-			hover = context2D.isPointInPath(this.path, x, y)
+			hover = context2D.isPointInPath(this.path, x, y);
 
 		context2D.restore();
 
@@ -216,6 +220,7 @@ export class Drawable extends Matrix
 			drawable.y >= this.y - radius &&
 			drawable.x <= this.x + radius &&
 			drawable.y <= this.y + radius &&
+			drawable.visible != false 
 			//drawable.guid != this.guid
 		);
 	}

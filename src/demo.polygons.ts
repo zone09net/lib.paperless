@@ -31,9 +31,7 @@ const label: Paperless.Drawables.Label = new Paperless.Drawables.Label({
 
 const triangle: Paperless.Drawables.Triangle = new Paperless.Drawables.Triangle({
 	outerRadius: 30, 
-	nostroke: false, 
-	linewidth: 2, 
-	strokecolor: '#151515', 
+	nostroke: true, 
 	fillcolor: '#ffffff', 
 	sticky: true, 
 	angle: 0
