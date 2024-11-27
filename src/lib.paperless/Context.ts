@@ -264,7 +264,7 @@ export class Context
 		entry.context = this;
 		entry.guid = guid;
 		entry.fx = this._fx;
-		entry.onAttach();
+		entry.onAttach(entry);
 
 		return entry;
 	}
