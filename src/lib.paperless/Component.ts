@@ -183,21 +183,34 @@ export class Component
 	}
 
 	/**
-	 * Detachs all [[Drawable]] and [[Control]] that as been previously enrolled with [[Component.enroll]].
+	 * Detachs all [[Drawable]], [[Control]] and [[Component]] that as been previously enrolled with [[Component.enroll]].
+	 * 
+	 * @param guid				If guid is passed to the method, only this guid will be detached.
 	 */
-	public detachEnrolled(): void
+	public detachEnrolled(guid?: string): void
 	{
-  		this.getComponents().forEach((component: Component) => {
-  			this.context.detach(component.guid);
-  		});
+		if(guid)
+		{
+			this.context.detach(guid);
+			this._enrolled.delete(guid);
+		}
+		else
+		{
+			this.getComponents().forEach((component: Component) => {
+				this.context.detach(component.guid);
+				this._enrolled.delete(component.guid);
+			});
 
-  		this.getDrawables().forEach((drawable: Drawable) => {
-  			this.context.detach(drawable.guid);
-  		});
+			this.getDrawables().forEach((drawable: Drawable) => {
+				this.context.detach(drawable.guid);
+				this._enrolled.delete(drawable.guid);
+			});
 
-  		this.getControls().forEach((control: Control) => {
-  			this.context.detach(control.guid);
-  		});
+			this.getControls().forEach((control: Control) => {
+				this.context.detach(control.guid);
+				this._enrolled.delete(control.guid);
+			});
+		}
 	}
 
 	/**
