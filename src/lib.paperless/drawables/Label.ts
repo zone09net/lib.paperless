@@ -22,7 +22,8 @@ export class Label extends Drawable
 	private _multiline: boolean;
 	private _tabsize: number;
 	private _fillbackground: string;
-	private _filter: IDrawableLabelFilter
+	private _filter: IDrawableLabelFilter;
+	private _infinite: boolean;
 	//---
 
 	/**
@@ -44,6 +45,7 @@ export class Label extends Drawable
 			corner = false,
 			autosize = false,
 			multiline = false,
+			infinite = false,
 			tabsize = 3,
 			fillbackground = '',
 			generate = true,
@@ -72,6 +74,7 @@ export class Label extends Drawable
 		this._tabsize = tabsize;
 		this._fillbackground = fillbackground;
 		this._filter = filter;
+		this._infinite = infinite;
 
 		if(generate)
 			this.generate();
@@ -408,40 +411,87 @@ export class Label extends Drawable
 					}
 					else
 					{
-						// occur when all lines are filled but these no more room for word
-						aOut[row - 1] += word;
-						maxwidth -= context2D.measureText('...').width;
-						if(maxwidth < 0)
-							maxwidth = 0;
-	
-						while(context2D.measureText(aOut[row - 1]).width > maxwidth)
-							aOut[row - 1] = aOut[row - 1].slice(0, -1);
+						if(this._infinite)
+						{
+							this._content = this._content.replace(aOut[0],'').replace(/^\s+/gm,'');
+						
+							if(this._content[0] == '\n')
+								this._content = this._content.replace('^\n','')
+		
+							aOut.shift();
+							row--;
 
-						aOut[row - 1] += '...';
-						context2D.restore();
-						return aOut;
+							if(word != ' ')
+							{
+								aOut[row] = word;
+								nLineWidth = nWordWidth;
+							}
+							else
+							{
+								aOut[row] = '';
+								nLineWidth = 0;
+							}
+
+							for(let i: number = 0; i < row; i++)
+								this._filter[i] = this._filter[i + 1];
+						}
+						else
+						{
+							// occur when all lines are filled but these no more room for word
+							aOut[row - 1] += word;
+							maxwidth -= context2D.measureText('...').width;
+							if(maxwidth < 0)
+								maxwidth = 0;
+		
+							while(context2D.measureText(aOut[row - 1]).width > maxwidth)
+								aOut[row - 1] = aOut[row - 1].slice(0, -1);
+
+							aOut[row - 1] += '...';
+							context2D.restore();
+							return aOut;
+						}
 					}
 				}
 			}
 
 			nCount++;
 			row++;
+
 			if(row >= maxline)
 			{
-				if(lines.length > nCount)
+				if(this._infinite)
 				{
-					// occur when these no more line when pressing enter
-					maxwidth -= context2D.measureText('...').width;
-					if(maxwidth < 0)
-						maxwidth = 0;
+					if(lines.length > nCount)
+					{
+						this._content = this._content.replace(aOut[0],'').replace(/^\s+/gm,'');
+						
+						if(this._content[0] == '\n')
+							this._content = this._content.replace('^\n','')
 
-					while(context2D.measureText(aOut[maxline - 1]).width > maxwidth)
-						aOut[maxline - 1] = aOut[maxline - 1].slice(0, -1);
-
-					aOut[maxline - 1] += '...';
+						aOut.shift();
+						row--;
+						
+						for(let i: number = 0; i < row; i++)
+							this._filter[i] = this._filter[i + 1];
+					}
 				}
+				else
+				{
+					if(lines.length > nCount)
+					{
+						// occur when these no more line when pressing enter
+						maxwidth -= context2D.measureText('...').width;
+						if(maxwidth < 0)
+							maxwidth = 0;
 
-				break;
+						while(context2D.measureText(aOut[maxline - 1]).width > maxwidth)
+							aOut[maxline - 1] = aOut[maxline - 1].slice(0, -1);
+
+						aOut[maxline - 1] += '...';
+					}
+
+					break;
+				}
 			}
 		}
 		

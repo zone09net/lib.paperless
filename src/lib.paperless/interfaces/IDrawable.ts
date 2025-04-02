@@ -352,7 +352,8 @@ export interface IDrawableLabelAttributes extends IDrawableAttributes
 	multiline?: boolean,
 	tabsize?: number,
 	fillbackground?: string,
-	filter?: IDrawableLabelFilter
+	filter?: IDrawableLabelFilter,
+	infinite?: boolean,
 }
 
 export interface IDrawableLabelFilter
