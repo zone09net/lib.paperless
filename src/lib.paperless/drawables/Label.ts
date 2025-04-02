@@ -23,6 +23,7 @@ export class Label extends Drawable
 	private _tabsize: number;
 	private _fillbackground: string;
 	private _filter: IDrawableLabelFilter;
+	private _maxline: number;
 	private _infinite: boolean;
 	//---
 
@@ -99,11 +100,15 @@ export class Label extends Drawable
 			{
 				if(this._autosize)
 				{
-					this._splitted = this.wrap(this.width - (this._padding.left + this._padding.right), (window.innerHeight / (boundingbox.height + this._spacing)) + 1);
+					this._maxline = (window.innerHeight / (boundingbox.height + this._spacing)) + 1;
+					this._splitted = this.wrap(this.width - (this._padding.left + this._padding.right), this._maxline);
 					this.height = (boundingbox.height + this._spacing) * this._splitted.length;
 				}
 				else
-					this._splitted = this.wrap(this.width - (this._padding.left + this._padding.right), Math.floor(((this.height - (this._padding.left + this._padding.right)) / (boundingbox.height + this._spacing))));
+				{
+					this._maxline = Math.floor(((this.height - (this._padding.left + this._padding.right)) / (boundingbox.height + this._spacing)))
+					this._splitted = this.wrap(this.width - (this._padding.left + this._padding.right), this._maxline);
+				}
 			}
 			else
 			{
@@ -119,6 +124,8 @@ export class Label extends Drawable
 		}
 		else
 		{
+			this._maxline = 1;
+
 			if(this._wrapping)
 				this._splitted = this.wrap(this.width - (this._padding.left + this._padding.right), 1);
 			else
@@ -701,5 +708,10 @@ export class Label extends Drawable
 	set filter(filter: IDrawableLabelFilter)
 	{
 		this._filter = filter;
+	}
+
+	get maxline(): number
+	{
+		return this._maxline;
 	}
 }
