@@ -519,6 +519,8 @@ export class Context
 			this.states.sorted = true;
 		}
 
+		this.onDrawBefore(this.context2D);
+
 		layers.forEach((layer: Layer) => {
 			if(layer.visible)
 			{
@@ -586,6 +588,8 @@ export class Context
 				}
 			}
 		});
+
+		this.onDrawAfter(this.context2D);
 
 		const bitmap: ImageBitmap = this._viewport.canvas.buffer.transferToImageBitmap();
 		this._viewport.context.main.transferFromImageBitmap(bitmap);
@@ -787,6 +791,10 @@ export class Context
 			(layer >= 0 ? Layer.decode(l.guid) == layer : true)
 		)[0];
 	}
+
+	public onDrawBefore(context2D: OffscreenCanvasRenderingContext2D) {}
+
+	public onDrawAfter(context2D: OffscreenCanvasRenderingContext2D) {}
 
 
 
