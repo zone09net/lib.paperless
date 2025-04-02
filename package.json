@@ -16,7 +16,7 @@
 		"build": "type tsconfig.main.json > tsconfig.json && tsc --build --force",
 		"rollup": "rollup -c rollup.config.js",
 		"obfuscator": "javascript-obfuscator ./.rollup --output ./.obfuscator --compact true --string-array false --identifier-names-generator mangled --simplify true --exclude ./.rollup/extlib/**/**",
-		"minify": "if not exist .minify mkdir .minify && minify ./.rollup/lib.paperless.js > ./.minify/lib.paperless.js",
+		"minify": "if not exist .minify mkdir .minify && terser ./.rollup/lib.paperless.js -o ./.minify/lib.paperless.js --keep-classnames --keep-fnames --ecma 2016",
 		"dist": "npm run -s clean && npm run build && npm run -s rollup && npm run -s minify && npm run -s obfuscator",
 
 		"dev": "type tsconfig.dev.json > tsconfig.json && tsc --build --force && tsc-alias",
