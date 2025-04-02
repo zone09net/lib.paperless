@@ -576,13 +576,13 @@ export class Context
 					{
 						//console.log(3, 'freezed', this.getLayers()[2].freezed);
 						layer.save();
-						this.context2D.drawImage(layer.bitmap, 0, 0);
+						context2D.drawImage(layer.bitmap, 0, 0);
 					}
 				}
 				else
 				{
 					//console.log(4, 'freezed', this.getLayers()[2].freezed, 'populated', this.getLayers()[2].populated);
-					this.context2D.drawImage(layer.bitmap, 0, 0);
+					context2D.drawImage(layer.bitmap, 0, 0);
 				}
 			}
 		});

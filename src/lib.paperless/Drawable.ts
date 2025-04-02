@@ -139,14 +139,14 @@ export class Drawable extends Matrix
 		context2D.strokeStyle = this.strokecolor;
 		context2D.lineWidth = this.linewidth;
 
-		if(!this.nostroke)
+		if(!this._nostroke)
 			context2D.stroke(this.path);
 
 		context2D.shadowBlur = this.shadow;
 		context2D.shadowColor = this.shadowcolor;
 		context2D.fillStyle = this.fillcolor;
 
-		if(!this.nofill)
+		if(!this._nofill)
 			context2D.fill(this.path);
 
 		context2D.restore();
