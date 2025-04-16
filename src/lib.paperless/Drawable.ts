@@ -1,3 +1,4 @@
+import * as Foundation from '@zone09.net/foundation';
 import {Point} from './Point.js';
 import {Size} from './Size.js';
 import {Context} from './Context.js';
@@ -188,8 +189,12 @@ export class Drawable extends Matrix
 		const drawables: any = this.context.getDrawables(layer);
 		const controls: any = this.context.getControls(layer);
 		const group: Group = this.context.get(this.group);
+		let grouped: Drawable[] = [];
+		
+		if(group)
+			grouped = [...group.grouped, ...group.enrolled].filter((drawable: Drawable) => drawable.guid == this.guid);
 
-		(group ? [...group.grouped, ...group.enrolled] : [this]).forEach((drawable: Drawable) => {
+		[...grouped, ...[this]].forEach((drawable: Drawable) => {
 			const drawableMap: any = drawables.map.get(drawable.guid);
 
 			if(drawableMap)
