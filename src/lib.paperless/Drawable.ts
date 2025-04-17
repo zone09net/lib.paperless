@@ -192,7 +192,7 @@ export class Drawable extends Matrix
 		let grouped: Drawable[] = [];
 		
 		if(group)
-			grouped = [...group.grouped, ...group.enrolled].filter((drawable: Drawable) => drawable.guid == this.guid);
+			grouped = [...group.grouped, ...group.enrolled].filter((drawable: Drawable) => drawable.guid != this.guid);
 
 		[...grouped, ...[this]].forEach((drawable: Drawable) => {
 			const drawableMap: any = drawables.map.get(drawable.guid);
