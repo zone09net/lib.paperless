@@ -549,7 +549,7 @@ export class Label extends Drawable
 		if(properties.variant) variant[0] = properties.variant;
 		if(properties.weight) weight[0] = properties.weight;
 
-		this._font = style[0] + ' ' + variant[0] + ' ' + weight[0] + this._font;
+		this._font = (style[0].length > 0 ? style[0] + ' ' : '') + (variant[0].length > 0 ? variant[0] + ' ' : '') + (weight[0].length > 0 ? weight[0] : '') + this._font;
 
 		if(properties.size)
 			this._font = this._font.replace(/(\d+)px/g, properties.size + 'px');
