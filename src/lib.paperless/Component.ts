@@ -415,4 +415,23 @@ export class Component
 	{
 		this._sticky = sticky;
 	}
+
+	/**
+	 * Sets the visibility of all the components enrolled drawables.
+	 */
+	public set visible(visible: boolean)
+	{
+		if(visible)
+		{
+			this.getDrawables().forEach((drawable: Drawable) => {
+				drawable.visible = true;
+			});
+		}
+		else
+		{
+			this.getDrawables().forEach((drawable: Drawable) => {
+				drawable.visible = false;
+			});
+		}
+	}
 }
