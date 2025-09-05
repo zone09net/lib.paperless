@@ -110,6 +110,12 @@ export class Menu extends Paperless.Component
 	private _drawables: any = {};
 	private _zones: any = [
 		[
+			// zone 4
+			{start: 245, end: 270, radius: 230, spacer: 130, angle: 257.5},
+			{start: 237.5, end: 277.5, radius: 170, spacer: 60, angle: 257.5},
+			{start: 237.5, end: 270, radius: 90, spacer: 80, angle: 253.75},
+		],
+		[
 			// zone 1
 			{start: 67.5, end: 120, radius: 290, spacer: 70, angle: 93.75},
 			{start: 52.5, end: 112.5, radius: 210, spacer: 80, angle: 82.5},
@@ -125,12 +131,6 @@ export class Menu extends Paperless.Component
 			// zone 3
 			{start: 180, end: 225, radius: 150, spacer: 60, angle: 202.5},
 			{start: 187.5, end: 210, radius: 90, spacer: 60, angle: 198.75},
-		],
-		[
-			// zone 4
-			{start: 245, end: 270, radius: 230, spacer: 130, angle: 257.5},
-			{start: 237.5, end: 277.5, radius: 170, spacer: 60, angle: 257.5},
-			{start: 237.5, end: 270, radius: 90, spacer: 80, angle: 253.75},
 		],
 		[
 			// zone5
@@ -303,6 +303,12 @@ export class Menu extends Paperless.Component
 				});
 			});
 		});
+
+		const control: Paperless.Control = this.context.get(this.context.getControls(3).first());
+		const group: Paperless.Group = this.context.get(control.drawable.group);
+
+		this._selected = group.guid;
+		control.onLeftClick(control);
 	}
 
 	public onDetach(): void
