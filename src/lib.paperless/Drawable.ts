@@ -327,11 +327,13 @@ export class Drawable extends Matrix
 		this._group = group;
 	}
 
-	public get point(): Point {
+	public get point(): Point 
+	{
 		return new Point(this.x, this.y);
 	}
 
-	public get points(): Point[] {
+	public get points(): Point[] 
+	{
 		return this._points;
 	}
 	public set points(points: Point[])
