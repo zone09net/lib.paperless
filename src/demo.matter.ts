@@ -228,6 +228,7 @@ const platform: Paperless.Interfaces.IMatterEntity = matter.Rectangle(
 	{
 		fillcolor: colors[Math.floor(Math.random() * 5)],
 		nostroke: true,
+		nofill: true
 	}
 );
 

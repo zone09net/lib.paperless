@@ -6,6 +6,19 @@ const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"]
 context.attach(document.body);
 
 
+const artwork: Paperless.Drawable = new Paperless.Drawable({
+	...{
+		size: { width: 30, height: 30 }, 
+		hoverable: true,
+		context: context,
+		shadow: 0,
+		sticky: true,
+		nostroke: true,
+		path: new Path2D('M15.26 0l1.239 8.337-2.183 3.645 2.747.144L19.722 30h-7.975l-.418-5.392H8.537L8.068 30H0L3.98 0zm-4.136 19.29c-.394-3.398-.791-7.598-1.188-12.601-.795 5.745-1.294 9.945-1.497 12.601z M20.097 15v-3.479l-2.456-.01-2.456-.011.863-1.344 2.759-4.297 2.843-4.43.982-1.426 2.165 3.385 3.538 5.531 1.535 2.4.129.202h-4.925V15z'),
+		fillcolor: '#ff0000',
+	}
+});
+
 /*
 // --------------------------------------------------
 // drawables + boundaries

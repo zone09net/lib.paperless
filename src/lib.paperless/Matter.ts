@@ -2,7 +2,7 @@ import * as decomp from '@extlib/poly-decomp';
 import * as Interfaces from './interfaces/Interfaces.js';
 import * as Enums from './enums/Enums.js';
 import * as Drawables from './drawables/Drawables.js';
-import {default as MatterJS} from '@extlib/matter';
+import {MatterJS} from '@extlib/matter';
 import {Context} from './Context.js';
 import {Control} from './Control.js';
 import {Drawable} from './Drawable.js';
@@ -292,7 +292,7 @@ export class Matter
 		const d: Drawables.Rectangle = new Drawables.Rectangle({
 			...drawable,
 			...{
-				//context: this._context,
+				context: this._context,
 				point: {x: body.point.x, y: body.point.y},
 				size: {width: body.size.width, height: body.size.height},
 			}
