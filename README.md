@@ -38,9 +38,3 @@ Distribution file can be generated with:
 ```bash
 npm run dist
 ```
-## Demo
-
-In the lib.paperless folder, you will find demo files.
-
-You can also see them live at https://www.zone09.net/demo/paperless
-
