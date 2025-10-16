@@ -145,6 +145,13 @@ export interface IControlAttributes
 	 * @param self				The control itself, automatically set by the Context.
 	 */
 	onDrawable?: (self?: Control) => void,
+
+	/**
+	 * Callback method when the browser window get resized. Only called when the feature [[Context.autosize]] is set to true.
+	 *
+	 * @param self				The control itself, automatically set by the Context.
+	 */
+	onResize?: (self?: Control) => void,
 }
 
 export interface IControlButtonAttributes extends IControlAttributes

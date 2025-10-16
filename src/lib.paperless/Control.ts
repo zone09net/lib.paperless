@@ -88,6 +88,7 @@ export class Control
 			onAttach = null,
 			onDetach = null,
 			onDrawable = null,
+			onResize = null
 		} = attributes;
 
 		this._enabled = enabled;
@@ -111,6 +112,7 @@ export class Control
 		onAttach ? this.onAttach = onAttach : null;
 		onDetach ? this.onDetach = onDetach : null;
 		onDrawable ? this.onDrawable = onDrawable : null;
+		onResize ? this.onResize = onResize : null;
 	}
 
 	/**
@@ -234,6 +236,14 @@ export class Control
 	 * @param self				The control itself, automatically set by the Context.
 	 */
 	public onDrawable(self?: Control): void {}
+
+
+	/**
+	 * Callback method when the browser window get resized. Only called when the feature [[Context.autosize]] is set to true.
+	 *
+	 * @param self				The Control itself, automatically set by the Context.
+	 */
+	 public onResize(self?: Control): void {}
 
 
 

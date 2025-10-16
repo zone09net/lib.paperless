@@ -215,6 +215,10 @@ export class Events
 						drawable.onResize(drawable);
 					});
 
+					layer.controls.forEach((control: Control) => {
+						control.onResize(control);
+					});
+
 					layer.components.forEach((component: Component) => {
 						component.onResize(component);
 					});

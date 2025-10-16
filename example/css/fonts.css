@@ -1,0 +1,34 @@
+/* Musisync */
+
+@font-face {
+	font-family: 'Musisync';
+	font-weight: normal;
+	font-style: normal;
+	src: local('Musisync'), url('/assets/fonts/Musisync.ttf') format('truetype');
+}
+
+/* Virgil */
+
+@font-face {
+	font-family: 'Virgil';
+	font-weight: normal;
+	font-style: normal;
+	src: local('Virgil'), url('/assets/fonts/Virgil.woff2') format('woff2');
+}
+
+/* CPMono_v07 */
+
+@font-face {
+	font-family: 'CPMono-v07-Light';
+	font-style: normal;
+	font-weight: normal;
+	src: local('CPMono-v07-Light'), url('/assets/fonts/CPMono-v07-Light.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'CPMono-v07-Bold';
+	font-style: normal;
+	font-weight: normal;
+	src: local('CPMono-v07-Bold'), url('/assets/fonts/CPMono-v07-Bold.woff') format('woff');
+}
+

@@ -40,6 +40,7 @@ export class Drawable extends Matrix
 	private _hoverable: boolean;
 	private _offset1: { x?: number; y?: number };
 	private _offset2: { x?: number; y?: number };
+	private _offset3: { x?: number; y?: number };
 	private _size: { width?: number; height?: number };
 
 	private _hover: boolean = false;
@@ -71,6 +72,7 @@ export class Drawable extends Matrix
 			scale = {x: 1, y: 1},
 			offset1 = {x: 0, y: 0},
 			offset2 = {x: 0, y: 0},
+			offset3 = {x: 0, y: 0},
 			size = {width: 50, height: 50},
 			matrix = null,
 			context = null,
@@ -97,6 +99,7 @@ export class Drawable extends Matrix
 		this._hoverable = hoverable;
 		this._offset1 = offset1;
 		this._offset2 = offset2;
+		this._offset3 = offset3;
 		this._size = size;
 		this._path = path;
 		this._points = points;
@@ -130,8 +133,8 @@ export class Drawable extends Matrix
 		context2D.save();
 		context2D.setTransform(
 			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
-			this.matrix.e + this.offset1.x + this.offset2.x,	
-			this.matrix.f + this.offset1.y + this.offset2.y
+			this.matrix.e + this.offset1.x + this.offset2.x + this.offset3.x,	
+			this.matrix.f + this.offset1.y + this.offset2.y + this.offset3.y
 		);
 
 		context2D.globalAlpha = this.alpha;
@@ -166,8 +169,8 @@ export class Drawable extends Matrix
 		context2D.save();
 		context2D.setTransform(
 			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
-			this.matrix.e + this.offset1.x + this.offset2.x, 
-			this.matrix.f + this.offset1.y + this.offset2.y
+			this.matrix.e + this.offset1.x + this.offset2.x + this.offset3.x,	
+			this.matrix.f + this.offset1.y + this.offset2.y + this.offset3.y
 		);
 
 		if(!this.context.features.nolinehover)
@@ -357,6 +360,15 @@ export class Drawable extends Matrix
 	public set offset2(offset2: { x?: number; y?: number })
 	{
 		this._offset2 = offset2;
+	}
+
+	public get offset3(): { x?: number; y?: number }
+	{
+		return this._offset3;
+	}
+	public set offset3(offset3: { x?: number; y?: number })
+	{
+		this._offset3 = offset3;
 	}
 
 	public get width(): number

@@ -25,6 +25,7 @@ export class Label extends Drawable
 	private _filter: IDrawableLabelFilter;
 	private _maxline: number;
 	private _infinite: boolean;
+	private _rounded: {topLeft?: number, bottomLeft?: number, topRight?: number, bottomRight?: number};
 	//---
 
 	/**
@@ -47,6 +48,7 @@ export class Label extends Drawable
 			autosize = false,
 			multiline = false,
 			infinite = false,
+			rounded = {topLeft: 0, topRight: 0, bottomLeft: 0, bottomRight: 0},
 			tabsize = 3,
 			fillbackground = '',
 			generate = true,
@@ -76,6 +78,7 @@ export class Label extends Drawable
 		this._fillbackground = fillbackground;
 		this._filter = filter;
 		this._infinite = infinite;
+		this._rounded = rounded;
 
 		if(generate)
 			this.generate();
@@ -146,32 +149,37 @@ export class Label extends Drawable
 		// bonderies
 		this.path = new Path2D();
 
-		if(this._corner)
-		{
-			this.path.rect(0, 0, this.width, this.height);
-			this.boundaries = { 
-				topleft: new Point(this.x, this.y), 
-				bottomright: new Point(this.x + this.width + maxwidth, this.y + this.height + y - this._spacing) 
-			};
-		}
-		else
-		{
-			this.path.rect(-this.width / 2, -this.height / 2, this.width, this.height);
-			this.boundaries = { 
-				topleft: new Point(this.x - (this.width / 2), this.y - (this.height / 2)), 
-				bottomright: new Point(this.x + (this.width / 2) + maxwidth, this.y + (this.height / 2) + y - this._spacing) 
-			}
-		}
+		let point: Point = new Point(0, 0);
 
-		this.path.closePath();
+		if(!this._corner)
+			point = new Point((-this.width / 2), -this.height / 2);
 
-		this.points = [
-			this.boundaries.topleft,
-			new Point(this.boundaries.bottomright.x, this.boundaries.topleft.y),
-			this.boundaries.bottomright,
-			new Point(this.boundaries.topleft.x, this.boundaries.bottomright.y)
+		const points: Point[] = [
+			new Point(point.x, point.y),
+			new Point(point.x + this.width, point.y),
+			new Point(point.x + this.width, point.y + this.height),
+			new Point(point.x, point.y + this.height),
 		];
 
+		this.boundaries = { 
+			topleft: points[0], 
+			bottomright: points[2] 
+		}
+
+		this.path = new Path2D();
+		this.path.moveTo(points[0].x + this._rounded.topLeft, points[0].y);
+		this.path.lineTo(points[1].x - this._rounded.topRight, points[1].y);
+		this.path.quadraticCurveTo(points[1].x, points[1].y, points[1].x, points[1].y + this._rounded.topRight);
+		this.path.lineTo(points[2].x, points[2].y - this._rounded.bottomRight);
+		this.path.quadraticCurveTo(points[2].x, points[2].y, points[2].x - this._rounded.bottomRight, points[2].y);
+		this.path.lineTo(points[3].x + this._rounded.bottomLeft, points[3].y);
+		this.path.quadraticCurveTo(points[3].x, points[3].y, points[3].x, points[3].y - this._rounded.bottomLeft);
+		this.path.lineTo(points[0].x, points[0].y + this._rounded.topLeft);
+		this.path.quadraticCurveTo(points[0].x, points[0].y, points[0].x + this._rounded.topLeft, points[0].y);
+		this.path.closePath();
+
+		//this.path.closePath();
+		this.points = points;	
 
 		// beginning context
 		context2D.fillStyle = this.fillcolor;
@@ -315,8 +323,8 @@ export class Label extends Drawable
 		context2D.save();
 		context2D.setTransform(
 			this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
-			this.matrix.e + this.offset1.x + this.offset2.x, 
-			this.matrix.f + this.offset1.y + this.offset2.y
+			this.matrix.e + this.offset1.x + this.offset2.x + this.offset3.x,	
+			this.matrix.f + this.offset1.y + this.offset2.y + this.offset3.y
 		);
 
 		context2D.globalAlpha = this.alpha;

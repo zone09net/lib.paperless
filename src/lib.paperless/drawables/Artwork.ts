@@ -114,8 +114,8 @@ export class Artwork extends Rectangle
 			context2D.save();
 			context2D.setTransform(
 				this.matrix.a, this.matrix.b, this.matrix.c, this.matrix.d, 
-				this.matrix.e + this.offset1.x + this.offset2.x, 
-				this.matrix.f + this.offset1.y + this.offset2.y
+				this.matrix.e + this.offset1.x + this.offset2.x + this.offset3.x,	
+				this.matrix.f + this.offset1.y + this.offset2.y + this.offset3.y
 			);
 
 			context2D.lineWidth = this.linewidth;

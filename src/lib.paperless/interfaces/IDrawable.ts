@@ -75,6 +75,8 @@ export interface IDrawableAttributes
 
 	offset2?: {x?: number, y?: number},
 
+	offset3?: {x?: number, y?: number},
+
 	point?: {x?: number, y?: number},
 
 	points?: Point[],
@@ -354,6 +356,7 @@ export interface IDrawableLabelAttributes extends IDrawableAttributes
 	fillbackground?: string,
 	filter?: IDrawableLabelFilter,
 	infinite?: boolean,
+	rounded?: {topLeft?: number, topRight?: number, bottomLeft?: number, bottomRight?: number},
 }
 
 export interface IDrawableLabelFilter
