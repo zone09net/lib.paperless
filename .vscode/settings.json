@@ -16,10 +16,9 @@
 
 	"editor.cursorStyle": "line",
 	"editor.cursorBlinking": "blink",
-	"editor.occurrencesHighlight": false,
+	"editor.occurrencesHighlight": "off",
 	"editor.hover.delay": 500,
 	"editor.matchBrackets": "near",
-	"editor.renderIndentGuides": false,
 	"editor.autoClosingBrackets": "never",
 	"editor.autoClosingDelete": "never",
 	"editor.autoClosingOvertype": "never",
@@ -186,5 +185,6 @@
 			"bold": false,
 			"italic": false
 		}
-	]
+	],
+	"editor.guides.indentation": false
 }

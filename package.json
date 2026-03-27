@@ -5,6 +5,7 @@
   	"author": "Régis Côté",
   	"license": "Proprietary",
   	"homepage": "https://www.zone09.net",
+   "type": "module",
 
 	"scripts": {
 		"clean:dist": "if exist .dist rmdir /s /q .dist",
@@ -16,8 +17,8 @@
 		"build": "type tsconfig.main.json > tsconfig.json && tsc --build --force",
 		"rollup": "rollup -c rollup.config.js",
 		"obfuscator": "javascript-obfuscator ./.rollup --output ./.obfuscator --compact true --string-array false --identifier-names-generator mangled --simplify true --exclude ./.rollup/extlib/**/**",
-		"minify": "if not exist .minify mkdir .minify && terser ./.rollup/lib.paperless.js -o ./.minify/lib.paperless.js --keep-classnames --keep-fnames --ecma 2016",
-		"dist": "npm run -s clean && npm run build && npm run -s rollup && npm run -s minify && npm run -s obfuscator",
+		"minify": "if not exist .minify mkdir .minify && terser ./.rollup/lib.paperless.js -o ./.minify/lib.paperless.js --keep-classnames --keep-fnames --ecma 2016 && terser ./.rollup/lib.paperless.matter.js -o ./.minify/lib.paperless.matter.js --keep-classnames --keep-fnames --ecma 2016",
+		"dist": "npm run -s clean && npm run build && npm run -s rollup && npm run -s minify",
 
 		"dev": "type tsconfig.dev.json > tsconfig.json && tsc --build --force && tsc-alias",
 		"watch": "type tsconfig.dev.json > tsconfig.json && concurrently --kill-others -p \"[{name}]\" -n \"watch,alias\" -c \"red.bold,yellow.bold\" \"tsc --build -w\" \"tsc-alias -w\""

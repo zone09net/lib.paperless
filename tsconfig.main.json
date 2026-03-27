@@ -21,9 +21,12 @@
 		"baseUrl": "../",
 		"paths": {
 			"@zone09.net/foundation": ["lib.foundation/src/lib.foundation.ts"],
+			"@zone09.net/paperless": ["lib.paperless/src/lib.paperless.ts"],
 			"@extlib/matter": ["extlib/matter-0.20.0.min.js"],
 			"@extlib/poly-decomp": ["extlib/poly-decomp-0.2.1.min.js"],
-			"@extlib/intersects": ["extlib/intersects-2.7.1.min.js"]
+			"@extlib/intersects": ["extlib/intersects-2.7.1.min.js"],
+			"@extlib/codemirror": ["extlib/codemirror-5.63.0.js"],
+			"@extlib/codemirror.javascript": ["extlib/codemirror-5.63.0.javascript.js"]
 		},
 		"typeRoots": ["./types"],
 		"types": [
@@ -38,7 +41,9 @@
 	 },
 
 	"include": [
-		"./src/lib.paperless.ts"
+		"./src/lib.paperless.ts",
+		"./src/lib.paperless.matter.ts",
+		"./src/lib.paperless.playground.ts"
 	],
 
 	"exclude": [

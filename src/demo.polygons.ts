@@ -1,6 +1,5 @@
-
-
 import * as Paperless from './lib.paperless.js';
+
 
 
 const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];

@@ -90,7 +90,7 @@ export class Context
 			canvas: {
 				buffer: new OffscreenCanvas(0, 0),
 				main: document.createElement('canvas')
-	},
+			},
 
 			context: {
 				buffer: undefined,

@@ -1,5 +1,5 @@
 import * as Paperless from './lib.paperless.js';
-
+import * as PaperlessEx from './lib.paperless.matter.js';
 
 
 const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
@@ -9,7 +9,7 @@ const context: Paperless.Context = new Paperless.Context({
 		delay: 0
 	}
 });
-const matter: Paperless.Matter = new Paperless.Matter({
+const matter: PaperlessEx.Matter = new PaperlessEx.Matter({
 	context: context, 
 	norender: true,
 	/*
@@ -201,7 +201,7 @@ matter.Rectangle({point: {x: window.innerWidth + 8, y: window.innerHeight / 2}, 
 matter.Rectangle({point: {x: window.innerWidth / 2, y: -8}, size: {width: window.innerWidth, height: 16}, options: {isStatic: true}}, {fillcolor: '#191919', nostroke: true});
 matter.Rectangle({point: {x: window.innerWidth / 2, y: window.innerHeight + 8}, size: {width: window.innerWidth, height: 16}, options: {isStatic: true}}, {fillcolor: '#191919', nostroke: true});
 
-const polygon: Paperless.Interfaces.IMatterEntity = matter.Polygon(
+const polygon: PaperlessEx.Interfaces.IMatterEntity = matter.Polygon(
 	{
 		point: {x: window.innerWidth / 2, y: window.innerHeight / 2}, 
 		outerRadius: 200,
@@ -217,7 +217,7 @@ const polygon: Paperless.Interfaces.IMatterEntity = matter.Polygon(
 	}
 );
 
-const platform: Paperless.Interfaces.IMatterEntity = matter.Rectangle(
+const platform: PaperlessEx.Interfaces.IMatterEntity = matter.Rectangle(
 	{
 		point: {x: window.innerWidth / 2, y: (window.innerHeight / 2) + 25}, 
 		size: {width: 240, height: 10},
@@ -232,7 +232,7 @@ const platform: Paperless.Interfaces.IMatterEntity = matter.Rectangle(
 	}
 );
 
-const z: Paperless.Interfaces.IMatterEntity = matter.Points(
+const z: PaperlessEx.Interfaces.IMatterEntity = matter.Points(
 	{
 		point: {x: (window.innerWidth / 2) - (40 * 2) - 20, y: window.innerHeight / 2}, 
 		points: zone09.z.points,
@@ -246,7 +246,7 @@ const z: Paperless.Interfaces.IMatterEntity = matter.Points(
 	}
 );
 
-const o: Paperless.Interfaces.IMatterEntity = matter.Points(
+const o: PaperlessEx.Interfaces.IMatterEntity = matter.Points(
 	{
 		point: {x: (window.innerWidth / 2) - (40 * 1) - 20, y: window.innerHeight / 2}, 
 		points: zone09.o.points,
@@ -261,7 +261,7 @@ const o: Paperless.Interfaces.IMatterEntity = matter.Points(
 	}
 );
 
-const n: Paperless.Interfaces.IMatterEntity = matter.Points(
+const n: PaperlessEx.Interfaces.IMatterEntity = matter.Points(
 	{
 		point: {x: (window.innerWidth / 2) - (40 * 0) - 20, y: window.innerHeight / 2}, 
 		points: zone09.n.points,
@@ -275,7 +275,7 @@ const n: Paperless.Interfaces.IMatterEntity = matter.Points(
 	}
 );
 
-const e: Paperless.Interfaces.IMatterEntity = matter.Points(
+const e: PaperlessEx.Interfaces.IMatterEntity = matter.Points(
 	{
 		point: {x: (window.innerWidth / 2) + (40 * 0) + 20, y: window.innerHeight / 2}, 
 		points: zone09.e.points,
@@ -290,7 +290,7 @@ const e: Paperless.Interfaces.IMatterEntity = matter.Points(
 	}
 );
 
-const zero: Paperless.Interfaces.IMatterEntity = matter.Points(
+const zero: PaperlessEx.Interfaces.IMatterEntity = matter.Points(
 	{
 		point: {x: (window.innerWidth / 2) + (40 * 1) + 20, y: (window.innerHeight / 2) - 5}, 
 		points: zone09.zero.points,
@@ -305,7 +305,7 @@ const zero: Paperless.Interfaces.IMatterEntity = matter.Points(
 	}
 );
 
-const nine: Paperless.Interfaces.IMatterEntity = matter.Points(
+const nine: PaperlessEx.Interfaces.IMatterEntity = matter.Points(
 	{
 		point: {x: (window.innerWidth / 2) + (40 * 2) + 20, y: (window.innerHeight / 2) - 5}, 
 		points: zone09.nine.points,

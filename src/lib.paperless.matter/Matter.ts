@@ -1,20 +1,13 @@
 import * as decomp from '@extlib/poly-decomp';
+import * as Paperless from '@zone09.net/paperless';
 import * as Interfaces from './interfaces/Interfaces.js';
-import * as Enums from './enums/Enums.js';
-import * as Drawables from './drawables/Drawables.js';
 import {MatterJS} from '@extlib/matter';
-import {Context} from './Context.js';
-import {Control} from './Control.js';
-import {Drawable} from './Drawable.js';
-import {DrawAction} from './DrawAction.js';
-import {DragAction} from './DragAction.js';
-import {Point} from './Point.js';
 
 
 
 export class Matter
 {
-	private _context: Context;
+	private _context: Paperless.Context;
 	private _entities: any[] = [];
 	private _mouse: any;
 	private _engine: any;
@@ -136,20 +129,20 @@ export class Matter
 			this._mouseConstraint.mouse.element.removeEventListener('touchend', this._mouseConstraint.mouse.mouseup);
 		}
 		this._mouseConstraint.mouse.element.addEventListener('mousemove', (event: HTMLElementEventMap['mousemove']) => { 
-			const control: Control = this._context.get(this._context.states.pointer.control);
+			const control: Paperless.Control = this._context.get(this._context.states.pointer.control);
 
 			if(this._context.states.drag)
 			{
-				if(control.restrict == Enums.Restrict.none)
+				if(control.restrict == Paperless.Enums.Restrict.none)
 				{
 					this._mouse.position.x = this._context.states.pointer.current.x;
 					this._mouse.position.y = this._context.states.pointer.current.y;
 				}
-				else if(control.restrict == Enums.Restrict.horizontal)
+				else if(control.restrict == Paperless.Enums.Restrict.horizontal)
 				{
 					this._mouse.position.x = this._context.states.pointer.current.x;
 				}
-				else if(control.restrict == Enums.Restrict.vertical)
+				else if(control.restrict == Paperless.Enums.Restrict.vertical)
 				{
 					this._mouse.position.y = this._context.states.pointer.current.y;
 				}
@@ -172,9 +165,9 @@ export class Matter
 
 	private initPaperless(): void
 	{
-		let position: Point;
+		let position: Paperless.Point;
 		
-		new DrawAction({
+		new Paperless.DrawAction({
 			context: this._context,
 			onDrawBefore: () => {
 				const awake: Interfaces.IMatterEntity[] = this._entities.filter((entity: any) => !entity.body.isSleeping);
@@ -196,10 +189,10 @@ export class Matter
 			}
 		});
 		
-		new DragAction({
+		new Paperless.DragAction({
 			context: this._context,
 			onDragBegin: () => {
-				const control: Control = this._context.get(this._context.states.pointer.control);
+				const control: Paperless.Control = this._context.get(this._context.states.pointer.control);
 				const bodies: any = MatterJS.Composite.allBodies(this._engine.world);
 				const mouse: any = this._mouseConstraint.mouse;
 				const constraint: any = this._mouseConstraint.constraint;
@@ -266,7 +259,7 @@ export class Matter
 					MatterJS.Body.setInertia(this._mouseConstraint.constraint.bodyB, this._mouseConstraint.constraint.bodyB.inertiaOld);
 				else
 				{
-					const control: Control = this._context.get(this._context.states.pointer.control);
+					const control: Paperless.Control = this._context.get(this._context.states.pointer.control);
 
 					control.drawable.x = position.x;
 					control.drawable.y = position.y;
@@ -279,7 +272,7 @@ export class Matter
 		});
 	}
 
-	public Rectangle(body: Interfaces.IMatterBodyRectangle, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	public Rectangle(body: Interfaces.IMatterBodyRectangle, drawable: Paperless.Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
 	{
 		const b: any = MatterJS.Bodies.rectangle(body.point.x, body.point.y, body.size.width, body.size.height, {
 			...body.options,
@@ -289,7 +282,7 @@ export class Matter
 				}
 			}
 		});
-		const d: Drawables.Rectangle = new Drawables.Rectangle({
+		const d: Paperless.Drawables.Rectangle = new Paperless.Drawables.Rectangle({
 			...drawable,
 			...{
 				context: this._context,
@@ -308,7 +301,7 @@ export class Matter
 		return {drawable: d,	body: b}
 	}
 
-	public Smiley(body: Interfaces.IMatterBodySmiley, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	public Smiley(body: Interfaces.IMatterBodySmiley, drawable: Paperless.Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
 	{
 		const b: any = MatterJS.Bodies.circle(body.point.x, body.point.y, body.radius, {
 			...body.options,
@@ -318,7 +311,7 @@ export class Matter
 				}
 			}
 		}, body.sides);
-		const d: Drawables.Smiley = new Drawables.Smiley({
+		const d: Paperless.Drawables.Smiley = new Paperless.Drawables.Smiley({
 			...drawable,
 			...{
 				context: this._context,
@@ -336,7 +329,7 @@ export class Matter
 	
 		return {drawable: d,	body: b}
 	}
-	public Hexagon(body: Interfaces.IMatterBodyHexagon, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	public Hexagon(body: Interfaces.IMatterBodyHexagon, drawable: Paperless.Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
 	{
 		const polygon: Interfaces.IMatterEntity = this.Polygon(
 			{
@@ -351,9 +344,9 @@ export class Matter
 		return polygon;
 	}
 
-	public Arrow(body: Interfaces.IMatterBodyArrow, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	public Arrow(body: Interfaces.IMatterBodyArrow, drawable: Paperless.Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
 	{
-		const d: Drawables.Arrow = new Drawables.Arrow({
+		const d: Paperless.Drawables.Arrow = new Paperless.Drawables.Arrow({
 			...drawable,
 			...{
 				context: this._context,
@@ -379,7 +372,7 @@ export class Matter
 		return {drawable: d,	body: b}
 	}
 
-	public Circle(body: Interfaces.IMatterBodyCircle, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	public Circle(body: Interfaces.IMatterBodyCircle, drawable: Paperless.Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
 	{
 		const outerRadius: number = body.outerRadius || 25;
 		const sides: number = body.sides || 25;
@@ -402,7 +395,7 @@ export class Matter
 		return polygon;
 	}
 
-	public Polygon(body: Interfaces.IMatterBodyPolygon, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	public Polygon(body: Interfaces.IMatterBodyPolygon, drawable: Paperless.Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
 	{
 		const outerRadius: number = body.outerRadius || 25;
 		const innerRadius: number = body.innerRadius || 0;
@@ -450,7 +443,7 @@ export class Matter
 			MatterJS.Body.setCentre(b, {x: body.point.x - center.x, y: body.point.y - center.y});
 		}
 
-		const d: Drawables.Polygon = new Drawables.Polygon({
+		const d: Paperless.Drawables.Polygon = new Paperless.Drawables.Polygon({
 			...drawable,
 			...{
 				context: this._context,
@@ -474,9 +467,9 @@ export class Matter
 		return {drawable: d,	body: b}
 	}
 
-	public Points(body: Interfaces.IMatterBodyVertices, drawable: Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
+	public Points(body: Interfaces.IMatterBodyVertices, drawable: Paperless.Interfaces.IDrawableAttributes = {}): Interfaces.IMatterEntity
 	{
-		const points: Point[] = body.points || [];
+		const points: Paperless.Point[] = body.points || [];
 
 		const b: any = MatterJS.Bodies.fromVertices(body.point.x, body.point.y, points, {
 			...body.options,
@@ -487,9 +480,9 @@ export class Matter
 			} 
 		}, undefined, undefined, undefined, false);
 		
-		let d: Drawable;
+		let d: Paperless.Drawable;
 
-		d = new (drawable.path ? Drawable : Drawables.Points)({
+		d = new (drawable.path ? Paperless.Drawable : Paperless.Drawables.Points)({
 			...drawable,
 			...{
 				context: this._context,
@@ -522,7 +515,7 @@ export class Matter
 		return MatterJS;
 	}
 
-	public get context(): Context
+	public get context(): Paperless.Context
 	{
 		return this._context;
 	}

@@ -10,5 +10,4 @@ export {IFeatures, IDragging, IStates, IContextAttributes} from './IContext.js';
 export {IDrawActionAttributes} from './IDrawAction.js';
 export {IMouseActionAttributes} from './IMouseAction.js';
 export {IDragActionAttributes} from './IDragAction.js';
-export {IMatter, IMatterEntity, IMatterBody, IMatterBodyRectangle, IMatterBodySmiley, IMatterBodyHexagon, IMatterBodyArrow, IMatterBodyCircle, IMatterBodyPolygon, IMatterBodyVertices} from './IMatter.js';
 

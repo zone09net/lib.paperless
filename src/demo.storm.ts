@@ -5,7 +5,7 @@ import * as Paperless from './lib.paperless.js';
 const context: Paperless.Context = new Paperless.Context( {features: { nohover: false }});
 const colors: string[] = ["#815556", "#436665", "#9a6c27", "#769050", "#c8af55"];
 const step: number = 250;
-const max: number = 3000;
+const max: number = 10000;
 let count: number = 1000;
 
 const virus: Paperless.Drawables.Circle = new Paperless.Drawables.Circle({
