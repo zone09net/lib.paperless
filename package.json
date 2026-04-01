@@ -5,7 +5,7 @@
   	"author": "Régis Côté",
   	"license": "Proprietary",
   	"homepage": "https://www.zone09.net",
-   "type": "module",
+	"type": "module",
 
 	"scripts": {
 		"clean:dist": "if exist .dist rmdir /s /q .dist",
